@@ -1,9 +1,15 @@
 
-# Troubleshooting
+# Lapis
+
+## Usage
 
 ```
-journalctl -xeu docker.service
+make
+```
 
-Q: Loopback ... 
-A: restart kernel
+## Dependencies
+
+```
+# Arch
+pacman -S nasm qemu
 ```
