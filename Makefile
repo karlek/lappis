@@ -18,6 +18,7 @@ bin/kernel_entry.o: src/kernel.asm | bin
 
 bin/kernel.o: src/kernel.c | bin
 	gcc \
+		-masm=intel \
 		-g \
 		-nostdlib \
 		-ffreestanding \
