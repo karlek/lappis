@@ -5,8 +5,7 @@ gdt_start:
 
 ; The mandatory null descriptor
 gdt_null:
-	dd 0x0 ; `dd` means define double word (i.e. 4 bytes)
-	dd 0x0
+	dq 0x0 ; `dd` means define quad word (i.e. 8 bytes)
 
  ; The code segment descriptor
 gdt_code:
@@ -32,14 +31,9 @@ gdt_data:
 	db 11001111b  ; 2nd flags, Limit (bits 16-19)
 	db 0x0        ; Base (bits 24-31)
 
-; The reason for putting a label at the end of the
-; GDT is so we can have the assembler calculate
-; The size of the GDT for the GDT decriptor (below)
-gdt_end:
-
 gdt_descriptor:
 	; Size of our GDT, always less one of the true size
-	dw gdt_end - gdt_start - 1
+	dw $ - gdt_start - 1
 	; Start address of our GDT
 	dd gdt_start
 
