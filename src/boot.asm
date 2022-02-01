@@ -34,7 +34,6 @@ load_kernel:
 
 %include "src/print.asm"
 %include "src/print32.asm"
-%include "src/print_hex.asm"
 %include "src/disk_read.asm"
 %include "src/gdt.asm"
 %include "src/pm.asm"
