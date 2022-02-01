@@ -38,7 +38,7 @@ void set_cursor_pos(unsigned short offset) {
 	out_port(REG_SCREEN_CTRL, 14);
 	out_port(REG_SCREEN_DATA, (unsigned char) (offset >> 8));
 	out_port(REG_SCREEN_CTRL, 15);
-	out_port(REG_SCREEN_DATA, (unsigned char) (offset && 0xff));
+	out_port(REG_SCREEN_DATA, (unsigned char) (offset & 0xff));
 }
 
 void main() {
