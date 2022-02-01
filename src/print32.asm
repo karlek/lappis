@@ -5,7 +5,7 @@ bits 32
 VIDEO_MEMORY equ 0xb8000
 WHITE_ON_BLACK equ 0x0f
 
-; Prints a null-terminated string pointed to by EDX.
+; Prints a null-terminated string pointed to by EBX.
 print32:
 	pusha
 	mov edx, VIDEO_MEMORY ; Set edx to the start of vid mem.

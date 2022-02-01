@@ -9,8 +9,8 @@ KERNEL_OFFSET equ 0x1000
 start:
 	; Set video mode to 80x25 text, 16 foreground colors, 8 background colors
 	; https://web.archive.org/web/20121213064559/http://www.ousob.com/ng/asm/ng6fcde.php
-	mov ah, 0x0  ; Set video mode. 
-	mov al, 0x3  ; Video mode number.
+	mov ah, 0x0 ; Set video mode. 
+	mov al, 0x3 ; Video mode number.
 	int 0x10
 	
 	; Load our kernel
