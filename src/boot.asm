@@ -16,10 +16,17 @@ start:
 	; Load our kernel
 	call .load_kernel
 
-	; Note: we never return from this.
 	call switch_to_protected_mode
+	; Todo: Ideally I'd like to switch to long mode before calling the kernel,
+	; but the size constraint of the boot magic (0xaa55) at 512 bytes makes
+	; this difficult.
 
-	jmp $
+	; We could load long mode starting code before, but I'm not sure if that's
+	; "cleaner".
+
+	; Jump to our kernel.
+	; Note: we will never return from here.
+	call KERNEL_OFFSET
 
 .load_kernel:
 	mov bx, MSG_LOAD_KERNEL
@@ -33,9 +40,7 @@ start:
 	ret
 
 %include "src/print.asm"
-%include "src/print32.asm"
 %include "src/disk_read.asm"
-%include "src/gdt.asm"
 %include "src/protected_mode.asm"
 
 ; Global variables

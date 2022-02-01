@@ -2,6 +2,8 @@ bits 64
 extern main
 
 kernel_start:
+	; Todo: Since we nuke the stack, we can't return here.
+	; So we jump to main from `init_long_mode`...
 	call init_long_mode
 	jmp $
 

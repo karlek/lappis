@@ -9,6 +9,5 @@ void write_string(int color, const char *string) {
 void main() {
 	const char *str = "Hello, world!";
 	write_string(0xf0, str);
-	while(1);
 }
 

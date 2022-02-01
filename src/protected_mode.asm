@@ -9,6 +9,8 @@ switch_to_protected_mode:
 
 	jmp CODE_SEG:.init_protected_mode
 
+	ret
+
 bits 32
 .init_protected_mode:
 	mov ax, DATA_SEG
@@ -21,4 +23,7 @@ bits 32
 	mov ebp, 0x90000
 	mov esp, ebp
 
-	call KERNEL_OFFSET
+	ret
+
+%include "src/protected_mode_gdt.asm"
+%include "src/print32.asm"
