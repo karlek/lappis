@@ -7,10 +7,10 @@ switch_to_protected_mode:
 	or eax, 0x1   ; the first bit of CR0, a control register.
 	mov cr0, eax  ; Update the control register.
 
-	jmp CODE_SEG:init_protected_mode
+	jmp CODE_SEG:.init_protected_mode
 
 bits 32
-init_protected_mode:
+.init_protected_mode:
 	mov ax, DATA_SEG
 	mov ds, ax
 	mov es, ax

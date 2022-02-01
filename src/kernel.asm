@@ -1,5 +1,6 @@
 bits 64
 extern main
+
 kernel_start:
 	call init_long_mode
 	jmp $

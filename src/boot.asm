@@ -14,14 +14,14 @@ start:
 	int 0x10
 	
 	; Load our kernel
-	call load_kernel
+	call .load_kernel
 
 	; Note: we never return from this.
 	call switch_to_protected_mode
 
 	jmp $
 
-load_kernel:
+.load_kernel:
 	mov bx, MSG_LOAD_KERNEL
 	call print
 
