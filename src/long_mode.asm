@@ -54,7 +54,6 @@ set_up_page_tables:
 
 enable_paging:
 	; Load P4 to CR3 register. (CPU uses this to access the P4 table).
-	; TODO: Why not `mov cr3, p4_table`?
 	mov eax, p4_table
 	mov cr3, eax
 
