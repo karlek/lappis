@@ -1,5 +1,5 @@
 bits 16
-switch_to_pm:
+switch_to_protected_mode:
 	cli
 	lgdt [gdt_descriptor]
 
@@ -7,10 +7,10 @@ switch_to_pm:
 	or eax, 0x1   ; the first bit of CR0, a control register.
 	mov cr0, eax  ; Update the control register.
 
-	jmp CODE_SEG:init_pm
+	jmp CODE_SEG:init_protected_mode
 
 bits 32
-init_pm:
+init_protected_mode:
 	mov ax, DATA_SEG
 	mov ds, ax
 	mov es, ax

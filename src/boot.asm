@@ -17,7 +17,7 @@ start:
 	call load_kernel
 
 	; Note: we never return from this.
-	call switch_to_pm
+	call switch_to_protected_mode
 
 	jmp $
 
@@ -36,7 +36,7 @@ load_kernel:
 %include "src/print32.asm"
 %include "src/disk_read.asm"
 %include "src/gdt.asm"
-%include "src/pm.asm"
+%include "src/protected_mode.asm"
 
 ; Global variables
 BOOT_DRIVE: db 0
