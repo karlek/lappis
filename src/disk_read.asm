@@ -11,11 +11,11 @@ disk_read:
 	mov cl, 0x02    ; Start reading from second sector (i.e. after the boot sector)
 
 	int 0x13        ; BIOS interrupt
-	jc .disk_error   ; Jump if error (i.e. carry flag set)
+	jc .disk_error  ; Jump if error (i.e. carry flag set)
 
 	pop dx          ; Restore DX from the stack
 	cmp dh, al      ; if AL (sectors read) != DH (sectors expected)
-	jne .disk_error  ; Display error message
+	jne .disk_error ; Display error message
 
 	ret
 
