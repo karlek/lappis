@@ -1,6 +1,6 @@
 .PHONY: all kernel debug clean
 
-all: debug
+all: run
 
 kernel: bin/lapis.img
 
@@ -21,6 +21,7 @@ bin/kernel.o: src/kernel.c | bin
 		-masm=intel \
 		-g \
 		-nostdlib \
+		-fno-stack-protector \
 		-ffreestanding \
 		-c $< \
 		-o $@
@@ -42,6 +43,9 @@ bin/lapis.img: bin/boot.bin bin/kernel.bin | bin
 
 debug: bin/lapis.img bin/kernel.dbg
 	./debug.sh
+
+run: bin/lapis.img
+	./run.sh
 
 clean:
 	rm -rf bin

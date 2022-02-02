@@ -21,6 +21,12 @@ init_protected_mode:
 	mov ebp, 0x90000
 	mov esp, ebp
 
+	; Store some pixel data in the VESA linear framebuffer, this works perfectly
+	; mov edi, [0xa400 + 40]
+	; mov eax, 0xFFFF0000
+	; mov ecx, 65536 / 4
+	; rep stosd
+
 	ret
 
 %include "src/protected_mode_gdt.asm"

@@ -14,4 +14,3 @@ gdb \
 	-ex 'symbol-file bin/kernel.dbg' \
 	-ex 'break main' \
 	-ex 'continue'
-	# -ex 'quit'
