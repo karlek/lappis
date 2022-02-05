@@ -14,6 +14,10 @@ stack_top:
 
 NUM_PAGES: equ 64
 
+PRESENT:   equ 0x1
+WRITABLE:  equ 0x2
+PAGE_SIZE: equ 0x80
+
 section .rodata
 gdt64:
 	dq 0 ; Zero entry
@@ -42,13 +46,13 @@ set_up_page_tables:
 	; Map the first P4 entry to P3 table.
 	mov eax, p3_table
 	; Set flags `present` and `writeable`.
-	or eax, 0b11
+	or eax, PRESENT|WRITABLE
 	mov [p4_table], eax
 
 	; Map the first P3 entry to P2 table.
 	mov eax, p2_table
 	; Set flags `present` and `writeable`.
-	or eax, 0b11
+	or eax, PRESENT|WRITABLE
 	mov [p3_table], eax
 
 	; Counter variable for each entry.
@@ -61,7 +65,7 @@ set_up_page_tables:
 	; Note: `mul reg` stores the answer in *ax registers.
 	mul ecx
 	; Set flags `page size`, `present` and `writeable`.
-	or eax, 0b10000011
+	or eax, PRESENT|WRITABLE|PAGE_SIZE
 	mov [p2_table + ecx*8], eax
 
 	inc ecx
@@ -76,7 +80,7 @@ map_frame_buffer:
 	; Start mapping the frame buffer at address 0x8000000.
 	mov eax, [0xa400+40]
 	; Set flags `page size`, `present` and `writeable`.
-	or eax, 0b10000011
+	or eax, PRESENT|WRITABLE|PAGE_SIZE
 	jmp .store
 
 .loop:
