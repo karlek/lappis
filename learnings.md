@@ -16,3 +16,12 @@ doing at any given time.
 
 Are you sure you're not running qemu in `-nographics`? Test `-curses`
 
+# X86
+
+## Double fault everywhere, `jmp $`, double for-loop, etc.
+
+Solution: Remove call to `sti`, since you probably haven't added complete
+support for hardware interrupts.
+
+"Apparently in x86, you have to acknowledge clock interrupts after each one. I.e
+one must sent an acknowledgment to the lapic after every clock interrupt."
