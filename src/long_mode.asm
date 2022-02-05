@@ -7,6 +7,8 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
+framebuffer:
+	resd 1
 stack_bottom:
     resb 64
 stack_top:
@@ -38,17 +40,29 @@ set_up_page_tables:
 	mov ecx, 0
 
 .map_p2_table:
-	; Map ecx-th P2 entry to a huge page that starts att address 2MiB * ecx.
+	; Map ecx-th P2 entry to a huge page that starts at address 2MiB * ecx.
 	mov eax, 0x200000          ; 2MiB
 
 	; Note: `mul reg` stores the answer in *ax registers.
 	mul ecx                    ; Start address of ecx-th page.
-	or eax, 0b10000011         ; Set flags `huge`, `present` and `writeable`.
+	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
 	mov [p2_table + ecx*8], eax  ; Store the entry.
 
 	inc ecx                    ; Increase counter.
-	cmp ecx, 512               ; if counter == 52, the whole P2 table is mapped.
+	cmp ecx, 64                ; if counter == 52, the whole P2 table is mapped.
 	jne .map_p2_table          ; else map the next entry.
+
+	mov eax, [0xa400+40]
+	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
+	mov [p2_table + ecx*8], eax
+
+.map_frame_buffer:	
+	inc ecx
+	add eax, 0x200000
+	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
+	mov [p2_table + ecx*8], eax
+	cmp ecx, 80
+	jne .map_frame_buffer
 
 	ret
 
@@ -78,22 +92,28 @@ enable_paging:
 init_long_mode:
 	mov esp, stack_top
 
+
 	call set_up_page_tables
+	; call map_frame_buffer
+
 	call enable_paging
 	lgdt [gdt64.pointer]
+
 	jmp gdt64.code:long_mode_start
 
 bits 64
 long_mode_start:
-    mov ax, 0
-    mov ss, ax
+	cli ; Clear the interrupt flag.
+    mov rax, 0
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
+    mov ss, ax
+
+	mov rbx, 0
+	mov rcx, 0
+	mov rdi, 0
 
 	call main
 	jmp $
-	; mov rax, 0x2f592f412f4b2f4f
-	; mov qword [0xb8000], rax
-	; jmp $
