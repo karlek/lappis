@@ -21,6 +21,7 @@ bin/kernel.o: src/kernel.c | bin
 		-masm=intel \
 		-g \
 		-nostdlib \
+		-fno-stack-protector \
 		-ffreestanding \
 		-c $< \
 		-o $@
