@@ -1,4 +1,5 @@
 section .bss
+
 ; Ensures page alignment
 align 4096
 p4_table:
@@ -7,17 +8,29 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
-framebuffer:
-	resd 1
 stack_bottom:
     resb 64
 stack_top:
 
+NUM_PAGES: equ 64
+
 section .rodata
 gdt64:
 	dq 0 ; Zero entry
-	; Descriptor type, present, executable, 64-bit flag
 .code: equ $ - gdt64
+	; [Descriptor type, present, executable, long mode flag]
+	;
+	; Descriptor type bit. If clear (0) the descriptor defines a system segment
+	; (eg. a Task State Segment). If set (1) it defines a code or data segment.
+	;
+    ; Pr: Present bit. Allows an entry to refer to a valid segment. Must be set (1) for any valid segment.
+	;
+	; Ex: Executable bit. If clear (0) the descriptor defines a data segment.
+	; If set (1) it defines a code segment which can be executed from.
+	;
+	; L: Long-mode code flag. If set (1), the descriptor defines a 64-bit code
+	; segment. When set, Sz should always be clear. For any other type of
+	; segment (other code types or any data segment), it should be clear (0).
 	dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; Code segment
 .pointer:
 	dw $ - gdt64 - 1
@@ -28,12 +41,14 @@ bits 32
 set_up_page_tables:
 	; Map the first P4 entry to P3 table.
 	mov eax, p3_table
-	or eax, 0b11 ; Set flags `present` and `writeable`.
+	; Set flags `present` and `writeable`.
+	or eax, 0b11
 	mov [p4_table], eax
 
 	; Map the first P3 entry to P2 table.
 	mov eax, p2_table
-	or eax, 0b11 ; Set flags `present` and `writeable`.
+	; Set flags `present` and `writeable`.
+	or eax, 0b11
 	mov [p3_table], eax
 
 	; Counter variable for each entry.
@@ -44,25 +59,35 @@ set_up_page_tables:
 	mov eax, 0x200000          ; 2MiB
 
 	; Note: `mul reg` stores the answer in *ax registers.
-	mul ecx                    ; Start address of ecx-th page.
-	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
-	mov [p2_table + ecx*8], eax  ; Store the entry.
-
-	inc ecx                    ; Increase counter.
-	cmp ecx, 64                ; if counter == 52, the whole P2 table is mapped.
-	jne .map_p2_table          ; else map the next entry.
-
-	mov eax, [0xa400+40]
-	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
+	mul ecx
+	; Set flags `page size`, `present` and `writeable`.
+	or eax, 0b10000011
 	mov [p2_table + ecx*8], eax
 
-.map_frame_buffer:	
 	inc ecx
+	; We map 64 of the total 512 entries.
+	cmp ecx, NUM_PAGES
+	jne .map_p2_table
+	ret
+
+; Map the frame buffer.
+; @param ecx: First free P2 entry.
+map_frame_buffer:
+	; Start mapping the frame buffer at address 0x8000000.
+	mov eax, [0xa400+40]
+	; Set flags `page size`, `present` and `writeable`.
+	or eax, 0b10000011
+	jmp .store
+
+.loop:
 	add eax, 0x200000
-	or eax, 0b10000011         ; Set flags `page size`, `present` and `writeable`.
+.store:
 	mov [p2_table + ecx*8], eax
-	cmp ecx, 80
-	jne .map_frame_buffer
+
+	inc ecx
+	; 3 bytes per pixel, 1280x1024 pixels = 3.75 MiB => two pages.
+	cmp ecx, (NUM_PAGES+2)
+	jne .loop
 
 	ret
 
@@ -92,9 +117,8 @@ enable_paging:
 init_long_mode:
 	mov esp, stack_top
 
-
 	call set_up_page_tables
-	; call map_frame_buffer
+	call map_frame_buffer
 
 	call enable_paging
 	lgdt [gdt64.pointer]
@@ -104,6 +128,7 @@ init_long_mode:
 bits 64
 long_mode_start:
 	cli ; Clear the interrupt flag.
+
     mov rax, 0
     mov ds, ax
     mov es, ax
