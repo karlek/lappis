@@ -4,19 +4,19 @@ all: run
 
 kernel: bin/lapis.img
 
-bin/boot.bin: src/boot.asm | bin
+bin/boot.bin: src/boot/boot.asm | bin
 	nasm \
 		-f bin \
 		-o $@ \
 		$<
 
-bin/kernel_entry.o: src/kernel.asm | bin
+bin/kernel_entry.o: src/kernel/kernel.asm | bin
 	nasm \
 		-f elf64 \
 		-o $@ \
 		$<
 
-bin/kernel.o: src/kernel.c | bin
+bin/kernel.o: src/kernel/kernel.c | bin
 	gcc \
 		-masm=intel \
 		-g \
