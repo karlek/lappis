@@ -21,7 +21,7 @@ start:
 	; running in Long Mode, AMD recommends that the OS notify the BIOS about
 	; the intended target environment that the OS will be running in: 32-bit
 	; mode, 64-bit mode, or a mixture of both modes. This can be done by
-	; calling the BIOS interrupt 15h from Real Mode with AX set to 0xEC00, and
+	; calling the BIOS interrupt 0x15 from Real Mode with AX set to 0xEC00, and
 	; BL set to 1 for 32-bit Protected Mode, 2 for 64-bit Long Mode, or 3 if
 	; both modes will be used. 
 	mov ax, 0xec00
@@ -51,9 +51,9 @@ start:
 
 	ret
 
-%include "src/print.asm"
-%include "src/disk_read.asm"
-%include "src/protected_mode.asm"
+%include "src/boot/print.asm"
+%include "src/boot/disk_read.asm"
+%include "src/boot/protected_mode.asm"
 
 ; Global variables
 BOOT_DRIVE: db 0
