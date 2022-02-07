@@ -99,6 +99,14 @@ void draw_string(char *str, int x, int y, unsigned char *color) {
 	}
 }
 
+int strlen(char * s) {
+	int len = 0;
+	while (*s++) {
+		len++;
+	}
+	return len;
+}
+
 void printf(char *format, int x, int y, unsigned char *color, ...) {
 	va_list args;
 	va_start(args, color);
@@ -129,20 +137,23 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 
 		switch (*c) {
 			case 's':
-				strcat(str, va_arg(args, char*));
+				char * arg = va_arg(args, char*);
+				strcat(str, arg);
+				offset += strlen(arg);
 				break;
 			case 'd':
 				int num = va_arg(args, int);
 				char num_str[256] = {0};
 				itoa(num, num_str);
 				strcat(str, num_str);
+				offset += strlen(num_str);
 				break;
 			case 'x':
 				int hnum = va_arg(args, int);
 				char hnum_str[256] = {0};
 				htox(hnum, hnum_str);
 				strcat(str, hnum_str);
-				break;
+				offset += strlen(hnum_str);
 			default:
 				str[offset++] = '?';
 				break;
@@ -161,5 +172,7 @@ void main() {
 	enable_fpu();
 
 	printf("Keep it %s\n", 0, 0, NULL, "lapsang \x03");
+	printf("%d == %d\n", 0, LARGE_FONT_CELL_HEIGHT, NULL, (-1 << 31), -2147483648);
+	printf("%d == %d\n", 0, LARGE_FONT_CELL_HEIGHT*2, NULL, -2147483648+1, -2147483647);
 }
 
