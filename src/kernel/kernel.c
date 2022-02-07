@@ -15,6 +15,12 @@ void itoa(int num, char *str) {
 		num = -num;
 	}
 
+	// Handle MinInt case.
+	if (num == (-1 << 31)) {
+		strcat(str, "-2147483648");
+		return;
+	}
+
 	if (is_negative) {
 		str[0] = '-';
 		str++;
