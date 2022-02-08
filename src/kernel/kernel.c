@@ -8,6 +8,17 @@
 #include "mandel.c"
 #include "terminal-font.h"
 
+// inb4 vulns
+void strcat(char *dest, const char *src) {
+	while (*dest) {
+		dest++;
+	}
+	while (*src) {
+		*dest++ = *src++;
+	}
+	*dest = '\0';
+}
+
 void itoa(int num, char *str) {
 	bool is_negative = false;
 	if (num < 0) {
@@ -62,17 +73,6 @@ void htox(int num, char *str) {
 		*(str++) = tmp[--offset];
 	}
 	str[offset] = '\0';
-}
-
-// inb4 vulns
-void strcat(char *dest, const char *src) {
-	while (*dest) {
-		dest++;
-	}
-	while (*src) {
-		*dest++ = *src++;
-	}
-	*dest = '\0';
 }
 
 void draw_char(char c, int x, int y, unsigned char *color) {
