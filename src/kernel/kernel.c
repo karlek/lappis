@@ -50,9 +50,9 @@ void itoa(int num, char *str) {
 }
 
 // TODO: This is pretty wonky.
-void htox(int num, char *str) {
+void htox(unsigned int num, char *str) {
 	int offset = 0;
-	char tmp[4] = {0};
+	char tmp[8] = {0};
 	if (num > 0) {
 		while (num > 0) {
 			uint8_t hdigit = (num % 16);
@@ -64,9 +64,9 @@ void htox(int num, char *str) {
 			num /= 16;
 		}
 	} else {
-		// TODO: Support for negative numbers.
-		tmp[offset++] = '?';
+		tmp[offset++] = '0';
 	}
+
 	*(str++) = '0';
 	*(str++) = 'x';
 	while (offset > 0) {
@@ -155,11 +155,12 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 				offset += strlen(num_str);
 				break;
 			case 'x':
-				int hnum = va_arg(args, int);
+				unsigned int hnum = va_arg(args, int);
 				char hnum_str[256] = {0};
 				htox(hnum, hnum_str);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
+				break;
 			default:
 				str[offset++] = '?';
 				break;
