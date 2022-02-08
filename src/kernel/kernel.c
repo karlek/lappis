@@ -9,7 +9,7 @@
 #include "terminal-font.h"
 
 // inb4 vulns
-void strcat(char *dest, const char *src) {
+void strcat(unsigned char *dest, const unsigned char *src) {
 	while (*dest) {
 		dest++;
 	}
@@ -19,7 +19,7 @@ void strcat(char *dest, const char *src) {
 	*dest = '\0';
 }
 
-void itoa(int num, char *str) {
+void itoa(int num, unsigned char *str) {
 	bool is_negative = false;
 	if (num < 0) {
 		is_negative = true;
@@ -38,7 +38,7 @@ void itoa(int num, char *str) {
 	}
 
 	int offset = 0;
-	char tmp[10] = {0};
+	unsigned char tmp[10] = {0};
 	while (num > 0) {
 		tmp[offset++] = (num % 10) + '0';
 		num /= 10;
@@ -50,9 +50,9 @@ void itoa(int num, char *str) {
 }
 
 // TODO: This is pretty wonky.
-void htox(unsigned int num, char *str) {
+void htox(unsigned int num, unsigned char *str) {
 	int offset = 0;
-	char tmp[8] = {0};
+	unsigned char tmp[8] = {0};
 	if (num > 0) {
 		while (num > 0) {
 			uint8_t hdigit = (num % 16);
@@ -75,7 +75,7 @@ void htox(unsigned int num, char *str) {
 	str[offset] = '\0';
 }
 
-void draw_char(char c, int x, int y, unsigned char *color) {
+void draw_char(unsigned char c, int x, int y, unsigned char *color) {
 	unsigned char black[3] = {0, 0, 0};
 	unsigned char white[3] = {255, 255, 255};
 	if (color == NULL) {
@@ -96,8 +96,8 @@ void draw_char(char c, int x, int y, unsigned char *color) {
 	}
 }
 
-void draw_string(char *str, int x, int y, unsigned char *color) {
-	const int letter_spacing = 1;
+void draw_string(unsigned char *str, int x, int y, unsigned char *color) {
+	const int letter_spacing = 0;
 
 	for (int i = 0; str[i] != '\0'; i++) {
 		draw_char(str[i], x, y, color);
@@ -105,7 +105,7 @@ void draw_string(char *str, int x, int y, unsigned char *color) {
 	}
 }
 
-int strlen(char * s) {
+int strlen(unsigned char * s) {
 	int len = 0;
 	while (*s++) {
 		len++;
@@ -113,13 +113,13 @@ int strlen(char * s) {
 	return len;
 }
 
-void printf(char *format, int x, int y, unsigned char *color, ...) {
+void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 	va_list args;
 	va_start(args, color);
-	char str[256] = {0};
+	unsigned char str[256] = {0};
 
 	int offset = 0;
-	for(char* c = format; *c != '\0'; c++) {
+	for(unsigned char* c = format; *c != '\0'; c++) {
 		// Skip newline and goto next line & reset x-coordinate.
 		if (*c == '\n') {
 			draw_string(str, x, y, color);
@@ -142,21 +142,25 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 		c++;
 
 		switch (*c) {
+			case 'c':
+				unsigned char carg = va_arg(args, int);
+				str[offset++] = carg;
+				break;
 			case 's':
-				char * arg = va_arg(args, char*);
+				unsigned char * arg = va_arg(args, char*);
 				strcat(str, arg);
 				offset += strlen(arg);
 				break;
 			case 'd':
 				int num = va_arg(args, int);
-				char num_str[256] = {0};
+				unsigned char num_str[256] = {0};
 				itoa(num, num_str);
 				strcat(str, num_str);
 				offset += strlen(num_str);
 				break;
 			case 'x':
 				unsigned int hnum = va_arg(args, int);
-				char hnum_str[256] = {0};
+				unsigned char hnum_str[256] = {0};
 				htox(hnum, hnum_str);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
