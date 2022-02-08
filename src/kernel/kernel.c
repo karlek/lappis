@@ -199,7 +199,7 @@ void num_to_error_name(int interrupt_number, unsigned char *error_name) {
 			strcat(error_name, "Overflow");
 			break;
 		case 5:
-			strcat(error_name, "BOUND Range Exceeded");
+			strcat(error_name, "Bound Range Exceeded");
 			break;
 		case 6:
 			strcat(error_name, "Invalid Opcode");
