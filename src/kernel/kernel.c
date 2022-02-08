@@ -173,7 +173,7 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 
 void warn_interrupt(int interrupt_number, int error_code) {
 	unsigned char red[3] = {255, 0, 0};
-	printf("Warning: Interrupt occured: %d (%x)\n", 0, 0, red, interrupt_number, error_code);
+	printf("Warning: Interrupt occurred: %d (%x)\n", 0, 0, red, interrupt_number, error_code);
 }
 
 void end_of_execution() {
