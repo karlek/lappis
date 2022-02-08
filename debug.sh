@@ -5,6 +5,7 @@ set -e
 # -S     Do not start CPU at startup (you must type 'c' in the monitor).
 qemu-system-x86_64 \
 	-S \
+	-d int \
 	-gdb tcp::1234 \
 	-fda bin/lapis.img &
 
