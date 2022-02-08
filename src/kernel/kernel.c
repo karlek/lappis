@@ -170,6 +170,11 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 	draw_string(str, x, y, color);
 }
 
+void warn_interrupt(int interrupt_number, int error_code) {
+	unsigned char red[3] = {255, 0, 0};
+	printf("Warning: Interrupt occured: %d (%x)\n", 0, 0, red, interrupt_number, error_code);
+}
+
 void main() {
 	// Setup interrupts.
 	idt_init();
