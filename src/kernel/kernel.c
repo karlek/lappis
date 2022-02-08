@@ -176,6 +176,11 @@ void warn_interrupt(int interrupt_number, int error_code) {
 	printf("Warning: Interrupt occured: %d (%x)\n", 0, 0, red, interrupt_number, error_code);
 }
 
+void end_of_execution() {
+	unsigned char green[3] = {0, 255, 0};
+	printf("End of execution\n", 0, 0, green);
+}
+
 void main() {
 	// Setup interrupts.
 	idt_init();
@@ -183,8 +188,23 @@ void main() {
 	// Enable floating point operations.
 	enable_fpu();
 
-	printf("Keep it %s\n", 0, 0, NULL, "lapsang \x03");
-	printf("%d == %d\n", 0, LARGE_FONT_CELL_HEIGHT, NULL, (-1 << 31), -2147483648);
-	printf("%d == %d\n", 0, LARGE_FONT_CELL_HEIGHT*2, NULL, -2147483648+1, -2147483647);
+	// Hardware interrupts / keyboard.
+	//
+	// draw_mandel takes a while, so we'll surely trigger a clock interrupt
+	// during it's execution.
+	//
+	// So we need to remap the PIC to not collide with the standard exceptions.
+	/* PIC_remap(0x20, 0x28); */
+	//
+	// - Don't forget to uncomment `sti` in `idt_init()`.
+	// - Also, don't forget to increase the number of vectors handled and bump
+	//   the number of stubs in `idt.asm`.
+	/* draw_mandel(); */
+
+	// Trigger page fault to the new IDT!
+	char * a = 0xffffffff;
+	*a = 1;
+
+	end_of_execution();
 }
 
