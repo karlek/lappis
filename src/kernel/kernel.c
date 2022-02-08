@@ -171,9 +171,129 @@ void printf(char *format, int x, int y, unsigned char *color, ...) {
 	draw_string(str, x, y, color);
 }
 
-void warn_interrupt(int interrupt_number, int error_code) {
+void num_to_error_name(int interrupt_number, unsigned char *error_name) {
+	switch (interrupt_number) {
+		case 0:
+			strcat(error_name, "Divide Error");
+			break;
+		case 1:
+			strcat(error_name, "Debug");
+			break;
+		case 2:
+			strcat(error_name, "NMI Interrupt");
+			break;
+		case 3:
+			strcat(error_name, "Breakpoint");
+			break;
+		case 4:
+			strcat(error_name, "Overflow");
+			break;
+		case 5:
+			strcat(error_name, "BOUND Range Exceeded");
+			break;
+		case 6:
+			strcat(error_name, "Invalid Opcode");
+			break;
+		case 7:
+			strcat(error_name, "Device Not Available");
+			break;
+		case 8:
+			strcat(error_name, "Double Fault");
+			break;
+		case 9:
+			strcat(error_name, "Coprocessor Segment Overrun");
+			break;
+		case 10:
+			strcat(error_name, "Invalid TSS");
+			break;
+		case 11:
+			strcat(error_name, "Segment Not Present");
+			break;
+		case 12:
+			strcat(error_name, "Stack-Segment Fault");
+			break;
+		case 13:
+			strcat(error_name, "General Protection Fault");
+			break;
+		case 14:
+			strcat(error_name, "Page Fault");
+			break;
+		case 15:
+			strcat(error_name, "Reserved");
+			break;
+		case 16:
+			strcat(error_name, "x87 FPU Floating-Point Error");
+			break;
+		case 17:
+			strcat(error_name, "Alignment Check");
+			break;
+		case 18:
+			strcat(error_name, "Machine-Check");
+			break;
+		case 19:
+			strcat(error_name, "SIMD Floating-Point Exception");
+			break;
+		case 20:
+			strcat(error_name, "Virtualization Exception");
+			break;
+		case 21:
+			strcat(error_name, "Reserved");
+			break;
+		case 22:
+			strcat(error_name, "Reserved");
+			break;
+		case 23:
+			strcat(error_name, "Reserved");
+			break;
+		case 24:
+			strcat(error_name, "Reserved");
+			break;
+		case 25:
+			strcat(error_name, "Reserved");
+			break;
+		case 26:
+			strcat(error_name, "Reserved");
+			break;
+		case 27:
+			strcat(error_name, "Reserved");
+			break;
+		case 28:
+			strcat(error_name, "Hypervisor Injection Exception");
+			break;
+		case 29:
+			strcat(error_name, "VMM Communication Exception");
+			break;
+		case 30:
+			strcat(error_name, "Security Exception");
+			break;
+		case 31:
+			strcat(error_name, "Reserved");
+			break;
+		default:
+			strcat(error_name, "Unknown interrupt");
+			break;
+	}
+}
+
+void warn_interrupt(int interrupt_number) {
 	unsigned char red[3] = {255, 0, 0};
-	printf("Warning: Interrupt occurred: %d (%x)\n", 0, 0, red, interrupt_number, error_code);
+	unsigned char error_name[256] = {0};
+	num_to_error_name(interrupt_number, error_name);
+
+	// TODO: Make this a function: box(unsigned char * str, int x, int y, unsigned char * color)
+	int i = 0;
+	printf("\xda", 0, 2, red);
+	for (i = 1; i < 60; i++) {
+		printf("\xc4", LARGE_FONT_CELL_WIDTH*i, 2, red);
+	}
+	printf("\xbf", LARGE_FONT_CELL_WIDTH*i, 2, red);
+	// TODO: Refactor `printf` to `sprintf` in order to get `strlen` here.
+	printf("\xb3      Warning! Interrupt occurred: %s [%d/%x]      \xb3", 0, LARGE_FONT_CELL_HEIGHT, red, error_name, interrupt_number, interrupt_number);
+	printf("\xc0", 0, LARGE_FONT_CELL_HEIGHT*2-2, red);
+	for (i = 1; i < 60; i++) {
+		printf("\xc4", LARGE_FONT_CELL_WIDTH*i, LARGE_FONT_CELL_HEIGHT*2-2, red);
+	}
+	printf("\xd9", LARGE_FONT_CELL_WIDTH*i, LARGE_FONT_CELL_HEIGHT*2-2, red);
 }
 
 void end_of_execution() {

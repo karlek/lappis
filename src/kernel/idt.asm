@@ -4,7 +4,6 @@ extern warn_interrupt
 isr_double_fault:
 	; Double fault
 	mov rdi, 8
-	mov rsi, 0xdeadbeef
 	call warn_interrupt
 	call exception_handler
 	iretq
@@ -12,7 +11,6 @@ isr_double_fault:
 isr_page_fault:
 	; Double fault
 	mov rdi, 0xe
-	mov rsi, 0xBAADF00D
 	call warn_interrupt
 	call exception_handler
 	iretq
@@ -21,8 +19,6 @@ isr_page_fault:
 not_implemented_%1:
 	; Save exception code.
 	mov rdi, %1
-	; Something eye-catching.
-	mov rsi, 0xABCDEF01
 	call warn_interrupt
 	hlt
 %endmacro
