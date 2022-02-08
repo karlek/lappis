@@ -90,7 +90,7 @@ void draw_char(unsigned char c, int x, int y, unsigned char *color) {
 				// Bitmap is set from left to right, so we need to flip it.
 				set_pixel(x+(LARGE_FONT_CELL_WIDTH-j), y+i, color);
 			} else {
-				set_pixel(x+(LARGE_FONT_CELL_WIDTH-j), y+i, black);
+				/* set_pixel(x+(LARGE_FONT_CELL_WIDTH-j), y+i, black); */
 			}
 		}
 	}
@@ -100,8 +100,14 @@ void draw_string(unsigned char *str, int x, int y, unsigned char *color) {
 	const int letter_spacing = 0;
 
 	for (int i = 0; str[i] != '\0'; i++) {
-		draw_char(str[i], x, y, color);
-		x += LARGE_FONT_CELL_WIDTH+letter_spacing;
+		unsigned char c = str[i];
+		draw_char(c, x, y, color);
+		x += LARGE_FONT_CELL_WIDTH;
+		if (c < 169 || c > 223) {
+			// Hack lol.
+			// Don't use letter spacing for boxing characters.
+			x += letter_spacing;
+		}
 	}
 }
 
