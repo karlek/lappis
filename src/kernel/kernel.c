@@ -329,11 +329,10 @@ void main() {
 	// - Don't forget to uncomment `sti` in `idt_init()`.
 	// - Also, don't forget to increase the number of vectors handled and bump
 	//   the number of stubs in `idt.asm`.
-	/* draw_mandel(); */
+	draw_mandel();
 
-	// Trigger page fault to the new IDT!
-	char * a = 0xffffffff;
-	*a = 1;
+	// Trigger a breakpoint exception.
+	__asm__ __volatile__("int3");
 
 	end_of_execution();
 }
