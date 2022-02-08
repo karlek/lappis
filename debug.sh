@@ -7,11 +7,11 @@ qemu-system-x86_64 \
 	-S \
 	-d int \
 	-gdb tcp::1234 \
-	-fda bin/lapis.img &
+	-drive format=raw,file=bin/lapis.img &
 
 gdb \
 	--quiet \
 	-ex 'target remote localhost:1234' \
-	-ex 'symbol-file bin/kernel.dbg' \
-	-ex 'break main' \
-	-ex 'continue'
+	-ex 'symbol-file bin/kernel.dbg'
+	# -ex 'break main' \
+	# -ex 'continue'
