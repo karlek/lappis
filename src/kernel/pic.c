@@ -1,5 +1,3 @@
-#include "ports.c"
-
 #define PIC1		0x20		/* IO base address for primary PIC */
 #define PIC2		0xA0		/* IO base address for secondary PIC */
 #define PIC1_COMMAND	PIC1

@@ -9,7 +9,7 @@ isr_double_fault:
 	iretq
 
 isr_page_fault:
-	; Double fault
+	; Page fault
 	mov rdi, 0xe
 	call warn_interrupt
 	call exception_handler

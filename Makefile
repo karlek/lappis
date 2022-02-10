@@ -10,24 +10,12 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
-bin/text.o: src/boot/text.asm | bin
-	nasm \
-		-f elf64 \
-		-o $@ \
-		$<
-
-bin/boot.elf: bin/boot.o | bin
+bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 	ld \
 		-n \
 		-o $@ \
 		-T linker.ld \
-		$<
-
-bin/kernel_entry.o: src/kernel/kernel.asm | bin
-	nasm \
-		-f elf64 \
-		-o $@ \
-		$<
+		$^
 
 bin/kernel.o: src/kernel/kernel.c | bin
 	gcc \
@@ -43,30 +31,22 @@ bin:
 	mkdir -p $@
 
 # For debug symbols.
-bin/kernel.dbg: bin/kernel_entry.o bin/kernel.o | bin
-	ld -o $@ -Ttext 0x1000 $^
+bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
+	ld -o $@ -T linker.ld $^
 
-# For build purposes.
-bin/kernel.bin: bin/kernel_entry.o bin/kernel.o | bin
-	ld -o $@ -Ttext 0x1000 $^ --oformat binary
+build: bin/kernel.iso
 
-bin/lapis.img: bin/boot.bin bin/kernel.bin | bin
-	dd if=bin/boot.bin   of=bin/lapis.img seek=0
-	dd if=bin/kernel.bin of=bin/lapis.img seek=1 conv=notrunc
-
-build: bin/lapis.img
-
-debug: bin/lapis.img bin/kernel.dbg
+debug: bin/kernel.iso bin/kernel.dbg
 	./debug.sh
 
-run: bin/lapis.img
+run: bin/kernel.iso
 	./run.sh
 
-bin/kernel.iso: bin/boot.elf grub.cfg | bin
+bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 	@mkdir -p bin/isofiles/boot/grub
 	@cp -v $< bin/isofiles/boot/kernel.bin
 	@cp -v grub.cfg bin/isofiles/boot/grub
-	@grub-mkrescue -o $@ bin/isofiles
+	@grub-mkrescue -o $@ bin/isofiles 2> /dev/null
 
 clean:
 	rm -rf bin

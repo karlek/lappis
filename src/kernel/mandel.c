@@ -1,5 +1,3 @@
-#include "video.c"
-
 #define ZOOM 1.0
 #define ITERATIONS 20
 
@@ -29,7 +27,7 @@ void to_mandel_space(double x, double y, double *cr, double *ci) {
 }
 
 void draw_mandel() {
-	unsigned char black[3] = {0x00, 0x00, 0x00};
+	unsigned char black[4] = {0x00, 0x00, 0x00, 0xff};
 	double cr = 0;
 	double ci = 0;
 	for (unsigned int x = 0; x < WIDTH; x++) {
@@ -40,7 +38,7 @@ void draw_mandel() {
 			if (escapes_in == -1) {
 				set_pixel(x, y, black);
 			} else {
-				unsigned char c[3] = {(256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in};
+				unsigned char c[4] = {(256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, 0xFF};
 				set_pixel(x, y, c);
 			}
 		}

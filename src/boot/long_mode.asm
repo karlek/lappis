@@ -78,7 +78,7 @@ set_up_page_tables:
 ; @param ecx: First free P2 entry.
 map_frame_buffer:
 	; Start mapping the frame buffer at address 0x8000000.
-	mov eax, [0xa400+40]
+	mov eax, 0xfd000000
 	; Set flags `page size`, `present` and `writeable`.
 	or eax, PRESENT|WRITABLE|PAGE_SIZE
 	jmp .store
@@ -89,8 +89,8 @@ map_frame_buffer:
 	mov [p2_table + ecx*8], eax
 
 	inc ecx
-	; 3 bytes per pixel, 1280x1024 pixels = 3.75 MiB => two pages.
-	cmp ecx, (NUM_PAGES+2)
+	; 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
+	cmp ecx, (NUM_PAGES+3)
 	jne .loop
 
 	ret
@@ -145,4 +145,5 @@ long_mode_start:
 	mov rdi, 0
 
 	call main
+	mov rax, 0xdeadbeef
 	jmp $

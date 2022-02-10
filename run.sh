@@ -9,7 +9,8 @@ qemu-system-x86_64 \
 	-no-shutdown \
 	-d int \
 	-serial file:/tmp/serial.log \
-	-hda bin/lapis.img
+	-cdrom bin/kernel.iso 
 
+	# -hda bin/lapis.img
 	# -drive file=bin/lapis.img,index=0,media=disk
 

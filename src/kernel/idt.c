@@ -1,5 +1,109 @@
 #define IDT_MAX_DESCRIPTORS 256
 
+void num_to_error_name(int interrupt_number, unsigned char *error_name) {
+	switch (interrupt_number) {
+		case 0:
+			strcat(error_name, "Divide Error");
+			break;
+		case 1:
+			strcat(error_name, "Debug");
+			break;
+		case 2:
+			strcat(error_name, "NMI Interrupt");
+			break;
+		case 3:
+			strcat(error_name, "Breakpoint");
+			break;
+		case 4:
+			strcat(error_name, "Overflow");
+			break;
+		case 5:
+			strcat(error_name, "Bound Range Exceeded");
+			break;
+		case 6:
+			strcat(error_name, "Invalid Opcode");
+			break;
+		case 7:
+			strcat(error_name, "Device Not Available");
+			break;
+		case 8:
+			strcat(error_name, "Double Fault");
+			break;
+		case 9:
+			strcat(error_name, "Coprocessor Segment Overrun");
+			break;
+		case 10:
+			strcat(error_name, "Invalid TSS");
+			break;
+		case 11:
+			strcat(error_name, "Segment Not Present");
+			break;
+		case 12:
+			strcat(error_name, "Stack-Segment Fault");
+			break;
+		case 13:
+			strcat(error_name, "General Protection Fault");
+			break;
+		case 14:
+			strcat(error_name, "Page Fault");
+			break;
+		case 15:
+			strcat(error_name, "Reserved");
+			break;
+		case 16:
+			strcat(error_name, "x87 FPU Floating-Point Error");
+			break;
+		case 17:
+			strcat(error_name, "Alignment Check");
+			break;
+		case 18:
+			strcat(error_name, "Machine-Check");
+			break;
+		case 19:
+			strcat(error_name, "SIMD Floating-Point Exception");
+			break;
+		case 20:
+			strcat(error_name, "Virtualization Exception");
+			break;
+		case 21:
+			strcat(error_name, "Reserved");
+			break;
+		case 22:
+			strcat(error_name, "Reserved");
+			break;
+		case 23:
+			strcat(error_name, "Reserved");
+			break;
+		case 24:
+			strcat(error_name, "Reserved");
+			break;
+		case 25:
+			strcat(error_name, "Reserved");
+			break;
+		case 26:
+			strcat(error_name, "Reserved");
+			break;
+		case 27:
+			strcat(error_name, "Reserved");
+			break;
+		case 28:
+			strcat(error_name, "Hypervisor Injection Exception");
+			break;
+		case 29:
+			strcat(error_name, "VMM Communication Exception");
+			break;
+		case 30:
+			strcat(error_name, "Security Exception");
+			break;
+		case 31:
+			strcat(error_name, "Reserved");
+			break;
+		default:
+			strcat(error_name, "Unknown interrupt");
+			break;
+	}
+}
+
 typedef struct {
 	uint16_t    isr_low;      // The lower 16 bits of the ISR's address
 	uint16_t    kernel_cs;    // The GDT segment selector that the CPU will load into CS before calling the ISR
