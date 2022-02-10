@@ -1,3 +1,6 @@
+int is_print(uint8_t c) {
+	return (c >= ' ' && c <= '~');
+}
 
 int strlen(unsigned char * s) {
 	int len = 0;
