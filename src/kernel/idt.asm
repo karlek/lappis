@@ -1,5 +1,6 @@
 extern exception_handler
 extern warn_interrupt
+extern keyboard_handler
 
 isr_double_fault:
 	; Double fault
@@ -13,6 +14,25 @@ isr_page_fault:
 	mov rdi, 0xe
 	call warn_interrupt
 	call exception_handler
+	iretq
+
+irq_timer:
+	; Timer interrupt.
+	push ax
+	; End of interrupt.
+	mov al, 0x20
+    out 0x20, al
+    pop ax
+	iretq
+
+irq_keyboard:
+	pushd
+	push rax     ; Make sure you don't damage current state.
+	; in al, 0x60  ; Read information from the keyboard.
+	; mov rdi, rax  ; Save the information.
+	call keyboard_handler
+	pop rax
+	popd
 	iretq
 
 %macro not_implemented 1
@@ -113,3 +133,7 @@ isr_stub_table:
 	dq not_implemented_30
 	; 31 Reserved
 	dq 0
+	; 32 Remapped: Programmable Interrupt Timer Interrupt
+	dq irq_timer
+	; 33 Remapped: Keyboard Interrupt
+	dq irq_keyboard
