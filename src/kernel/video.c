@@ -1,16 +1,6 @@
-#define MAX_COLS 80
-#define MAX_ROWS 25
-#define VIDEO_ADDRESS 0xb8000
 #define FRAME_BUFFER 0x8000000
 #define WIDTH 1280
 #define HEIGHT 1024
-
-void clear_screen_vga() {
-	for (unsigned short i = 0; i < MAX_ROWS * MAX_COLS; i++) {
-		*((volatile char*) VIDEO_ADDRESS + i*2) = 0;
-		*((volatile char*) VIDEO_ADDRESS + i*2+1) = 0;
-	}
-}
 
 void set_pixel(unsigned int x, unsigned int y, unsigned char color[4]) {
 	volatile unsigned char* fb = (volatile unsigned char*)FRAME_BUFFER;
