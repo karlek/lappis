@@ -120,6 +120,7 @@ enable_paging:
 
 init_long_mode:
 	mov esp, stack_top
+	push ebx
 
 	call set_up_page_tables
 	call map_frame_buffer
@@ -131,19 +132,23 @@ init_long_mode:
 
 bits 64
 long_mode_start:
-	cli ; Clear the interrupt flag.
+	; Clear the interrupt flag.
+	cli
 
-    mov rax, 0
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+	mov rax, 0
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
 
 	mov rbx, 0
 	mov rcx, 0
 	mov rdi, 0
 
+	pop rdi
 	call main
+
+	; A hint that we have escaped the kernel.
 	mov rax, 0xdeadbeef
 	jmp $
