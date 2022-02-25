@@ -75,6 +75,9 @@ void htox(unsigned int num, unsigned char *str) {
 
 	*(str++) = '0';
 	*(str++) = 'x';
+	if (strlen(tmp) % 2 != 0) {
+		*(str++) = '0';
+	}
 	while (offset > 0) {
 		*(str++) = tmp[--offset];
 	}
