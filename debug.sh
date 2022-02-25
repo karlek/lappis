@@ -13,5 +13,5 @@ gdb \
 	--quiet \
 	-ex 'target remote localhost:1234' \
 	-ex 'symbol-file bin/kernel.dbg' \
-	-ex 'b main' \
+	-ex 'b mouse_handler' \
 	-ex 'continue'

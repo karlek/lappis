@@ -9,6 +9,7 @@ qemu-system-x86_64 \
 	-no-shutdown \
 	-d int \
 	-serial file:/tmp/serial.log \
+	-machine q35 \
 	-cdrom bin/kernel.iso 
 
 	# -hda bin/lapis.img

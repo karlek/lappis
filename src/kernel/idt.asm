@@ -1,10 +1,18 @@
 extern exception_handler
 extern warn_interrupt
 extern keyboard_handler
+extern mouse_handler
 
 isr_double_fault:
 	; Double fault
 	mov rdi, 8
+	call warn_interrupt
+	call exception_handler
+	iretq
+
+isr_general_protection_fault:
+	; Page fault
+	mov rdi, 0xd
 	call warn_interrupt
 	call exception_handler
 	iretq
@@ -26,13 +34,18 @@ irq_timer:
 	iretq
 
 irq_keyboard:
-	pushd
+	; iretq
 	push rax     ; Make sure you don't damage current state.
 	; in al, 0x60  ; Read information from the keyboard.
 	; mov rdi, rax  ; Save the information.
 	call keyboard_handler
 	pop rax
-	popd
+	iretq
+
+irq_mouse:
+	push rax     ; Make sure you don't damage current state.
+	call mouse_handler
+	pop rax
 	iretq
 
 %macro not_implemented 1
@@ -41,6 +54,7 @@ not_implemented_%1:
 	mov rdi, %1
 	call warn_interrupt
 	hlt
+	nop
 %endmacro
 
 ; Generate the labels.
@@ -52,11 +66,11 @@ not_implemented 4
 not_implemented 5
 not_implemented 6
 not_implemented 7
+
 not_implemented 9
 not_implemented 10
 not_implemented 11
 not_implemented 12
-not_implemented 13
 not_implemented 16
 not_implemented 17
 not_implemented 18
@@ -66,6 +80,19 @@ not_implemented 21
 not_implemented 28
 not_implemented 29
 not_implemented 30
+not_implemented 34
+not_implemented 35
+not_implemented 36
+not_implemented 37
+not_implemented 38
+not_implemented 39
+not_implemented 40
+not_implemented 41
+not_implemented 42
+not_implemented 43
+not_implemented 45
+not_implemented 46
+not_implemented 47
 
 global isr_stub_table
 isr_stub_table:
@@ -96,7 +123,7 @@ isr_stub_table:
 	; 12 Stack-Segment Fault
 	dq not_implemented_12
 	; 13 General Protection Fault
-	dq not_implemented_13
+	dq isr_general_protection_fault
 	; 14 Page Fault
 	dq isr_page_fault
 	; 15 Reserved
@@ -137,3 +164,31 @@ isr_stub_table:
 	dq irq_timer
 	; 33 Remapped: Keyboard Interrupt
 	dq irq_keyboard
+	; 34 Remapped: Cascade
+	dq not_implemented_34
+	; 35 Remapped: COM2
+	dq not_implemented_35
+	; 36 Remapped: COM1
+	dq not_implemented_36
+	; 37 Remapped: LPT2
+	dq not_implemented_37
+	; 38 Remapped: Floppy Disk
+	dq not_implemented_38
+	; 39 Remapped: LPT1
+	dq not_implemented_39
+	; 40 Remapped: CMOS real-time clock
+	dq not_implemented_40
+	; 41 Remapped: Free for peripherals
+	dq not_implemented_41
+	; 42 Remapped: Free for peripherals
+	dq not_implemented_42
+	; 43 Remapped: Free for peripherals
+	dq not_implemented_43
+	; 44 Remapped: PS2 Mouse
+	dq irq_mouse
+	; 45 Remapped: FPU
+	dq not_implemented_45
+	; 46 Remapped: Primary ATA Hard Disk
+	dq not_implemented_46
+	; 47 Remapped: Secondary ATA Hard Disk
+	dq not_implemented_47

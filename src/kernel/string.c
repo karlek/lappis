@@ -33,6 +33,10 @@ void itoa(int num, unsigned char *str) {
 		strcat(str, "-2147483648");
 		return;
 	}
+	if (num == 0) {
+		strcat(str, "0");
+		return;
+	}
 
 	if (is_negative) {
 		str[0] = '-';

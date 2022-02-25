@@ -1,164 +1,220 @@
 enum KEYCODE {
-	NULL_KEY  = 0,
+	NULL_KEY = 0,
 
-	Q_PRESSED = 0x10,
-	W_PRESSED = 0x11,
-	E_PRESSED = 0x12,
-	R_PRESSED = 0x13,
-	T_PRESSED = 0x14,
-	Y_PRESSED = 0x15,
-	U_PRESSED = 0x16,
-	I_PRESSED = 0x17,
-	O_PRESSED = 0x18,
-	P_PRESSED = 0x19,
-	A_PRESSED = 0x1E,
-	S_PRESSED = 0x1F,
-	D_PRESSED = 0x20,
-	F_PRESSED = 0x21,
-	G_PRESSED = 0x22,
-	H_PRESSED = 0x23,
-	J_PRESSED = 0x24,
-	K_PRESSED = 0x25,
-	L_PRESSED = 0x26,
-	Z_PRESSED = 0x2C,
-	X_PRESSED = 0x2D,
-	C_PRESSED = 0x2E,
-	V_PRESSED = 0x2F,
-	B_PRESSED = 0x30,
-	N_PRESSED = 0x31,
-	M_PRESSED = 0x32,
+	Q = 0x10,
+	W = 0x11,
+	E = 0x12,
+	R = 0x13,
+	T = 0x14,
+	Y = 0x15,
+	U = 0x16,
+	I = 0x17,
+	O = 0x18,
+	P = 0x19,
+	A = 0x1E,
+	S = 0x1F,
+	D = 0x20,
+	F = 0x21,
+	G = 0x22,
+	H = 0x23,
+	J = 0x24,
+	K = 0x25,
+	L = 0x26,
+	Z = 0x2C,
+	X = 0x2D,
+	C = 0x2E,
+	V = 0x2F,
+	B = 0x30,
+	N = 0x31,
+	M = 0x32,
 
-	ZERO_PRESSED  = 0x29,
-	ONE_PRESSED   = 0x2,
-	TWO_PRESSED   = 0x3,
-	THREE_PRESSED = 0x4,
-	FOUR_PRESSED  = 0x5,
-	FIVE_PRESSED  = 0x6,
-	SIX_PRESSED   = 0x7,
-	SEVEN_PRESSED = 0x8,
-	EIGHT_PRESSED = 0x9,
-	NINE_PRESSED  = 0xA,
+	ONE   = 0x2,
+	TWO   = 0x3,
+	THREE = 0x4,
+	FOUR  = 0x5,
+	FIVE  = 0x6,
+	SIX   = 0x7,
+	SEVEN = 0x8,
+	EIGHT = 0x9,
+	NINE  = 0xA,
+	ZERO  = 0xb,
 
-	POINT_PRESSED      = 0x34,
-	SPACE_PRESSED      = 0x39,
-	ENTER_PRESSED      = 0x1C,
-	BACKSPACE_PRESSED  = 0x0e,
-	BACKSPACE_RELEASED = 0x8e,
+	BACKTICK      = 0x29,
+	HYPHEN        = 0x0c,
+	EQUAL         = 0x0d,
+	LEFT_BRACKET  = 0x1a,
+	RIGHT_BRACKET = 0x1b,
+	SEMICOLON     = 0x27,
+	SINGLE_QUOTE  = 0x28,
+	BACKSLASH     = 0x2b,
+	COMMA         = 0x33,
+	PERIOD        = 0x34,
+	FORWARD_SLASH = 0x35,
+	LESS_THAN     = 0x56,
+
+	SPACE     = 0x39,
+	ENTER     = 0x1C,
+	ESCAPE    = 0x01,
+	BACKSPACE = 0x0e,
 };
 
 static char* _qwertyuiop = "qwertyuiop"; // 0x10-0x1c
-static char* _asdfghjkl = "asdfghjkl";   // 0x1e-0x2c
-static char* _zxcvbnm = "zxcvbnm";
-static char* _num = "123456789";
+static char* _asdfghjkl  = "asdfghjkl";   // 0x1e-0x2c
+static char* _zxcvbnm    = "zxcvbnm";
+static char* _num        = "0123456789";
 
 uint8_t keyboard_to_ascii(uint8_t key) {
+	// Transform released to pressed.
+	if (key >= 0x80) {
+		key -= 0x80;
+	}
+
 	switch (key) {
-		case Q_PRESSED:
+		case Q:
 			return _qwertyuiop[0];
-		case W_PRESSED:
+		case W:
 			return _qwertyuiop[1];
-		case E_PRESSED:
+		case E:
 			return _qwertyuiop[2];
-		case R_PRESSED:
+		case R:
 			return _qwertyuiop[3];
-		case T_PRESSED:
+		case T:
 			return _qwertyuiop[4];
-		case Y_PRESSED:
+		case Y:
 			return _qwertyuiop[5];
-		case U_PRESSED:
+		case U:
 			return _qwertyuiop[6];
-		case I_PRESSED:
+		case I:
 			return _qwertyuiop[7];
-		case O_PRESSED:
+		case O:
 			return _qwertyuiop[8];
-		case P_PRESSED:
+		case P:
 			return _qwertyuiop[9];
 
-		case A_PRESSED:
+		case A:
 			return _asdfghjkl[0];
-		case S_PRESSED:
+		case S:
 			return _asdfghjkl[1];
-		case D_PRESSED:
+		case D:
 			return _asdfghjkl[2];
-		case F_PRESSED:
+		case F:
 			return _asdfghjkl[3];
-		case G_PRESSED:
+		case G:
 			return _asdfghjkl[4];
-		case H_PRESSED:
+		case H:
 			return _asdfghjkl[5];
-		case J_PRESSED:
+		case J:
 			return _asdfghjkl[6];
-		case K_PRESSED:
+		case K:
 			return _asdfghjkl[7];
-		case L_PRESSED:
+		case L:
 			return _asdfghjkl[8];
 
-		case Z_PRESSED:
+		case Z:
 			return _zxcvbnm[0];
-		case X_PRESSED:
+		case X:
 			return _zxcvbnm[1];
-		case C_PRESSED:
+		case C:
 			return _zxcvbnm[2];
-		case V_PRESSED:
+		case V:
 			return _zxcvbnm[3];
-		case B_PRESSED:
+		case B:
 			return _zxcvbnm[4];
-		case N_PRESSED:
+		case N:
 			return _zxcvbnm[5];
-		case M_PRESSED:
+		case M:
 			return _zxcvbnm[6];
 
-		case ZERO_PRESSED:
+		case ZERO:
 			return _num[0];
-		case ONE_PRESSED:
+		case ONE:
 			return _num[1];
-		case TWO_PRESSED:
+		case TWO:
 			return _num[2];
-		case THREE_PRESSED:
+		case THREE:
 			return _num[3];
-		case FOUR_PRESSED:
+		case FOUR:
 			return _num[4];
-		case FIVE_PRESSED:
+		case FIVE:
 			return _num[5];
-		case SIX_PRESSED:
+		case SIX:
 			return _num[6];
-		case SEVEN_PRESSED:
+		case SEVEN:
 			return _num[7];
-		case EIGHT_PRESSED:
+		case EIGHT:
 			return _num[8];
-		case NINE_PRESSED:
+		case NINE:
 			return _num[9];
 
-		case POINT_PRESSED:
+		case BACKTICK:
+			return '`';
+		case HYPHEN:
+			return '-';
+		case EQUAL:
+			return '=';
+		case LEFT_BRACKET:
+			return '[';
+		case RIGHT_BRACKET:
+			return ']';
+		case SEMICOLON:
+			return ';';
+		case SINGLE_QUOTE:
+			return '\'';
+		case BACKSLASH:
+			return '\\';
+		case COMMA:
+			return ',';
+		case PERIOD:
 			return '.';
-		case SPACE_PRESSED:
-			return ' ';
-		case ENTER_PRESSED:
-			return '\n';
+		case FORWARD_SLASH:
+			return '/';
+		case LESS_THAN:
+			return '<';
 
-		case BACKSPACE_PRESSED:
-		case BACKSPACE_RELEASED:
+		case SPACE:
+			return ' ';
+		case ENTER:
+			return '\n';
+		case ESCAPE:
+			return '\x1b';
+		case BACKSPACE:
 			return '\b';
+
 		default:
 			return 0;
 	}
 }
 
+enum KEY_STATE {
+	KEY_STATE_RELEASED = 0,
+	KEY_STATE_PRESSED = 1,
+};
+
+/* struct Key { */
+/* 	KEY key; */
+/* 	KEY_STATE pressed; */
+/* }; */
+
 int caret_x = 0;
 int caret_y = 3*LARGE_FONT_CELL_HEIGHT;
 extern void keyboard_handler() {
-	uint8_t key = inb(0x60);
+	PIC_sendEOI(0x22);
+
+	uint8_t rawkey = inb(0x60);
 	clear_screen_vbe();
-	if (key > 0x90) {
-		PIC_sendEOI(0x22);
-		return;
-	}
-	if (!keyboard_to_ascii(key)) {
+
+	if (rawkey > 0x80) {
 		PIC_sendEOI(0x22);
 		return;
 	}
 
-	uint8_t c = keyboard_to_ascii(key);
+	uint8_t c = keyboard_to_ascii(rawkey);
+	if (!c) {
+		printf("Unk key: %d  ", 200, 200, NULL, rawkey);
+		PIC_sendEOI(0x22);
+		return;
+	}
+
 	if (is_print(c)) {
 		printf("%c", caret_x, caret_y, NULL, c);
 		caret_x += LARGE_FONT_CELL_WIDTH;
@@ -171,5 +227,4 @@ extern void keyboard_handler() {
 		caret_x  = 0;
 		caret_y += LARGE_FONT_CELL_HEIGHT;
 	}
-	PIC_sendEOI(0x22);
 }

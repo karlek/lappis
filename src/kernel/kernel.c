@@ -72,10 +72,13 @@ unsigned char* get_tag_name(int tag_type) {
 
 void main(struct multiboot_info* boot_info) {
 	// Setup interrupts.
+	PIC_remap(0x20, 0x28);
 	idt_init();
+	print_box("Press any key:", 0, 0, NULL);
+	while(1) {};
 
 	// Enable floating point operations.
-	enable_fpu();
+	/* enable_fpu(); */
 
 	// Hardware interrupts / keyboard.
 	//
@@ -83,28 +86,25 @@ void main(struct multiboot_info* boot_info) {
 	// during it's execution.
 	//
 	// So we need to remap the PIC to not collide with the standard exceptions.
-	PIC_remap(0x20, 0x28);
 
-	int i = 0;
-	struct multiboot_tag *tag = boot_info->tags;
-	while (tag->type != 0) {
-		switch (tag->type) {
-			default:
-				unsigned int next = ((tag->size+8) / 8);
-				printf("Skipping: %s\n", 300, 300+i*LARGE_FONT_CELL_HEIGHT, NULL, get_tag_name(tag->type));
-				tag += next;
-		}
-		i++;
-	}
+	/* int i = 0; */
+	/* struct multiboot_tag *tag = boot_info->tags; */
+	/* while (tag->type != 0) { */
+	/* 	switch (tag->type) { */
+	/* 		default: */
+	/* 			unsigned int next = ((tag->size+8) / 8); */
+	/* 			printf("Skipping: %s\n", 300, 300+i*LARGE_FONT_CELL_HEIGHT, NULL, get_tag_name(tag->type)); */
+	/* 			tag += next; */
+	/* 	} */
+	/* 	i++; */
+	/* } */
 
 	/* draw_mandel(); */
 
-	print_box("Press any key:", 0, 0, NULL);
 	// Trigger a breakpoint exception.
 	/* __asm__ __volatile__("int3"); */
 
 	/* end_of_execution(); */
 
-	while(1) {};
 }
 
