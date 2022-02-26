@@ -89,19 +89,28 @@ void enable_mouse() {
 	status |= 0x2;
 	status &= 0xdf;
 
-	printf("status: %x\n          ", 0, 150, NULL, status);
 	// Set status byte.
 	ps2_write(CMD_PORT, 0x60);
 	ps2_write(DATA_PORT, status);
 
+	// Communicate with mouse.
 	ps2_write(CMD_PORT, 0xD4);
+	// Set mouse defaults.
 	ps2_write(DATA_PORT, 0xf6);
 
 	uint8_t ret = ps2_read(DATA_PORT);
-	printf("ret: %x                   ", 0, 200, NULL, ret);
+	if (ret != 0xfa) {
+		printf("Failed to set mouse defaults.\n", 0, 400, NULL);
+		return;
+	}
 
+	// Communicate with mouse.
 	ps2_write(CMD_PORT, 0xD4);
+	// Enable mouse data reporting.
 	ps2_write(DATA_PORT, 0xf4);
 	ret = ps2_read(DATA_PORT);
-	printf("ret: %x                   ", 0, 250, NULL, ret);
+	if (ret != 0xfa) {
+		printf("Failed to enable mouse data reporting.\n", 0, 400, NULL);
+		return;
+	}
 }
