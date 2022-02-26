@@ -2,6 +2,7 @@ extern exception_handler
 extern warn_interrupt
 extern keyboard_handler
 extern mouse_handler
+extern ata_handler
 
 isr_double_fault:
 	; Double fault
@@ -45,6 +46,18 @@ irq_keyboard:
 irq_mouse:
 	push rax     ; Make sure you don't damage current state.
 	call mouse_handler
+	pop rax
+	iretq
+
+irq_primary_ata:
+	push rax     ; Make sure you don't damage current state.
+	call ata_handler
+	pop rax
+	iretq
+
+irq_secondary_ata:
+	push rax     ; Make sure you don't damage current state.
+	call ata_handler
 	pop rax
 	iretq
 
@@ -189,6 +202,6 @@ isr_stub_table:
 	; 45 Remapped: FPU
 	dq not_implemented_45
 	; 46 Remapped: Primary ATA Hard Disk
-	dq not_implemented_46
+	dq irq_primary_ata
 	; 47 Remapped: Secondary ATA Hard Disk
-	dq not_implemented_47
+	dq irq_secondary_ata

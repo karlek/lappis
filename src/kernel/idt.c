@@ -1,6 +1,7 @@
 #include "ps2.c"
 #include "drivers/keyboard.c"
 #include "drivers/mouse.c"
+#include "drivers/ata.c"
 
 #define IDT_MAX_DESCRIPTORS 256
 
@@ -174,72 +175,9 @@ void idt_init() {
 		idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
 	}
 
-
-	ps2_write(CMD_PORT, 0xa8);
-
-	// Get status byte.
-	ps2_write(CMD_PORT, 0x20);
-
-	uint8_t status = ps2_read(DATA_PORT);
-	status |= 0x2;
-	status &= 0xdf;
-
-	printf("status: %x\n          ", 0, 150, NULL, status);
-	// Set status byte.
-	ps2_write(CMD_PORT, 0x60);
-	ps2_write(DATA_PORT, status);
-
-	ps2_write(CMD_PORT, 0xD4);
-	ps2_write(DATA_PORT, 0xf6);
-
-	uint8_t ret = ps2_read(DATA_PORT);
-	printf("ret: %x                   ", 0, 200, NULL, ret);
-
-	ps2_write(CMD_PORT, 0xD4);
-	ps2_write(DATA_PORT, 0xf4);
-	ret = ps2_read(DATA_PORT);
-	printf("ret: %x                   ", 0, 250, NULL, ret);
+	enable_mouse();
+	enable_ata();
 
     __asm__ volatile ("lidt %0" : : "m"(idtr));  // load the new IDT
     __asm__ volatile ("sti");                    // set the interrupt flag
-
-	// Mouse.
-
-/* 	uint8_t x = inb(DATA_PORT); */
-/* 	if (x != 0xFA) { */
-/* 		printf("Mouse failed to initialize\n", 200, 200, NULL); */
-/* 	} */
-
-/* 		uint16_t port = PIC1_DATA */
-/* 		if line >= 8 { */
-/* 			port = PIC2_DATA */
-/* 			line -= 8 */
-/* 		} */
-/* 		sys.Outb(port, byte(sys.Inb(port)&^(1<<line))) */
-
-    /* ps2_write_device(device, PS2_DEV_ENABLE_SCAN); */
-	/* Write a byte to the specified `device` input buffer.
-	* This function is used to send command to devices.
-	*/
-	/* bool ps2_write_device(uint8_t b) { */
-	/* 	if (device != 0) { */
-	/* 		if (!ps2_write(PS2_CMD, PS2_WRITE_SECOND)) { */
-	/* 			return false; */
-	/* 		} */
-	/* 	} */
-
-	/* 	return ps2_write(PS2_DATA, b); */
-	/* } */
-
-
-/* bool ps2_write(uint32_t port, uint8_t b) { */
-    /* if (ps2_wait_write()) { */
-        /* outportb(port, b); */
-        /* return true; */
-    /* } */
-
-    /* printf("[PS2] Write failed\n"); */
-
-    /* return false; */
-/* } */
 }

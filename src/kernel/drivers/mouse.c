@@ -78,3 +78,30 @@ extern void mouse_handler() {
 
 	printf("break!\n", 0, 400, NULL);
 }
+
+void enable_mouse() {
+	ps2_write(CMD_PORT, 0xa8);
+
+	// Get status byte.
+	ps2_write(CMD_PORT, 0x20);
+
+	uint8_t status = ps2_read(DATA_PORT);
+	status |= 0x2;
+	status &= 0xdf;
+
+	printf("status: %x\n          ", 0, 150, NULL, status);
+	// Set status byte.
+	ps2_write(CMD_PORT, 0x60);
+	ps2_write(DATA_PORT, status);
+
+	ps2_write(CMD_PORT, 0xD4);
+	ps2_write(DATA_PORT, 0xf6);
+
+	uint8_t ret = ps2_read(DATA_PORT);
+	printf("ret: %x                   ", 0, 200, NULL, ret);
+
+	ps2_write(CMD_PORT, 0xD4);
+	ps2_write(DATA_PORT, 0xf4);
+	ret = ps2_read(DATA_PORT);
+	printf("ret: %x                   ", 0, 250, NULL, ret);
+}
