@@ -17,5 +17,5 @@ make
 
 ```
 # Arch
-pacman -S nasm qemu
+pacman -S nasm qemu mtools xorriso
 ```
