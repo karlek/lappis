@@ -153,6 +153,7 @@ void idt_init() {
 	// Remap PIC interrupt numbers.
 	PIC_remap(0x20, 0x28);
 
+	debug("idt_init: initating IDT");
 	idtr.base  = (uint64_t)&idt[0];
 	idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
 
@@ -169,4 +170,6 @@ void idt_init() {
 	__asm__ volatile ("lidt %0" : : "m"(idtr));
 	// Set the interrupt flag.
 	__asm__ volatile ("sti");
+
+	debug("idt_init: IDT initialized");
 }

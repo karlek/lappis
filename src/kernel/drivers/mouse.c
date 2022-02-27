@@ -78,6 +78,7 @@ extern void mouse_handler() {
 }
 
 void enable_mouse() {
+	debug("Enabling PS/2 mouse.");
 	ps2_write(CMD_PORT, 0xa8);
 
 	// Get status byte.
@@ -98,7 +99,7 @@ void enable_mouse() {
 
 	uint8_t ret = ps2_read(DATA_PORT);
 	if (ret != 0xfa) {
-		printf("Failed to set mouse defaults.\n", 0, 400, NULL);
+		error("Failed to set mouse defaults.");
 		return;
 	}
 
@@ -108,7 +109,9 @@ void enable_mouse() {
 	ps2_write(DATA_PORT, 0xf4);
 	ret = ps2_read(DATA_PORT);
 	if (ret != 0xfa) {
-		printf("Failed to enable mouse data reporting.\n", 0, 400, NULL);
+		error("Failed to enable mouse data reporting.");
 		return;
 	}
+
+	debug("PS/2 mouse enabled.");
 }

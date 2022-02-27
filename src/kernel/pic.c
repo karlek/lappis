@@ -36,6 +36,7 @@ arguments:
 	offset2 - same for secondary PIC: offset2..offset2+7
 */
 void PIC_remap(int offset1, int offset2) {
+	debug("PIC_remap: start.");
 	unsigned char a1, a2;
  
 	a1 = inb(PIC1_DATA);                        // save masks
@@ -53,4 +54,5 @@ void PIC_remap(int offset1, int offset2) {
  
 	outb(PIC1_DATA, a1);   // restore saved masks.
 	outb(PIC2_DATA, a2);
+	debug("PIC_remap: done.");
 }

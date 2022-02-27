@@ -237,12 +237,15 @@ void ata_read(uint8_t *buf, uint32_t lba, uint32_t numsects, ide_dev *dev) {
 void ata_probe() {
 	uint8_t ide_buf[512] = {0};
 	if (!ide_identify(ATA_PRIMARY_BUS, ATA_PRIMARY_DRIVE, ide_buf)) {
-		printf("IDE primary master not found!", 0, 500, NULL);
+		error("IDE primary master not found!");
 		return;
 	}
-	printf("ide_identify: %s", 200, 600, NULL, (char *) &ide_buf[ATA_IDENT_MODEL]);
+	debug("ide_identify");
+	debug(&ide_buf[ATA_IDENT_MODEL]);
 }
 
 void enable_ata() {
+	debug("Enabling ATA.");
 	ata_probe();
+	debug("ATA enabled.");
 }
