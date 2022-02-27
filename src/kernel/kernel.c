@@ -33,13 +33,15 @@ void end_of_execution() {
 }
 
 void main(struct multiboot_info* boot_info) {
+	init_serial(SERIAL_COM1_PORT);
+	init_serial(SERIAL_COM2_PORT);
+
+	debug("Kernel started.");
 	// Setup interrupts.
 	idt_init();
 
 	// Enable floating point operations.
 	enable_fpu();
-
-	print_box("Press any key:", 700, 0, NULL);
 
 	ide_dev dev = {
 		ATA_PRIMARY_BUS,
@@ -47,18 +49,58 @@ void main(struct multiboot_info* boot_info) {
 		ATA_PRIMARY_IO,
 	};
 
+	debug("> ATA");
 	uint8_t read_buf[1024] = {0};
-	uint32_t cur = 0;
-
 	ata_read(read_buf, 0, 2, &dev);
-	for (int i = 0; i < 5; i++) {
-		zip_t zip;
-		read_zip(read_buf, &cur, &zip);
-		printf("%s", 0, 200+i*20, NULL, zip.file_name);
-	}
+	debug("> ATA");
+
+
+
+
+
+	/* debug_buffer(read_buf, sizeof read_buf); */
+
+	/* debug("> zipfs"); */
+	/* zip_fs_t zipfs; */
+	/* uint32_t cur = 0; */
+	/* read_zip(read_buf, -1, &cur, &zipfs); */
+	/* /1* debug(zip.file_name); *1/ */
+	/* /1* debug_buffer(zip.uncompressed, zip.uncompressed_size); *1/ */
+	/* debug("< zipfs"); */
+
+	/* debug("> memcpy"); */
+	/* cur = 0; */
+	/* uint8_t nested_buf[1024] = {0}; */
+	/* memcpy(nested_buf, zip.uncompressed, zip.uncompressed_size); */
+	/* debug("< memcpy"); */
+
+	/* int i = 0; */
+	/* while (cur != zip.uncompressed_size) { */
+	/* 	debug("> nested zip"); */
+	/* 	zip_t nested_zip; */
+	/* 	read_zip(nested_buf, &cur, &nested_zip); */
+	/* 	debug("< nested zip"); */
+	/* 	debug(nested_zip.file_name); */
+	/* 	uint8_t str[256] = {0}; */
+	/* 	sprintf(str, "i: %d, cur: %d -- zip.uncompressed_size: %d", i, cur, zip.uncompressed_size); */
+	/* 	debug(str); */
+	/* 	i++; */
+	/* } */
+
+	/* debug_buffer(&zip.file_name, zip.file_name_length); */
+	/* printf("%x", 100, 250, NULL, &zip.file_name); */
+
 
 	/* draw_mandel(); */
 
-	end_of_execution();
+	/* end_of_execution(); */
 	while(1) {};
+}
+
+void test_kernel_printing() {
+	for (int i = 0; i <= 59; i++) {
+		unsigned char num_str[256] = {0};
+		itoa(i, num_str);
+		kprint(num_str);
+	}
 }

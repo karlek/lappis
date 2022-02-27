@@ -1,19 +1,14 @@
-typedef struct zip_t {
-	uint8_t signature[4];
-	uint8_t version[2];
-	uint8_t flags[2];
-	uint8_t compression_method[2];
-	uint8_t last_mod_time[2];
-	uint8_t last_mod_date[2];
-	uint8_t crc32[4];
-	uint32_t compressed_size;
-	uint32_t uncompressed_size;
-	uint16_t file_name_length;
-	uint16_t extra_field_length;
-	uint8_t *file_name;
-	uint8_t *extra_fields;
-	uint8_t *uncompressed;
-} zip_t;
+typedef struct {
+	uint8_t* name;
+	uint8_t* data;
+	uint32_t size;
+} file_t;
+
+typedef struct {
+	file_t* files;
+	uint32_t num_files;
+} zip_fs_t;
+
 
 void read(uint8_t* buf, int n, uint32_t* cur, uint8_t* dest) {
 	for (int i = 0; i < n; i++) {
@@ -21,10 +16,19 @@ void read(uint8_t* buf, int n, uint32_t* cur, uint8_t* dest) {
 	}
 }
 
-void read_zip(uint8_t *buf, uint32_t* cur, zip_t *zip) {
-	uint8_t signature[4] = {0};
-	read(buf, sizeof signature, cur, signature);
+uint16_t read_uint16(uint8_t* buf, uint32_t* cur) {
+	uint8_t raw[2] = {0};
+	read(buf, sizeof raw, cur, raw);
+	return raw[0] | (raw[1] << 8);
+}
 
+uint32_t read_uint32(uint8_t* buf, uint32_t* cur) {
+	uint8_t raw[4] = {0};
+	read(buf, sizeof raw, cur, raw);
+	return raw[0] | (raw[1] << 8) | (raw[2] << 16) | (raw[3] << 24);
+}
+
+void read_local_file(uint8_t* buf, uint32_t* cur, file_t* file) {
 	uint8_t version[2] = {0};
 	read(buf, sizeof version, cur, version);
 
@@ -43,55 +47,116 @@ void read_zip(uint8_t *buf, uint32_t* cur, zip_t *zip) {
 	uint8_t crc32_uncompressed[4] = {0};
 	read(buf, sizeof crc32_uncompressed, cur, crc32_uncompressed);
 
-	uint8_t compressed_size[4] = {0};
-	read(buf, sizeof compressed_size, cur, compressed_size);
+	uint32_t compressed_size = read_uint32(buf, cur);
+	uint32_t uncompressed_size = read_uint32(buf, cur);
 
-	uint8_t uncompressed_size_raw[4] = {0};
-	read(buf, sizeof uncompressed_size_raw, cur, uncompressed_size_raw);
-	uint32_t uncompressed_size = uncompressed_size_raw[0] | (uncompressed_size_raw[1] << 8) | (uncompressed_size_raw[2] << 16) | (uncompressed_size_raw[3] << 24);
-
-	uint8_t file_name_length_raw[2] = {0};
-	read(buf, sizeof file_name_length_raw, cur, file_name_length_raw);
-	uint16_t file_name_length = file_name_length_raw[0] | (file_name_length_raw[1] << 8);
-
-	uint8_t extra_field_length_raw[2] = {0};
-	read(buf, sizeof extra_field_length_raw, cur, extra_field_length_raw);
-	uint16_t extra_field_length = extra_field_length_raw[0] | (extra_field_length_raw[1] << 8);
+	uint16_t file_name_length = read_uint16(buf, cur);
+	uint16_t extra_field_length = read_uint16(buf, cur);
 
 	// 256 is aribtrary. Use malloc when it exists.
-	static uint8_t file_name[256] = {0};
+	uint8_t file_name[256] = {0};
 	read(buf, file_name_length, cur, file_name);
 
 	// 256 is aribtrary. Use malloc when it exists.
-	uint8_t extra_fields[256] = {0};
+	uint8_t extra_fields[64] = {0};
 	read(buf, extra_field_length, cur, extra_fields);
 
-	uint8_t uncompressed[256] = {0};
+	uint8_t uncompressed[1024] = {0};
 	read(buf, uncompressed_size, cur, uncompressed);
 
-	zip->signature[0] = signature[0];
-	zip->signature[1] = signature[1];
-	zip->signature[2] = signature[2];
-	zip->signature[3] = signature[3];
-	zip->version[0] = version[0];
-	zip->version[1] = version[1];
-	zip->flags[0] = flags[0];
-	zip->flags[1] = flags[1];
-	zip->compression_method[0] = compression_method[0];
-	zip->compression_method[1] = compression_method[1];
-	zip->last_mod_date[0] = last_mod_date[0];
-	zip->last_mod_date[1] = last_mod_date[1];
-	zip->last_mod_time[0] = last_mod_time[0];
-	zip->last_mod_time[1] = last_mod_time[1];
-	zip->crc32[0] = crc32_uncompressed[0];
-	zip->crc32[1] = crc32_uncompressed[1];
-	zip->crc32[2] = crc32_uncompressed[2];
-	zip->crc32[3] = crc32_uncompressed[3];
-	zip->compressed_size = compressed_size;
-	zip->uncompressed_size = uncompressed_size;
-	zip->file_name_length = file_name_length;
-	zip->extra_field_length = extra_field_length;
-	zip->file_name = file_name;
-	zip->extra_fields = extra_fields;
-	zip->uncompressed = uncompressed;
+	file->name = file_name;
+	file->data = uncompressed;
+	file->size = uncompressed_size;
+}
+
+void read_central_directory(uint8_t* buf, uint32_t* cur) {
+	uint8_t version_made_by[2] = {0};
+	read(buf, sizeof version_made_by, cur, version_made_by);
+
+	uint8_t version_needed[2] = {0};
+	read(buf, sizeof version_needed, cur, version_needed);
+
+	uint8_t flags[2] = {0};
+	read(buf, sizeof flags, cur, flags);
+
+	uint8_t compression_method[2] = {0};
+	read(buf, sizeof compression_method, cur, compression_method);
+
+	uint8_t last_mod_date[2] = {0};
+	read(buf, sizeof last_mod_date, cur, last_mod_date);
+
+	uint8_t last_mod_time[2] = {0};
+	read(buf, sizeof last_mod_time, cur, last_mod_time);
+
+	uint8_t crc32_uncompressed[4] = {0};
+	read(buf, sizeof crc32_uncompressed, cur, crc32_uncompressed);
+
+	uint32_t compressed_size = read_uint32(buf, cur);
+	uint32_t uncompressed_size = read_uint32(buf, cur);
+
+	uint16_t file_name_length = read_uint16(buf, cur);
+
+	uint16_t extra_field_length = read_uint16(buf, cur);
+	uint16_t file_comment_length = read_uint16(buf, cur);
+
+	uint16_t disk_number_start_raw = read_uint16(buf, cur);
+
+	uint16_t internal_file_attributes = read_uint16(buf, cur);
+
+	uint32_t external_file_attributes = read_uint32(buf, cur);
+
+	uint32_t relative_offset_of_local_header = read_uint32(buf, cur);
+
+	uint8_t file_name[256] = {0};
+	read(buf, file_name_length, cur, file_name);
+
+	uint8_t extra_fields[64] = {0};
+	read(buf, extra_field_length, cur, extra_fields);
+
+	uint8_t file_comment[256] = {0};
+	read(buf, file_comment_length, cur, file_comment);
+}
+
+void read_end_of_central_directory(uint8_t* buf, uint32_t* cur) {
+	uint16_t disk_number = read_uint16(buf, cur);
+	uint16_t disk_number_with_start_of_central_directory = read_uint16(buf, cur);
+	uint16_t number_of_central_directory_entries_on_this_disk = read_uint16(buf, cur);
+	uint16_t number_of_central_directory_entries = read_uint16(buf, cur);
+	uint32_t size_of_central_directory = read_uint32(buf, cur);
+	uint32_t offset_of_start_of_central_directory_with_respect_to_starting_disk_number = read_uint32(buf, cur);
+	uint16_t zip_file_comment_length = read_uint16(buf, cur);
+
+	uint8_t zip_file_comment[256] = {0};
+	read(buf, zip_file_comment_length, cur, zip_file_comment);
+}
+
+void read_zip(uint8_t *buf, uint32_t len, uint32_t* cur, zip_fs_t *zipfs) {
+	file_t files[16] = {0};
+	zipfs->files = files;
+
+	uint32_t num_files = 0;
+	while (*cur < len) {
+		uint8_t signature[4] = {0};
+		read(buf, sizeof signature, cur, signature);
+
+		if (signature[2] == 0x03 && signature[3] == 0x04) {
+			file_t file;
+			read_local_file(buf, cur, &file);
+			zipfs->files[num_files] = file;
+			num_files++;
+		} else if (signature[2] == 0x01 && signature[3] == 0x02) {
+			read_central_directory(buf, cur);
+		} else if (signature[2] == 0x05 && signature[3] == 0x06) {
+			read_end_of_central_directory(buf, cur);
+
+			// Unknown length, so we're done.
+			if (len == -1) {
+				break;
+			}
+		} else {
+			error("Invalid zip file!");
+			debug_buffer(signature, sizeof signature);
+			return;
+		}
+	}
 }
