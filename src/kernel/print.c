@@ -157,3 +157,32 @@ void print_box(unsigned char *s, int x, int y, unsigned char *color) {
 	printf("%c", x+xoffset, y+yoffset, color, bottom_right_corner);
 }
 
+uint32_t line_number = 0;
+
+typedef struct lines {
+	char *line;
+	struct lines *next;
+} lines_t;
+
+lines_t kernel_lines = {
+	.line = NULL,
+	.next = NULL,
+};
+lines_t *current_lines = &kernel_lines;
+
+void kprint(uint8_t *s) {
+	lines_t next = {
+		.line = s,
+		.next = NULL,
+	};
+	current_lines->next = &next;
+
+	current_lines = &next;
+	/* clear_screen(); */
+
+	for (lines_t *l = &kernel_lines; l != NULL; l = l->next) {
+		printf("%s", 0, line_number*LARGE_FONT_CELL_HEIGHT, 0, l->line);
+	}
+	line_number++;
+	/* printf("%s", 0, line_number*LARGE_FONT_CELL_HEIGHT, 0, s); */
+}
