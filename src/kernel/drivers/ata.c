@@ -235,7 +235,7 @@ void ata_read(uint8_t *buf, uint32_t lba, uint32_t numsects, ide_dev *dev) {
 }
 
 void ata_probe() {
-	uint8_t ide_buf[512] = {0};
+	uint8_t* ide_buf = malloc(512);
 	if (!ide_identify(ATA_PRIMARY_BUS, ATA_PRIMARY_DRIVE, ide_buf)) {
 		error("IDE primary master not found!");
 		return;

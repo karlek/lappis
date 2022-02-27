@@ -26,14 +26,14 @@ void sprintf(unsigned char *out, unsigned char *format, ...) {
 				break;
 			case 'd':
 				int num = va_arg(args, int);
-				unsigned char num_str[256] = {0};
+				uint8_t* num_str = malloc(256);
 				itoa(num, num_str);
 				strcat(str, num_str);
 				offset += strlen(num_str);
 				break;
 			case 'x':
 				unsigned int hnum = va_arg(args, int);
-				unsigned char hnum_str[256] = {0};
+				uint8_t* hnum_str = malloc(256);
 				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
@@ -88,14 +88,14 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 				break;
 			case 'd':
 				int num = va_arg(args, int);
-				unsigned char num_str[256] = {0};
+				uint8_t* num_str = malloc(256);
 				itoa(num, num_str);
 				strcat(str, num_str);
 				offset += strlen(num_str);
 				break;
 			case 'x':
 				unsigned int hnum = va_arg(args, int);
-				unsigned char hnum_str[256] = {0};
+				uint8_t* hnum_str = malloc(256);
 				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
@@ -106,7 +106,7 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 					if (vnum[i] == 0) {
 						break;
 					}
-					unsigned char num_str[256] = {0};
+					uint8_t* num_str = malloc(256);
 					htox(vnum[i], num_str, false);
 					strcat(str, num_str);
 					offset += strlen(num_str);
@@ -130,7 +130,7 @@ void print_box(unsigned char *s, int x, int y, unsigned char *color) {
 	const unsigned char bottom_left_corner = 0xc0;
 	const unsigned char bottom_right_corner = 0xd9;
 
-	char tmp[256] = {0};
+	uint8_t* tmp = malloc(256);
 	int len = strlen(s)+2; // +2 for the pipe and the spacing.
 
 	unsigned int xoffset = 0;

@@ -53,15 +53,14 @@ void read_local_file(uint8_t* buf, uint32_t* cur, file_t* file) {
 	uint16_t file_name_length = read_uint16(buf, cur);
 	uint16_t extra_field_length = read_uint16(buf, cur);
 
-	// 256 is aribtrary. Use malloc when it exists.
-	uint8_t file_name[256] = {0};
+	uint8_t* file_name = malloc(file_name_length + 1);
 	read(buf, file_name_length, cur, file_name);
+	file_name[file_name_length] = 0;
 
-	// 256 is aribtrary. Use malloc when it exists.
-	uint8_t extra_fields[64] = {0};
+	uint8_t* extra_fields = malloc(extra_field_length);
 	read(buf, extra_field_length, cur, extra_fields);
 
-	uint8_t uncompressed[1024] = {0};
+	uint8_t* uncompressed = malloc(uncompressed_size);
 	read(buf, uncompressed_size, cur, uncompressed);
 
 	file->name = file_name;
@@ -107,13 +106,14 @@ void read_central_directory(uint8_t* buf, uint32_t* cur) {
 
 	uint32_t relative_offset_of_local_header = read_uint32(buf, cur);
 
-	uint8_t file_name[256] = {0};
+	uint8_t* file_name = malloc(file_name_length+1);
 	read(buf, file_name_length, cur, file_name);
+	file_name[file_name_length] = 0;
 
-	uint8_t extra_fields[64] = {0};
+	uint8_t* extra_fields = malloc(extra_field_length);
 	read(buf, extra_field_length, cur, extra_fields);
 
-	uint8_t file_comment[256] = {0};
+	uint8_t* file_comment = malloc(file_comment_length);
 	read(buf, file_comment_length, cur, file_comment);
 }
 
@@ -126,7 +126,7 @@ void read_end_of_central_directory(uint8_t* buf, uint32_t* cur) {
 	uint32_t offset_of_start_of_central_directory_with_respect_to_starting_disk_number = read_uint32(buf, cur);
 	uint16_t zip_file_comment_length = read_uint16(buf, cur);
 
-	uint8_t zip_file_comment[256] = {0};
+	uint8_t* zip_file_comment = malloc(zip_file_comment_length);
 	read(buf, zip_file_comment_length, cur, zip_file_comment);
 }
 

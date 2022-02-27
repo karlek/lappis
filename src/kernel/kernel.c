@@ -8,6 +8,7 @@
 #include "string.c"
 #include "ports.c"
 #include "serial.c"
+#include "heap.c"
 #include "terminal-font.h"
 #include "video.c"
 #include "mandel.c"
@@ -50,7 +51,7 @@ void main(struct multiboot_info* boot_info) {
 	};
 
 	debug("> ATA");
-	uint8_t read_buf[1024] = {0};
+	uint8_t *read_buf = malloc(1024);
 	ata_read(read_buf, 0, 2, &dev);
 	debug("> ATA");
 
@@ -99,7 +100,7 @@ void main(struct multiboot_info* boot_info) {
 
 void test_kernel_printing() {
 	for (int i = 0; i <= 59; i++) {
-		unsigned char num_str[256] = {0};
+		uint8_t *num_str = malloc(256);
 		itoa(i, num_str);
 		kprint(num_str);
 	}
