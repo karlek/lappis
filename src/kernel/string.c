@@ -21,6 +21,12 @@ void strcat(unsigned char *dest, const unsigned char *src) {
 	*dest = '\0';
 }
 
+void memcpy(uint8_t *dest, const uint8_t *src, uint32_t n) {
+	for (; n != 0; n--) {
+		*dest++ = *src++;
+	}
+}
+
 void itoa(int num, unsigned char *str) {
 	bool is_negative = false;
 	if (num < 0) {
