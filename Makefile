@@ -27,8 +27,14 @@ bin/kernel.o: src/kernel/kernel.c | bin
 		-c $< \
 		-o $@
 
-bin/foo.img: | bin
-	dd if=foobar.zip of=$@ bs=1M conv=sync
+bin/zipfs.zip: bin/nested.zip | bin
+	zip -0 -r $@ $<
+
+bin/nested.zip: | bin
+	zip -0 -r $@ zipfs
+
+bin/fs.img: bin/zipfs.zip | bin
+	dd if=bin/zipfs.zip of=$@ bs=1M conv=sync
 
 bin:
 	@mkdir -p $@
@@ -39,10 +45,10 @@ bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
 
 build: bin/kernel.iso
 
-debug: bin/kernel.iso bin/kernel.dbg bin/foo.img
+debug: bin/kernel.iso bin/kernel.dbg bin/fs.img
 	./debug.sh
 
-run: bin/kernel.iso bin/foo.img
+run: bin/kernel.iso bin/fs.img
 	./run.sh
 
 bin/kernel.iso: bin/kernel.elf grub.cfg | bin
