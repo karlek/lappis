@@ -1,11 +1,11 @@
-static int mouse_count = 0;
+static int32_t mouse_count = 0;
 
-static int stat_raw = 0;
-static int xrel_raw = 0;
-static int yrel_raw = 0;
+static int32_t stat_raw = 0;
+static int32_t xrel_raw = 0;
+static int32_t yrel_raw = 0;
 
-static int mouse_cursor_x = 0;
-static int mouse_cursor_y = 0;
+static int32_t mouse_cursor_x = 0;
+static int32_t mouse_cursor_y = 0;
 
 void draw_cursor() {
 	draw_char('\x03', mouse_cursor_x, mouse_cursor_y, NULL);

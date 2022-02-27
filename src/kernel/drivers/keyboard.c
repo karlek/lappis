@@ -195,8 +195,8 @@ enum KEY_STATE {
 /* 	KEY_STATE pressed; */
 /* }; */
 
-int caret_x = 0;
-int caret_y = 3*LARGE_FONT_CELL_HEIGHT;
+uint32_t caret_x = 0;
+uint32_t caret_y = 3*LARGE_FONT_CELL_HEIGHT;
 extern void keyboard_handler() {
 	PIC_sendEOI(0x22);
 

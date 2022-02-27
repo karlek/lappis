@@ -2,8 +2,8 @@
 #define WIDTH 1280
 #define HEIGHT 1024
 
-void set_pixel(unsigned int x, unsigned int y, unsigned char color[4]) {
-	volatile unsigned char* fb = (volatile unsigned char*)FRAME_BUFFER;
+void set_pixel(uint32_t x, uint32_t y, uint8_t color[4]) {
+	volatile uint8_t* fb = (volatile uint8_t*)FRAME_BUFFER;
 
 	// Colors are written in little endian order.
 	// Red
@@ -16,18 +16,18 @@ void set_pixel(unsigned int x, unsigned int y, unsigned char color[4]) {
 	fb[(y * WIDTH + x)*4 + 3] = color[3];
 }
 
-void draw_char(unsigned char c, int x, int y, unsigned char *color) {
-	unsigned char black[4] = {0, 0, 0, 0xff};
-	unsigned char white[4] = {255, 255, 255, 0xff};
+void draw_char(uint8_t c, uint32_t x, uint32_t y, uint8_t *color) {
+	uint8_t black[4] = {0, 0, 0, 0xff};
+	uint8_t white[4] = {255, 255, 255, 0xff};
 	if (color == NULL) {
 		color = white;
 	}
 
 	uint16_t *bitmap = large_font[c];
 	// The first & last row bitmap is always empty.
-	for (int i = 1; i < LARGE_FONT_CELL_HEIGHT; i++) {
+	for (uint32_t i = 1; i < LARGE_FONT_CELL_HEIGHT; i++) {
 		uint8_t row_bitmap = bitmap[i];
-		for (int j = 0; j < LARGE_FONT_CELL_WIDTH; j++) {
+		for (uint32_t j = 0; j < LARGE_FONT_CELL_WIDTH; j++) {
 			if (row_bitmap & (1 << j)) {
 				// Bitmap is set from left to right, so we need to flip it.
 				set_pixel(x+(LARGE_FONT_CELL_WIDTH-j), y+i, color);
@@ -38,11 +38,11 @@ void draw_char(unsigned char c, int x, int y, unsigned char *color) {
 	}
 }
 
-void draw_string(unsigned char *str, int x, int y, unsigned char *color) {
-	const int letter_spacing = 0;
+void draw_string(uint8_t *str, uint32_t x, uint32_t y, uint8_t *color) {
+	const uint32_t letter_spacing = 0;
 
-	for (int i = 0; str[i] != '\0'; i++) {
-		unsigned char c = str[i];
+	for (uint32_t i = 0; str[i] != '\0'; i++) {
+		uint8_t c = str[i];
 		draw_char(c, x, y, color);
 		x += LARGE_FONT_CELL_WIDTH;
 		if (c < 169 || c > 223) {
@@ -54,9 +54,9 @@ void draw_string(unsigned char *str, int x, int y, unsigned char *color) {
 }
 
 void clear_screen() {
-	unsigned char black[4] = {0, 0, 0, 0xff};
-	for (int y = 0; y < HEIGHT; y++) {
-		for(int x = 0; x < WIDTH; x++) {
+	uint8_t black[4] = {0, 0, 0, 0xff};
+	for (uint32_t y = 0; y < HEIGHT; y++) {
+		for(uint32_t x = 0; x < WIDTH; x++) {
 			set_pixel(x, y, black);
 		}
 	}

@@ -2,7 +2,7 @@
 #define DATA_PORT 0x60
 
 bool ps2_wait_write() {
-    int timer = 500;
+    uint32_t timer = 500;
 
     while ((inb(0x64) & 2) && timer-- > 0) {}
 
@@ -10,7 +10,7 @@ bool ps2_wait_write() {
 }
 
 bool ps2_wait_read() {
-    int timer = 500;
+    uint32_t timer = 500;
 
     while (!(inb(0x64) & 1) && timer-- >= 0) {}
 

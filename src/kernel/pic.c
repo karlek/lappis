@@ -6,7 +6,7 @@
 #define PIC2_DATA	(PIC2+1)
 #define PIC_EOI		0x20		/* End-of-interrupt command code */
  
-void PIC_sendEOI(unsigned char irq) {
+void PIC_sendEOI(uint8_t irq) {
 	if(irq >= 8) {
 		outb(PIC2_COMMAND, PIC_EOI);
 	}
@@ -35,9 +35,9 @@ arguments:
 		vectors on the primary become offset1..offset1+7
 	offset2 - same for secondary PIC: offset2..offset2+7
 */
-void PIC_remap(int offset1, int offset2) {
+void PIC_remap(uint16_t offset1, uint16_t offset2) {
 	debug("PIC_remap: start.");
-	unsigned char a1, a2;
+	uint8_t a1, a2;
  
 	a1 = inb(PIC1_DATA);                        // save masks
 	a2 = inb(PIC2_DATA);

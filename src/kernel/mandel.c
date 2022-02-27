@@ -27,18 +27,18 @@ void to_mandel_space(double x, double y, double *cr, double *ci) {
 }
 
 void draw_mandel() {
-	unsigned char black[4] = {0x00, 0x00, 0x00, 0xff};
+	uint8_t black[4] = {0x00, 0x00, 0x00, 0xff};
 	double cr = 0;
 	double ci = 0;
-	for (unsigned int x = 0; x < WIDTH; x++) {
-		for (unsigned int y = 0; y < HEIGHT; y++) {
+	for (uint32_t x = 0; x < WIDTH; x++) {
+		for (uint32_t y = 0; y < HEIGHT; y++) {
 			to_mandel_space(x, y, &cr, &ci);
 			int32_t escapes_in = mandel(cr, ci);
 
 			if (escapes_in == -1) {
 				set_pixel(x, y, black);
 			} else {
-				unsigned char c[4] = {(256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, 0xFF};
+				uint8_t c[4] = {(256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, (256/ITERATIONS)*escapes_in, 0xFF};
 				set_pixel(x, y, c);
 			}
 		}

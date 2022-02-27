@@ -160,7 +160,7 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t *ide_buf) {
 	}
 
 	// Now we can read the name of the drive.
-	for (int i = 0; i < 256; i++) {
+	for (uint32_t i = 0; i < 256; i++) {
 		uint16_t tmp = inw(io + ATA_REG_DATA);
 		ide_buf[i*2] = tmp >> 8;
 		ide_buf[i*2+1] = tmp & 0xFF;
@@ -171,7 +171,7 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t *ide_buf) {
 }
 
 void ide_400ns_delay(uint16_t io) {
-	for(int i = 0; i < 4; i++) {
+	for(uint32_t i = 0; i < 4; i++) {
 		inb(io + ATA_REG_ALTSTATUS);
 	}
 }
@@ -220,7 +220,7 @@ void ide_read_sector(uint8_t *buf, uint32_t lba, ide_dev *dev) {
 
 	ide_poll(io);
 
-	for (int i = 0; i < 256; i++) {
+	for (uint32_t i = 0; i < 256; i++) {
 		uint16_t data = inw(io + ATA_REG_DATA);
 		*(uint16_t *)(buf +i * 2) = data;
 	}
@@ -228,7 +228,7 @@ void ide_read_sector(uint8_t *buf, uint32_t lba, ide_dev *dev) {
 }
 
 void ata_read(uint8_t *buf, uint32_t lba, uint32_t numsects, ide_dev *dev) {
-	for (int i = 0; i < numsects; i++) {
+	for (uint32_t i = 0; i < numsects; i++) {
 		ide_read_sector(buf, lba + i, dev);
 		buf += 512;
 	}

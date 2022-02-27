@@ -5,7 +5,7 @@
 
 #define IDT_MAX_DESCRIPTORS 256
 
-void num_to_error_name(int interrupt_number, unsigned char *error_name) {
+void num_to_error_name(uint8_t interrupt_number, uint8_t *error_name) {
 	switch (interrupt_number) {
 		case 0:
 			strcat(error_name, "Divide Error");

@@ -10,8 +10,8 @@ typedef struct {
 } zip_fs_t;
 
 
-void read(uint8_t* buf, int n, uint32_t* cur, uint8_t* dest) {
-	for (int i = 0; i < n; i++) {
+void read(uint8_t* buf, uint64_t n, uint32_t* cur, uint8_t* dest) {
+	for (uint64_t i = 0; i < n; i++) {
 		dest[i] = buf[(*cur)++];
 	}
 }

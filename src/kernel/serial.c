@@ -1,7 +1,7 @@
 #define SERIAL_COM1_PORT 0x3F8
 #define SERIAL_COM2_PORT 0x2F8
 
-static int init_serial(int port) {
+static bool init_serial(uint16_t port) {
 	outb(port + 1, 0x00);    // Disable all interrupts
 	outb(port + 3, 0x80);    // Enable DLAB (set baud rate divisor)
 	outb(port + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -14,26 +14,26 @@ static int init_serial(int port) {
 
 	// Check if serial is faulty (i.e: not same byte as sent)
 	if(inb(port + 0) != 0xAE) {
-		return 1;
+		return false;
 	}
 
 	// If serial is not faulty set it in normal operation mode
 	// (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
 	outb(port + 4, 0x0F);
-	return 0;
+	return true;
 }
 
-bool is_transmit_empty(int port) {
+bool is_transmit_empty(uint16_t port) {
 	return inb(port + 5) & 0x20 == 1;
 }
 
-void serial_write_byte(int port, uint8_t a) {
+void serial_write_byte(uint16_t port, uint8_t a) {
 	while (is_transmit_empty(port));
 
 	outb(port, a);
 }
 
-void serial_write_string(int port, char *string) {
+void serial_write_string(uint16_t port, char *string) {
 	while (*string) {
 		serial_write_byte(port, *string);
 		string++;
@@ -52,8 +52,8 @@ void error(char *string) {
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }
 
-void debug_buffer(uint8_t *buffer, int size) {
-	for (int i = 0; i < size; i++) {
+void debug_buffer(uint8_t *buffer, uint64_t size) {
+	for (uint64_t i = 0; i < size; i++) {
 		serial_write_byte(SERIAL_COM2_PORT, buffer[i]);
 	}
 }

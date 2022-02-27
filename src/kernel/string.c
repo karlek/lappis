@@ -1,9 +1,9 @@
-int is_print(uint8_t c) {
+bool is_print(uint8_t c) {
 	return (c >= ' ' && c <= '~');
 }
 
-int strlen(unsigned char * s) {
-	int len = 0;
+uint32_t strlen(uint8_t * s) {
+	uint32_t len = 0;
 	while (*s++) {
 		len++;
 	}
@@ -11,7 +11,7 @@ int strlen(unsigned char * s) {
 }
 
 // inb4 vulns
-void strcat(unsigned char *dest, const unsigned char *src) {
+void strcat(uint8_t *dest, const uint8_t *src) {
 	while (*dest) {
 		dest++;
 	}
@@ -27,7 +27,7 @@ void memcpy(uint8_t *dest, const uint8_t *src, uint32_t n) {
 	}
 }
 
-void itoa(int num, unsigned char *str) {
+void itoa(int64_t num, uint8_t *str) {
 	bool is_negative = false;
 	if (num < 0) {
 		is_negative = true;
@@ -49,8 +49,8 @@ void itoa(int num, unsigned char *str) {
 		str++;
 	}
 
-	int offset = 0;
-	unsigned char tmp[10] = {0};
+	uint8_t offset = 0;
+	uint8_t tmp[10] = {0};
 	while (num > 0) {
 		tmp[offset++] = (num % 10) + '0';
 		num /= 10;
@@ -62,9 +62,9 @@ void itoa(int num, unsigned char *str) {
 }
 
 // TODO: This is pretty wonky.
-void htox(unsigned int num, unsigned char *str, bool prefix) {
-	int offset = 0;
-	unsigned char tmp[8] = {0};
+void htox(int64_t num, uint8_t *str, bool prefix) {
+	uint8_t offset = 0;
+	uint8_t tmp[8] = {0};
 	if (num > 0) {
 		while (num > 0) {
 			uint8_t hdigit = (num % 16);

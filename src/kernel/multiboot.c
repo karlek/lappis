@@ -10,7 +10,7 @@ struct multiboot_info {
     struct multiboot_tag tags[0];
 };
 
-unsigned char* get_tag_name(int tag_type) {
+uint8_t* get_tag_name(uint8_t tag_type) {
 	switch (tag_type) {
 		case 0: {return "MULTIBOOT_TAG_TYPE_END";}
 		case 1: {return "MULTIBOOT_TAG_TYPE_CMDLINE";}
@@ -44,7 +44,7 @@ unsigned char* get_tag_name(int tag_type) {
 /* while (tag->type != 0) { */
 /* 	switch (tag->type) { */
 /* 		default: */
-/* 			unsigned int next = ((tag->size+8) / 8); */
+/* 			uint32_t next = ((tag->size+8) / 8); */
 /* 			printf("Skipping: %s\n", 300, 300+i*LARGE_FONT_CELL_HEIGHT, NULL, get_tag_name(tag->type)); */
 /* 			tag += next; */
 /* 	} */

@@ -1,10 +1,10 @@
-void sprintf(unsigned char *out, unsigned char *format, ...) {
+void sprintf(uint8_t *out, uint8_t *format, ...) {
 	va_list args;
 	va_start(args, format);
-	unsigned char str[256] = {0};
+	uint8_t* str = malloc(256);
 
-	int offset = 0;
-	for(unsigned char* c = format; *c != '\0'; c++) {
+	uint32_t offset = 0;
+	for(uint8_t* c = format; *c != '\0'; c++) {
 		// Skip newline and goto next line & reset x-coordinate.
 		if (*c != '%') {
 			str[offset++] = *c;
@@ -16,23 +16,23 @@ void sprintf(unsigned char *out, unsigned char *format, ...) {
 
 		switch (*c) {
 			case 'c':
-				unsigned char carg = va_arg(args, int);
+				uint8_t carg = va_arg(args, int);
 				str[offset++] = carg;
 				break;
 			case 's':
-				unsigned char * arg = va_arg(args, char*);
+				uint8_t * arg = va_arg(args, char*);
 				strcat(str, arg);
 				offset += strlen(arg);
 				break;
 			case 'd':
-				int num = va_arg(args, int);
+				int64_t num = va_arg(args, int);
 				uint8_t* num_str = malloc(256);
 				itoa(num, num_str);
 				strcat(str, num_str);
 				offset += strlen(num_str);
 				break;
 			case 'x':
-				unsigned int hnum = va_arg(args, int);
+				int64_t hnum = va_arg(args, int);
 				uint8_t* hnum_str = malloc(256);
 				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
@@ -48,13 +48,13 @@ void sprintf(unsigned char *out, unsigned char *format, ...) {
 	strcat(out, str);
 }
 
-void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
-	unsigned char str[256] = {0};
+void printf(uint8_t *format, uint32_t x, uint32_t y, uint8_t *color, ...) {
+	uint8_t* str = malloc(256);
 	va_list args;
 	va_start(args, color);
 
-	int offset = 0;
-	for(unsigned char* c = format; *c != '\0'; c++) {
+	uint32_t offset = 0;
+	for(uint8_t* c = format; *c != '\0'; c++) {
 		// Skip newline and goto next line & reset x-coordinate.
 		if (*c == '\n') {
 			draw_string(str, x, y, color);
@@ -62,7 +62,7 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 			y += LARGE_FONT_CELL_HEIGHT;
 			x = 0;
 
-			for (int i = 0; i < offset; i++) {
+			for (uint32_t i = 0; i < offset; i++) {
 				str[i] = '\0';
 			}
 			offset = 0;
@@ -78,23 +78,23 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 
 		switch (*c) {
 			case 'c':
-				unsigned char carg = va_arg(args, int);
+				uint8_t carg = va_arg(args, int);
 				str[offset++] = carg;
 				break;
 			case 's':
-				unsigned char * arg = va_arg(args, char*);
+				uint8_t * arg = va_arg(args, char*);
 				strcat(str, arg);
 				offset += strlen(arg);
 				break;
 			case 'd':
-				int num = va_arg(args, int);
+				int64_t num = va_arg(args, int);
 				uint8_t* num_str = malloc(256);
 				itoa(num, num_str);
 				strcat(str, num_str);
 				offset += strlen(num_str);
 				break;
 			case 'x':
-				unsigned int hnum = va_arg(args, int);
+				int64_t hnum = va_arg(args, int);
 				uint8_t* hnum_str = malloc(256);
 				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
@@ -102,7 +102,7 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 				break;
 			case 'v':
 				uint8_t* vnum = va_arg(args, uint8_t*);
-				for (int i = 0; i < 4; i++) {
+				for (uint32_t i = 0; i < 4; i++) {
 					if (vnum[i] == 0) {
 						break;
 					}
@@ -122,22 +122,22 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 	draw_string(str, x, y, color);
 }
 
-void print_box(unsigned char *s, int x, int y, unsigned char *color) {
-	const unsigned char top_left_corner = 0xda;
-	const unsigned char flat = 0xc4;
-	const unsigned char top_right_corner = 0xbf;
-	const unsigned char pipe = 0xb3;
-	const unsigned char bottom_left_corner = 0xc0;
-	const unsigned char bottom_right_corner = 0xd9;
+void print_box(uint8_t *s, uint32_t x, uint32_t y, uint8_t *color) {
+	const uint8_t top_left_corner = 0xda;
+	const uint8_t flat = 0xc4;
+	const uint8_t top_right_corner = 0xbf;
+	const uint8_t pipe = 0xb3;
+	const uint8_t bottom_left_corner = 0xc0;
+	const uint8_t bottom_right_corner = 0xd9;
 
 	uint8_t* tmp = malloc(256);
-	int len = strlen(s)+2; // +2 for the pipe and the spacing.
+	uint32_t len = strlen(s)+2; // +2 for the pipe and the spacing.
 
-	unsigned int xoffset = 0;
-	unsigned int yoffset = 0;
+	uint32_t xoffset = 0;
+	uint32_t yoffset = 0;
 	printf("%c", x+xoffset, y+yoffset, color, top_left_corner);
 	xoffset += LARGE_FONT_CELL_WIDTH;
-	for (int i = 0; i < len; i++) {
+	for (uint32_t i = 0; i < len; i++) {
 		printf("%c", x+xoffset, y+yoffset, color, flat);
 		xoffset += LARGE_FONT_CELL_WIDTH;
 	}
@@ -150,7 +150,7 @@ void print_box(unsigned char *s, int x, int y, unsigned char *color) {
 	yoffset += LARGE_FONT_CELL_HEIGHT-2; // -2 for better spacing (connect the ascii box chars.).
 	printf("%c", x+xoffset, y+yoffset, color, bottom_left_corner);
 	xoffset += LARGE_FONT_CELL_WIDTH;
-	for (int i = 0; i < len; i++) {
+	for (uint32_t i = 0; i < len; i++) {
 		printf("%c", x+xoffset, y+yoffset, color, flat);
 		xoffset += LARGE_FONT_CELL_WIDTH;
 	}
