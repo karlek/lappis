@@ -53,10 +53,11 @@ void draw_string(unsigned char *str, int x, int y, unsigned char *color) {
 	}
 }
 
-void clear_screen_vbe() {
-	for(int x = 400; x < 700; x++) {
-		for (int y = 400; y < 600; y++) {
-			set_pixel(x, y, (unsigned char[4]){0, 0, 0, 0xff});
+void clear_screen() {
+	unsigned char black[4] = {0, 0, 0, 0xff};
+	for (int y = 0; y < HEIGHT; y++) {
+		for(int x = 0; x < WIDTH; x++) {
+			set_pixel(x, y, black);
 		}
 	}
 }
