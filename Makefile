@@ -5,20 +5,20 @@ all: build
 kernel: bin/lapis.img
 
 bin/boot.o: src/boot/boot.asm | bin
-	nasm \
+	@nasm \
 		-f elf64 \
 		-o $@ \
 		$<
 
 bin/kernel.elf: bin/boot.o bin/kernel.o | bin
-	ld \
+	@ld \
 		-n \
 		-o $@ \
 		-T linker.ld \
 		$^
 
 bin/kernel.o: src/kernel/kernel.c | bin
-	gcc \
+	@gcc \
 		-masm=intel \
 		-g \
 		-nostdlib \
@@ -31,11 +31,11 @@ bin/foo.img: | bin
 	dd if=foobar.zip of=$@ bs=1M conv=sync
 
 bin:
-	mkdir -p $@
+	@mkdir -p $@
 
 # For debug symbols.
 bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
-	ld -o $@ -T linker.ld $^
+	@ld -o $@ -T linker.ld $^
 
 build: bin/kernel.iso
 
@@ -47,9 +47,9 @@ run: bin/kernel.iso bin/foo.img
 
 bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 	@mkdir -p bin/isofiles/boot/grub
-	@cp -v $< bin/isofiles/boot/kernel.bin
-	@cp -v grub.cfg bin/isofiles/boot/grub
+	@cp $< bin/isofiles/boot/kernel.bin
+	@cp grub.cfg bin/isofiles/boot/grub
 	@grub-mkrescue -o $@ bin/isofiles 2> /dev/null
 
 clean:
-	rm -rf bin
+	@rm -rf bin
