@@ -2,7 +2,8 @@ extern exception_handler
 extern warn_interrupt
 extern keyboard_handler
 extern mouse_handler
-extern ata_handler
+extern ata_primary_handler
+extern ata_secondary_handler
 
 isr_double_fault:
 	; Double fault
@@ -51,13 +52,13 @@ irq_mouse:
 
 irq_primary_ata:
 	push rax     ; Make sure you don't damage current state.
-	call ata_handler
+	call ata_primary_handler
 	pop rax
 	iretq
 
 irq_secondary_ata:
 	push rax     ; Make sure you don't damage current state.
-	call ata_handler
+	call ata_secondary_handler
 	pop rax
 	iretq
 

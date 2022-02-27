@@ -201,7 +201,6 @@ extern void keyboard_handler() {
 	PIC_sendEOI(0x22);
 
 	uint8_t rawkey = inb(0x60);
-	clear_screen_vbe();
 
 	if (rawkey > 0x80) {
 		PIC_sendEOI(0x22);

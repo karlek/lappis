@@ -7,3 +7,9 @@ uint8_t inb(unsigned short port) {
 	__asm__("in al, dx" : "=a" (result) : "d" (port));
 	return result;
 }
+
+uint16_t inw(unsigned short port) {
+	uint16_t result;
+	__asm__("in ax, dx" : "=a" (result) : "d" (port));
+	return result;
+}

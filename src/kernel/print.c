@@ -34,7 +34,7 @@ void sprintf(unsigned char *out, unsigned char *format, ...) {
 			case 'x':
 				unsigned int hnum = va_arg(args, int);
 				unsigned char hnum_str[256] = {0};
-				htox(hnum, hnum_str);
+				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
 				break;
@@ -96,9 +96,21 @@ void printf(unsigned char *format, int x, int y, unsigned char *color, ...) {
 			case 'x':
 				unsigned int hnum = va_arg(args, int);
 				unsigned char hnum_str[256] = {0};
-				htox(hnum, hnum_str);
+				htox(hnum, hnum_str, true);
 				strcat(str, hnum_str);
 				offset += strlen(hnum_str);
+				break;
+			case 'v':
+				uint8_t* vnum = va_arg(args, uint8_t*);
+				for (int i = 0; i < 4; i++) {
+					if (vnum[i] == 0) {
+						break;
+					}
+					unsigned char num_str[256] = {0};
+					htox(vnum[i], num_str, false);
+					strcat(str, num_str);
+					offset += strlen(num_str);
+				}
 				break;
 			default:
 				str[offset++] = '?';

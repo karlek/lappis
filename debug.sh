@@ -7,11 +7,12 @@ alacritty -e \
 	qemu-system-x86_64 \
 	-S \
 	-gdb tcp::1234 \
+	-hda bin/foo.img \
 	-cdrom bin/kernel.iso &
 
 gdb \
 	--quiet \
 	-ex 'target remote localhost:1234' \
 	-ex 'symbol-file bin/kernel.dbg' \
-	-ex 'b mouse_handler' \
+	-ex 'b read_zip' \
 	-ex 'continue'

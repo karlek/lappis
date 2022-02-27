@@ -133,41 +133,28 @@ static idtr_t idtr;
 extern void* isr_stub_table[];
 
 __attribute__((noreturn)) void exception_handler() {
-    __asm__ volatile ("cli; hlt"); // Completely hangs the computer
+	__asm__ volatile ("cli; hlt"); // Completely hangs the computer
 }
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
-    idt_entry_t* descriptor = &idt[vector];
+	idt_entry_t* descriptor = &idt[vector];
 
-    descriptor->isr_low    =  (uint64_t)isr & 0xFFFF;
-    descriptor->isr_mid    = ((uint64_t)isr >> 16) & 0xFFFF;
-    descriptor->isr_high   = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
-    descriptor->kernel_cs  = 0x08;
-    descriptor->ist        = 0;
-    descriptor->attributes = flags;
-    descriptor->reserved   = 0;
+	descriptor->isr_low    =  (uint64_t)isr & 0xFFFF;
+	descriptor->isr_mid    = ((uint64_t)isr >> 16) & 0xFFFF;
+	descriptor->isr_high   = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
+	descriptor->kernel_cs  = 0x08;
+	descriptor->ist        = 0;
+	descriptor->attributes = flags;
+	descriptor->reserved   = 0;
 }
 
 
 void idt_init() {
-    idtr.base  = (uint64_t)&idt[0];
-    idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
+	// Remap PIC interrupt numbers.
+	PIC_remap(0x20, 0x28);
 
-	// Double fault.
-	/* idt_set_descriptor(8, isr_stub_table[8], 0x8E); */
-	// General protection fault.
-	/* idt_set_descriptor(13, isr_stub_table[13], 0x8E); */
-	// Page fault.
-	/* idt_set_descriptor(14, isr_stub_table[14], 0x8E); */
-	// Timer.
-	/* idt_set_descriptor(32, isr_stub_table[32], 0x8E); */
-	// Keyboard.
-	/* idt_set_descriptor(33, isr_stub_table[33], 0x8E); */
-
-	// enable mouse IRQ and port clock
-/* 	// enable keyboard IRQ and port clock */
-/* 	// enable keyboard translation */
-
+	idtr.base  = (uint64_t)&idt[0];
+	idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
 
 	// Highest number should correspond to the length of isr_stub_table in
 	// `idt.asm`.
@@ -178,6 +165,8 @@ void idt_init() {
 	enable_mouse();
 	enable_ata();
 
-    __asm__ volatile ("lidt %0" : : "m"(idtr));  // load the new IDT
-    __asm__ volatile ("sti");                    // set the interrupt flag
+	// Load the new IDT.
+	__asm__ volatile ("lidt %0" : : "m"(idtr));
+	// Set the interrupt flag.
+	__asm__ volatile ("sti");
 }

@@ -56,7 +56,7 @@ void itoa(int num, unsigned char *str) {
 }
 
 // TODO: This is pretty wonky.
-void htox(unsigned int num, unsigned char *str) {
+void htox(unsigned int num, unsigned char *str, bool prefix) {
 	int offset = 0;
 	unsigned char tmp[8] = {0};
 	if (num > 0) {
@@ -73,8 +73,10 @@ void htox(unsigned int num, unsigned char *str) {
 		tmp[offset++] = '0';
 	}
 
-	*(str++) = '0';
-	*(str++) = 'x';
+	if (prefix) {
+		*(str++) = '0';
+		*(str++) = 'x';
+	}
 	if (strlen(tmp) % 2 != 0) {
 		*(str++) = '0';
 	}

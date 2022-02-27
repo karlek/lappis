@@ -75,8 +75,6 @@ extern void mouse_handler() {
 		uint8_t x = inb(DATA_PORT);
 		handle(x);
 	}
-
-	printf("break!\n", 0, 400, NULL);
 }
 
 void enable_mouse() {
