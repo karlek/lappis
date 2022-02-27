@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 
-#include "multiboot2.h"
+#include "multiboot.c"
 
 #include "string.c"
 #include "ports.c"

@@ -1,3 +1,4 @@
+#include "multiboot2.h"
 /* struct multiboot_tag { */
 /*     uint32_t type; */
 /*     uint32_t size; */
