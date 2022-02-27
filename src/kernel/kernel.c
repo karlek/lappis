@@ -7,6 +7,7 @@
 
 #include "string.c"
 #include "ports.c"
+#include "serial.c"
 #include "terminal-font.h"
 #include "video.c"
 #include "mandel.c"
