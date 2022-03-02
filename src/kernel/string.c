@@ -21,9 +21,12 @@ void strcat(uint8_t *dest, const uint8_t *src) {
 	*dest = '\0';
 }
 
-void memcpy(uint8_t *dest, const uint8_t *src, uint32_t n) {
-	for (; n != 0; n--) {
-		*dest++ = *src++;
+void memcpy(uint8_t *dest, const uint8_t *src, uint64_t n) {
+	if (n <= 0) {
+		return;
+	}
+	for (uint64_t i = 0; i < n; i++) {
+		dest[i] = src[i];
 	}
 }
 
