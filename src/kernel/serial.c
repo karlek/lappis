@@ -57,3 +57,12 @@ void debug_buffer(uint8_t *buffer, uint64_t size) {
 		serial_write_byte(SERIAL_COM2_PORT, buffer[i]);
 	}
 }
+
+void debug_num(uint64_t num) {
+	char string[20] = {0};
+	for (int i = 0; i < 20; i++) {
+		string[i] = 0;
+	}
+	itoa(num, string);
+	debug(string);
+}
