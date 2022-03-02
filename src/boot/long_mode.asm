@@ -12,7 +12,7 @@ stack_bottom:
     resb 64
 stack_top:
 
-NUM_PAGES: equ 64
+NUM_PAGES: equ 256
 
 PRESENT:   equ 0x1
 WRITABLE:  equ 0x2
