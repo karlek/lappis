@@ -6,8 +6,8 @@ set -e
 
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
+alacritty --class lapis-serial-log -e fish -c 'tail -f /tmp/serial.raw' &
 alacritty --class lapis-serial-log -e tail -f /tmp/serial.log &
-alacritty --class lapis-serial-log -e fish -c 'tail -f /tmp/serial.raw | xxd' &
 sleep 1
 
 qemu-system-x86_64 \
@@ -16,7 +16,7 @@ qemu-system-x86_64 \
 	-d int \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
-	-hda bin/fs.img \
+	-drive media=disk,index=0,file=bin/fs.img,format=raw,if=ide \
 	-cdrom bin/kernel.iso 
 
 ps ax | grep alacritty | grep lapis-serial-log | awk '{print $1}' | xargs kill
