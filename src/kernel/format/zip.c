@@ -5,7 +5,7 @@ typedef struct {
 } file_t;
 
 typedef struct {
-	file_t* files;
+	file_t** files;
 	uint32_t num_files;
 } zip_fs_t;
 
@@ -15,19 +15,19 @@ void read(uint8_t* buf, uint64_t n, uint64_t* cur, uint8_t* dest) {
 	(*cur) += n;
 }
 
-uint16_t read_uint16(uint8_t* buf, uint32_t* cur) {
+uint16_t read_uint16(uint8_t* buf, uint64_t* cur) {
 	uint8_t raw[2] = {0};
 	read(buf, sizeof raw, cur, raw);
 	return raw[0] | (raw[1] << 8);
 }
 
-uint32_t read_uint32(uint8_t* buf, uint32_t* cur) {
+uint32_t read_uint32(uint8_t* buf, uint64_t* cur) {
 	uint8_t raw[4] = {0};
 	read(buf, sizeof raw, cur, raw);
 	return raw[0] | (raw[1] << 8) | (raw[2] << 16) | (raw[3] << 24);
 }
 
-void read_local_file(uint8_t* buf, uint32_t* cur, file_t* file) {
+void read_local_file(uint8_t* buf, uint64_t* cur, file_t* file) {
 	uint8_t version[2] = {0};
 	read(buf, sizeof version, cur, version);
 
@@ -67,7 +67,7 @@ void read_local_file(uint8_t* buf, uint32_t* cur, file_t* file) {
 	file->size = uncompressed_size;
 }
 
-void read_central_directory(uint8_t* buf, uint32_t* cur) {
+void read_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint8_t version_made_by[2] = {0};
 	read(buf, sizeof version_made_by, cur, version_made_by);
 
@@ -116,7 +116,7 @@ void read_central_directory(uint8_t* buf, uint32_t* cur) {
 	read(buf, file_comment_length, cur, file_comment);
 }
 
-void read_end_of_central_directory(uint8_t* buf, uint32_t* cur) {
+void read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint16_t disk_number = read_uint16(buf, cur);
 	uint16_t disk_number_with_start_of_central_directory = read_uint16(buf, cur);
 	uint16_t number_of_central_directory_entries_on_this_disk = read_uint16(buf, cur);
@@ -129,24 +129,28 @@ void read_end_of_central_directory(uint8_t* buf, uint32_t* cur) {
 	read(buf, zip_file_comment_length, cur, zip_file_comment);
 }
 
-void read_zip(uint8_t *buf, uint32_t len, uint32_t* cur, zip_fs_t *zipfs) {
-	file_t files[16] = {0};
+void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
+	file_t** files = malloc(16 * sizeof(file_t*));
 	zipfs->files = files;
 
 	uint32_t num_files = 0;
-	while (*cur < len) {
+
+	uint64_t cur = 0;
+	while (cur < len) {
 		uint8_t signature[4] = {0};
-		read(buf, sizeof signature, cur, signature);
+		read(buf, sizeof signature, &cur, signature);
+		debug_num(cur);
+		debug_num(len);
 
 		if (signature[2] == 0x03 && signature[3] == 0x04) {
-			file_t file;
-			read_local_file(buf, cur, &file);
+			file_t *file = malloc(sizeof(file_t));
+			read_local_file(buf, &cur, file);
 			zipfs->files[num_files] = file;
 			num_files++;
 		} else if (signature[2] == 0x01 && signature[3] == 0x02) {
-			read_central_directory(buf, cur);
+			read_central_directory(buf, &cur);
 		} else if (signature[2] == 0x05 && signature[3] == 0x06) {
-			read_end_of_central_directory(buf, cur);
+			read_end_of_central_directory(buf, &cur);
 
 			// Unknown length, so we're done.
 			if (len == -1) {
@@ -158,4 +162,6 @@ void read_zip(uint8_t *buf, uint32_t len, uint32_t* cur, zip_fs_t *zipfs) {
 			return;
 		}
 	}
+	zipfs->num_files = num_files;
+	debug("Done!");
 }
