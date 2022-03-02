@@ -1,6 +1,7 @@
 // 96MiB heap
 #define HEAP_START   0x1000000
-#define HEAP_END     0x7000000
+#define HEAP_END     0x1f000000
+/* #define FRAME_BUFFER 0x20000000 */
 
 void *heap_start   = (void *)HEAP_START;
 void *heap_end     = (void *)HEAP_END;
@@ -19,10 +20,6 @@ void *malloc(uint64_t size) {
 	}
 
 	heap_current += size;
-
-	uint8_t tmp[10];
-	itoa((uint64_t)heap_current, tmp);
-	debug(tmp);
 
 	return ptr;
 }
