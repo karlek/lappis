@@ -19,6 +19,7 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 
 bin/kernel.o: src/kernel/kernel.c | bin
 	@gcc \
+		-mno-red-zone \
 		-masm=intel \
 		-g \
 		-nostdlib \
