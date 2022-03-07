@@ -9,7 +9,7 @@ alacritty --class lapis-serial-log -e tail -f /tmp/serial.log &
 sleep 1
 
 # -S     Do not start CPU at startup (you must type 'c' in the monitor).
-alacritty -e \
+alacritty --class qemu-terminal -e \
 	qemu-system-x86_64 \
 	-S \
 	-gdb tcp::1234 \
@@ -24,3 +24,6 @@ gdb \
 	-ex 'symbol-file bin/kernel.dbg' \
 	-ex 'b kernel.c:64' \
 	-ex 'continue'
+
+ps ax | grep alacritty | grep lapis-serial-log | awk '{print $1}' | xargs kill
+ps ax | grep qemu-system-x86_64 | grep kernel\.iso | awk '{print $1}' | xargs kill
