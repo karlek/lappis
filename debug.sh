@@ -22,7 +22,7 @@ gdb \
 	--quiet \
 	-ex 'target remote localhost:1234' \
 	-ex 'symbol-file bin/kernel.dbg' \
-	-ex 'b kernel.c:64' \
+	-ex 'b kernel/format/zip.c:68' \
 	-ex 'continue'
 
 ps ax | grep alacritty | grep lapis-serial-log | awk '{print $1}' | xargs kill
