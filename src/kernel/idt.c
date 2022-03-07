@@ -104,7 +104,7 @@ void num_to_error_name(uint8_t interrupt_number, uint8_t *error_name) {
 			strcat(error_name, "Reserved");
 			break;
 		default:
-			strcat(error_name, "Unknown interrupt");
+			strcat(error_name, "Unknown interrupt, probably reserved");
 			break;
 	}
 }

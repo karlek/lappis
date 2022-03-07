@@ -62,6 +62,17 @@ irq_secondary_ata:
 	pop rax
 	iretq
 
+%macro reserved 1
+reserved_%1:
+	; Save exception code.
+	push rdi
+	mov rdi, %1
+	call warn_interrupt
+	pop rdi
+	hlt
+	nop
+%endmacro
+
 %macro not_implemented 1
 not_implemented_%1:
 	; Save exception code.
@@ -108,6 +119,15 @@ not_implemented 45
 not_implemented 46
 not_implemented 47
 
+reserved 15
+reserved 22
+reserved 23
+reserved 24
+reserved 25
+reserved 26
+reserved 27
+reserved 31
+
 global isr_stub_table
 isr_stub_table:
 	; 0 Divide-by-zero Error
@@ -141,7 +161,7 @@ isr_stub_table:
 	; 14 Page Fault
 	dq isr_page_fault
 	; 15 Reserved
-	dq 0
+	dq reserved_15
 	; 16 x87 Floating-Point Exception
 	dq not_implemented_16
 	; 17 Alignment Check
@@ -155,17 +175,17 @@ isr_stub_table:
 	; 21 Control Protection Exception
 	dq not_implemented_21
 	; 22 Reserved
-	dq 0
+	dq reserved_22
 	; 23 Reserved
-	dq 0
+	dq reserved_23
 	; 24 Reserved
-	dq 0
+	dq reserved_24
 	; 25 Reserved
-	dq 0
+	dq reserved_25
 	; 26 Reserved
-	dq 0
+	dq reserved_26
 	; 27 Reserved
-	dq 0
+	dq reserved_27
 	; 28 Hypervisor Injection Exception
 	dq not_implemented_28
 	; 29 VMM Communication Exception
@@ -173,7 +193,7 @@ isr_stub_table:
 	; 30 Security Exception
 	dq not_implemented_30
 	; 31 Reserved
-	dq 0
+	dq reserved_31
 	; 32 Remapped: Programmable Interrupt Timer Interrupt
 	dq irq_timer
 	; 33 Remapped: Keyboard Interrupt
