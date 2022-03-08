@@ -2,8 +2,6 @@
 
 set -e
 
-# sudo systemctl start docker
-
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
 alacritty --class lapis-serial-log -e fish -c 'tail -f /tmp/serial.raw' &

@@ -8,7 +8,6 @@ alacritty --class lapis-serial-log -e fish -c 'tail -f /tmp/serial.raw' &
 alacritty --class lapis-serial-log -e tail -f /tmp/serial.log &
 sleep 1
 
-# -S     Do not start CPU at startup (you must type 'c' in the monitor).
 alacritty --class qemu-terminal -e \
 	qemu-system-x86_64 \
 	-S \
