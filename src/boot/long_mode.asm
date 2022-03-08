@@ -7,7 +7,8 @@ gdt64:
 	; Descriptor type bit. If clear (0) the descriptor defines a system segment
 	; (eg. a Task State Segment). If set (1) it defines a code or data segment.
 	;
-    ; Pr: Present bit. Allows an entry to refer to a valid segment. Must be set (1) for any valid segment.
+	; Pr: Present bit. Allows an entry to refer to a valid segment. Must be set
+	; (1) for any valid segment.
 	;
 	; Ex: Executable bit. If clear (0) the descriptor defines a data segment.
 	; If set (1) it defines a code segment which can be executed from.
@@ -15,7 +16,9 @@ gdt64:
 	; L: Long-mode code flag. If set (1), the descriptor defines a 64-bit code
 	; segment. When set, Sz should always be clear. For any other type of
 	; segment (other code types or any data segment), it should be clear (0).
-	dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; Code segment
+	;
+	; Code segment
+	dq (1<<43) | (1<<44) | (1<<47) | (1<<53)
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64

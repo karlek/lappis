@@ -90,5 +90,5 @@ void main(struct multiboot_info* boot_info) {
 	}
 	debug("< inner zipfs layer");
 
-	while (1) {};
+	while (1) {}
 }
