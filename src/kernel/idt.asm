@@ -6,68 +6,69 @@ extern ata_primary_handler
 extern ata_secondary_handler
 
 isr_double_fault:
-	; Double fault
-	mov rdi, 8
+	push rdi
+
+	mov rdi, 0x8
 	call warn_interrupt
 	call exception_handler
+
+	pop rdi
 	iretq
 
 isr_general_protection_fault:
-	; Page fault
+	push rdi
+
 	mov rdi, 0xd
 	call warn_interrupt
 	call exception_handler
+
+	pop rdi
 	iretq
 
 isr_page_fault:
-	; Page fault
+	push rdi
+
 	mov rdi, 0xe
 	call warn_interrupt
 	call exception_handler
+
+	pop rdi
 	iretq
 
 irq_timer:
-	; Timer interrupt.
-	push ax
+	push rax
+
 	; End of interrupt.
 	mov al, 0x20
     out 0x20, al
-    pop ax
+
+    pop rax
 	iretq
 
 irq_keyboard:
-	; iretq
-	push rax     ; Make sure you don't damage current state.
-	; in al, 0x60  ; Read information from the keyboard.
-	; mov rdi, rax  ; Save the information.
 	call keyboard_handler
-	pop rax
 	iretq
 
 irq_mouse:
-	push rax     ; Make sure you don't damage current state.
 	call mouse_handler
-	pop rax
 	iretq
 
 irq_primary_ata:
-	push rax     ; Make sure you don't damage current state.
 	call ata_primary_handler
-	pop rax
 	iretq
 
 irq_secondary_ata:
-	push rax     ; Make sure you don't damage current state.
 	call ata_secondary_handler
-	pop rax
 	iretq
 
 %macro reserved 1
 reserved_%1:
-	; Save exception code.
+	; Maybe overly cautious to push rdi when we later hlt.
 	push rdi
+
 	mov rdi, %1
 	call warn_interrupt
+
 	pop rdi
 	hlt
 	nop
@@ -75,9 +76,13 @@ reserved_%1:
 
 %macro not_implemented 1
 not_implemented_%1:
-	; Save exception code.
+	; Maybe overly cautious to push rdi when we later hlt.
+	push rdi
+
 	mov rdi, %1
 	call warn_interrupt
+
+	pop rdi
 	hlt
 	nop
 %endmacro
