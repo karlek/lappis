@@ -112,7 +112,7 @@ bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 	@mkdir -p bin/isofiles/boot/grub
 	@cp $< bin/isofiles/boot/kernel.bin
 	@cp grub.cfg bin/isofiles/boot/grub
-	@grub-mkrescue -o $@ bin/isofiles 2> /dev/null
+	grub-mkrescue -o $@ bin/isofiles
 
 format:
 	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
