@@ -1,4 +1,6 @@
 
+[![Compile](https://github.com/karlek/lapis/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/karlek/lapis/actions/workflows/build.yml)
+
 # Lapis
 
 A toy BIOS bootloader which kickstarts a toy 64-bit operating system.
