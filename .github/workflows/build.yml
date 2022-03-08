@@ -22,4 +22,4 @@ jobs:
           ld --version
 
       - name: make
-        run: make
+        run: CC=gcc-11 make

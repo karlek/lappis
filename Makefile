@@ -1,5 +1,7 @@
 .PHONY: all kernel debug clean format
 
+$(CC) ?= gcc
+
 all: build
 
 kernel: bin/lapis.img
@@ -69,7 +71,7 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 # -o file
 #     Place the primary output in file file.
 bin/kernel.o: src/kernel/kernel.c | bin
-	@gcc \
+	@$(CC) \
 		-mno-red-zone \
 		-masm=intel \
 		-nostdlib \
