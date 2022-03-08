@@ -95,3 +95,21 @@ void htox(int64_t num, uint8_t *str, bool prefix) {
 	str[offset] = '\0';
 }
 
+// Does not handle null pointers.
+bool streq(uint8_t *s1, uint8_t *s2) {
+	if (s1 == NULL || s2 == NULL) {
+		return false;
+	}
+	if (s1 == s2) {
+		return true;
+	}
+	if (strlen(s1) != strlen(s2)) {
+		return false;
+	}
+	for (int i = 0; i < strlen(s1); i++) {
+		if (s1[i] != s2[i]) {
+			return false;
+		}
+	}
+	return true;
+}
