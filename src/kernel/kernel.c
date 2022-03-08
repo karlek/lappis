@@ -5,8 +5,8 @@
 
 #include "multiboot.c"
 
-#include "string.c"
 #include "ports.c"
+#include "string.c"
 #include "serial.c"
 #include "heap.c"
 #include "terminal-font.h"
@@ -51,17 +51,40 @@ void main(struct multiboot_info* boot_info) {
 	};
 
 	debug("> ATA");
-	uint8_t *read_buf = malloc(1024);
-	ata_read(read_buf, 0, 2, &dev);
+	uint64_t buf_size = 0xa00000;
+	uint8_t *read_buf = malloc(buf_size);
+	// TODO: Warn if there's data left on disk, but buf_size is too small.
+	// Or even better, only parse the header of the zip file and ascertain
+	// whether the size is too small.
+	// Or even better, implement an actual file system.
+	ata_read(read_buf, 0, buf_size/512, &dev);
 	debug("< ATA");
 
-	while(1) {};
-}
+	debug("> first zipfs layer");
+	zip_fs_t first_layer;
+	read_zip(read_buf, -1, &first_layer);
+	debug("< first zipfs layer");
 
-void test_kernel_printing() {
-	for (uint8_t i = 0; i <= 59; i++) {
-		uint8_t *num_str = malloc(256);
-		itoa(i, num_str);
-		kprint(num_str);
+	debug("> inner zipfs layer");
+	zip_fs_t zipfs;
+
+	printf("File system initialized.\n", 0, 0, NULL);
+	read_zip(first_layer.files[0]->data, first_layer.files[0]->size, &zipfs);
+	for (uint32_t i = 0; i < zipfs.num_files; i++) {
+		file_t* file = zipfs.files[i];
+		debug(file->name);
+		if (streq(file->name, "zipfs/dog.raw") == false) {
+			continue;
+		}
+		debug("found dog.raw!");
+		for (uint32_t x = 0; x < WIDTH; x++) {
+			for (uint32_t y = 0; y < HEIGHT; y++) {
+				uint8_t* dog_pixel = &(file->data[(y * WIDTH)*4 + (x*4)]);
+				set_pixel(x, y, dog_pixel);
+			}
+		}
 	}
+	debug("< inner zipfs layer");
+
+	while(1) {};
 }
