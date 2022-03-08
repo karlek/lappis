@@ -7,9 +7,13 @@ on:
       branches: [ main ]
 
 jobs:
-  build-and-test:
+  build:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
+
+      - name: install dependencies
+        run: sudo apt install -y nasm
+
       - name: make
         run: make
