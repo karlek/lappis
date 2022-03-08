@@ -26,7 +26,6 @@ gdt64:
 section .text
 bits 32
 init_long_mode:
-	mov esp, stack_top
 	; ebx contains the 32-bit physical address of the Multiboot2 information
 	; structure provided by the boot loader.
 	push ebx

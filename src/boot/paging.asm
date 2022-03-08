@@ -8,9 +8,6 @@ p3_table:
     resb 4096
 p2_table:
     resb 4096
-stack:
-    resb 4096
-stack_top:
 
 NUM_PAGES: equ 32
 ; 1 guard page, NUM_KERNEL_STACK_PAGES-2 stack pages, 1 guard page
