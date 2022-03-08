@@ -12,11 +12,21 @@ stack:
     resb 4096
 stack_top:
 
-NUM_PAGES: equ 256
+NUM_PAGES: equ 32
+; 1 guard page, NUM_KERNEL_STACK_PAGES-2 stack pages, 1 guard page
+NUM_KERNEL_STACK_PAGES: equ 4
+; 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
+NUM_FRAME_BUFFER_PAGES: equ 3
+
+; Remember, skip the last guard page.
+STACK_TOP: equ (2 << 20) * (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
 
 PRESENT:   equ 0x1
 WRITABLE:  equ 0x2
 PAGE_SIZE: equ 0x80
+
+CR0_WRITE_PROTECT: equ 1 << 16
+CR0_PAGING: equ 1 << 31
 
 section .text
 bits 32
@@ -47,9 +57,40 @@ set_up_page_tables:
 	mov [p2_table + ecx*8], eax
 
 	inc ecx
-	; We map 64 of the total 512 entries.
 	cmp ecx, NUM_PAGES
 	jne .map_p2_table
+	ret
+
+map_kernel_stack:
+.guard_page_start:
+	mov eax, 0x200000
+	mul ecx
+
+	; Make it a `guard` page by removing WRITABLE.
+	or eax, PRESENT|PAGE_SIZE
+	mov [p2_table + ecx*8], eax
+	inc ecx
+
+.loop:
+	mov eax, 0x200000
+	mul ecx
+
+	or eax, PRESENT|WRITABLE|PAGE_SIZE
+	mov [p2_table + ecx*8], eax
+	inc ecx
+
+	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
+	jne .loop
+
+.guard_page_end:
+	mov eax, 0x200000
+	mul ecx
+
+	; Make it a `guard` page by removing WRITABLE.
+	or eax, PRESENT|PAGE_SIZE
+	mov [p2_table + ecx*8], eax
+	inc ecx
+
 	ret
 
 ; Map the frame buffer.
@@ -67,8 +108,7 @@ map_frame_buffer:
 	mov [p2_table + ecx*8], eax
 
 	inc ecx
-	; 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
-	cmp ecx, (NUM_PAGES+3)
+	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES+NUM_FRAME_BUFFER_PAGES)
 	jne .loop
 
 	ret
@@ -91,7 +131,7 @@ enable_paging:
 
 	; Enable paging in the CR0 register.
 	mov eax, cr0
-	or eax, 1 << 31
+	or eax, CR0_PAGING
 	mov cr0, eax
 
 	ret

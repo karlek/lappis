@@ -24,9 +24,12 @@ section .text
 bits 32
 init_long_mode:
 	mov esp, stack_top
+	; ebx contains the 32-bit physical address of the Multiboot2 information
+	; structure provided by the boot loader.
 	push ebx
 
 	call set_up_page_tables
+	call map_kernel_stack
 	call map_frame_buffer
 
 	call enable_paging
@@ -39,6 +42,12 @@ long_mode_start:
 	; Clear the interrupt flag.
 	cli
 
+	; Kernel respects write protection.
+	mov rax, cr0
+	or rax, CR0_WRITE_PROTECT
+	mov cr0, rax
+
+	; Reset registers for sanity.
 	mov rax, 0
 	mov ds, ax
 	mov es, ax
@@ -50,7 +59,10 @@ long_mode_start:
 	mov rcx, 0
 	mov rdi, 0
 
+	; Fetch that multiboot structure, before we use our new fresh stack.
 	pop rdi
+	; Set our kernel stack.
+	mov rsp, STACK_TOP
 	call main
 
 	; A hint that we have escaped the kernel.
