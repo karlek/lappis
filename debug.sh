@@ -12,6 +12,7 @@ alacritty --class qemu-terminal -e \
 	qemu-system-x86_64 \
 	-S \
 	-gdb tcp::1234 \
+	-m size=128M \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/fs.img,format=raw,if=ide \
