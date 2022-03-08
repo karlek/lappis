@@ -1,2 +1,8 @@
+# Ignore build folder.
 bin/
+# Ignore ctags.
 tags
+# Ignore tooling virtual environments.
+.venv
+# Ignore lapis background images.
+*.raw
