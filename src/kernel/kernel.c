@@ -19,6 +19,9 @@
 #include "format/zip.c"
 
 void warn_interrupt(uint8_t interrupt_number) {
+	error("Interrupt!");
+	debug_num(interrupt_number);
+
 	uint8_t  red[4]     = {255, 0, 0, 0xff};
 	uint8_t* error_name = malloc(256);
 	num_to_error_name(interrupt_number, error_name);
