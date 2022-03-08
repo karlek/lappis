@@ -1,0 +1,23 @@
+---
+# Cpp is used for both C and Cpp ¯\_(ツ)_/¯
+Language: Cpp
+BasedOnStyle: LLVM
+
+UseTab: AlignWithSpaces
+TabWidth: 4
+IndentWidth: 4
+
+AlignConsecutiveMacros: AcrossComments
+AlignConsecutiveAssignments: AcrossComments
+AlignConsecutiveDeclarations: AcrossComments
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Empty
+BreakBeforeBraces: Attach
+KeepEmptyLinesAtTheStartOfBlocks: False
+PointerAlignment: Left
+ReferenceAlignment: Right
+SortIncludes: Never
+
+# -----------------------------------------------------------------------------
+# clang-format 15
+# InsertBraces: AddBraces

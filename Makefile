@@ -1,4 +1,4 @@
-.PHONY: all kernel debug clean
+.PHONY: all kernel debug clean format
 
 all: build
 
@@ -57,6 +57,12 @@ bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 	@cp $< bin/isofiles/boot/kernel.bin
 	@cp grub.cfg bin/isofiles/boot/grub
 	@grub-mkrescue -o $@ bin/isofiles 2> /dev/null
+
+format:
+	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
+
+dump-format-config:
+	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
 
 clean:
 	@rm -rf bin
