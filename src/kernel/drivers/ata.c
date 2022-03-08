@@ -1,37 +1,37 @@
-#define ATA_SR_BSY     0x80
-#define ATA_SR_DRDY    0x40
-#define ATA_SR_DF      0x20
-#define ATA_SR_DSC     0x10
-#define ATA_SR_DRQ     0x08
-#define ATA_SR_CORR    0x04
-#define ATA_SR_IDX     0x02
-#define ATA_SR_ERR     0x01
+#define ATA_SR_BSY  0x80
+#define ATA_SR_DRDY 0x40
+#define ATA_SR_DF   0x20
+#define ATA_SR_DSC  0x10
+#define ATA_SR_DRQ  0x08
+#define ATA_SR_CORR 0x04
+#define ATA_SR_IDX  0x02
+#define ATA_SR_ERR  0x01
 
-#define ATA_ER_BBK      0x80
-#define ATA_ER_UNC      0x40
-#define ATA_ER_MC       0x20
-#define ATA_ER_IDNF     0x10
-#define ATA_ER_MCR      0x08
-#define ATA_ER_ABRT     0x04
-#define ATA_ER_TK0NF    0x02
-#define ATA_ER_AMNF     0x01
+#define ATA_ER_BBK   0x80
+#define ATA_ER_UNC   0x40
+#define ATA_ER_MC    0x20
+#define ATA_ER_IDNF  0x10
+#define ATA_ER_MCR   0x08
+#define ATA_ER_ABRT  0x04
+#define ATA_ER_TK0NF 0x02
+#define ATA_ER_AMNF  0x01
 
-#define ATA_CMD_READ_PIO          0x20
-#define ATA_CMD_READ_PIO_EXT      0x24
-#define ATA_CMD_READ_DMA          0xC8
-#define ATA_CMD_READ_DMA_EXT      0x25
-#define ATA_CMD_WRITE_PIO         0x30
-#define ATA_CMD_WRITE_PIO_EXT     0x34
-#define ATA_CMD_WRITE_DMA         0xCA
-#define ATA_CMD_WRITE_DMA_EXT     0x35
-#define ATA_CMD_CACHE_FLUSH       0xE7
-#define ATA_CMD_CACHE_FLUSH_EXT   0xEA
-#define ATA_CMD_PACKET            0xA0
-#define ATA_CMD_IDENTIFY_PACKET   0xA1
-#define ATA_CMD_IDENTIFY          0xEC
+#define ATA_CMD_READ_PIO        0x20
+#define ATA_CMD_READ_PIO_EXT    0x24
+#define ATA_CMD_READ_DMA        0xC8
+#define ATA_CMD_READ_DMA_EXT    0x25
+#define ATA_CMD_WRITE_PIO       0x30
+#define ATA_CMD_WRITE_PIO_EXT   0x34
+#define ATA_CMD_WRITE_DMA       0xCA
+#define ATA_CMD_WRITE_DMA_EXT   0x35
+#define ATA_CMD_CACHE_FLUSH     0xE7
+#define ATA_CMD_CACHE_FLUSH_EXT 0xEA
+#define ATA_CMD_PACKET          0xA0
+#define ATA_CMD_IDENTIFY_PACKET 0xA1
+#define ATA_CMD_IDENTIFY        0xEC
 
-#define      ATAPI_CMD_READ       0xA8
-#define      ATAPI_CMD_EJECT      0x1B
+#define ATAPI_CMD_READ  0xA8
+#define ATAPI_CMD_EJECT 0x1B
 
 #define ATA_IDENT_DEVICETYPE   0
 #define ATA_IDENT_CYLINDERS    2
@@ -45,11 +45,11 @@
 #define ATA_IDENT_COMMANDSETS  164
 #define ATA_IDENT_MAX_LBA_EXT  200
 
-#define IDE_ATA        0x00
-#define IDE_ATAPI      0x01
- 
-#define ATA_PRIMARY_DRIVE     0x00
-#define ATA_SECONDARY_DRIVE      0x01
+#define IDE_ATA   0x00
+#define IDE_ATAPI 0x01
+
+#define ATA_PRIMARY_DRIVE   0x00
+#define ATA_SECONDARY_DRIVE 0x01
 
 #define ATA_REG_DATA       0x00
 #define ATA_REG_ERROR      0x01
@@ -70,22 +70,22 @@
 #define ATA_REG_DEVADDRESS 0x0D
 
 // Channels:
-#define      ATA_PRIMARY_BUS      0x00
-#define      ATA_SECONDARY_BUS    0x01
- 
-// Directions:
-#define      ATA_READ      0x00
-#define      ATA_WRITE     0x013
+#define ATA_PRIMARY_BUS   0x00
+#define ATA_SECONDARY_BUS 0x01
 
-#define ATA_PRIMARY_IO 0x1F0
+// Directions:
+#define ATA_READ  0x00
+#define ATA_WRITE 0x013
+
+#define ATA_PRIMARY_IO   0x1F0
 #define ATA_SECONDARY_IO 0x170
 
-#define ATA_PRIMARY_IRQ 14
+#define ATA_PRIMARY_IRQ   14
 #define ATA_SECONDARY_IRQ 15
 
 typedef struct ide_dev {
-	uint8_t bus;
-	uint8_t drive;
+	uint8_t  bus;
+	uint8_t  drive;
 	uint16_t io;
 } ide_dev;
 
@@ -126,7 +126,7 @@ void ide_select_drive(uint8_t bus, uint8_t drive) {
 	outb(io + ATA_REG_HDDEVSEL, command);
 }
 
-bool ide_identify(uint8_t bus, uint8_t drive, uint8_t *ide_buf) {
+bool ide_identify(uint8_t bus, uint8_t drive, uint8_t* ide_buf) {
 	ide_select_drive(bus, drive);
 
 	uint16_t io = bus == ATA_PRIMARY_BUS ? ATA_PRIMARY_IO : ATA_SECONDARY_IO;
@@ -153,7 +153,7 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t *ide_buf) {
 		return false;
 	}
 
-	while(!(status & ATA_SR_DRQ)) {
+	while (!(status & ATA_SR_DRQ)) {
 		status = inb(io + ATA_REG_STATUS);
 		if (status & ATA_SR_ERR) {
 			printf("ide_identify: error", 0, 400, NULL);
@@ -163,17 +163,17 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t *ide_buf) {
 
 	// Now we can read the name of the drive.
 	for (uint32_t i = 0; i < 256; i++) {
-		uint16_t tmp = inw(io + ATA_REG_DATA);
-		ide_buf[i*2] = tmp >> 8;
-		ide_buf[i*2+1] = tmp & 0xFF;
+		uint16_t tmp       = inw(io + ATA_REG_DATA);
+		ide_buf[i * 2]     = tmp >> 8;
+		ide_buf[i * 2 + 1] = tmp & 0xFF;
 	}
-	ide_buf[ATA_IDENT_MODEL+40] = '\x00';
+	ide_buf[ATA_IDENT_MODEL + 40] = '\x00';
 
 	return true;
 }
 
 void ide_400ns_delay(uint16_t io) {
-	for(uint32_t i = 0; i < 4; i++) {
+	for (uint32_t i = 0; i < 4; i++) {
 		inb(io + ATA_REG_ALTSTATUS);
 	}
 }
@@ -182,8 +182,8 @@ void ide_poll(uint16_t io) {
 	ide_400ns_delay(io);
 
 	for (;;) {
-		uint8_t status = inb(io + ATA_REG_STATUS);
-		bool is_busy = (status & ATA_SR_BSY) != 0;
+		uint8_t status  = inb(io + ATA_REG_STATUS);
+		bool    is_busy = (status & ATA_SR_BSY) != 0;
 		if (!is_busy) {
 			break;
 		}
@@ -191,7 +191,7 @@ void ide_poll(uint16_t io) {
 
 	for (;;) {
 		uint8_t status = inb(io + ATA_REG_STATUS);
-		bool is_err = (status & ATA_SR_ERR) != 0;
+		bool    is_err = (status & ATA_SR_ERR) != 0;
 		if (is_err) {
 			printf("ide_poll: error", 0, 300, NULL);
 			return;
@@ -204,9 +204,9 @@ void ide_poll(uint16_t io) {
 	}
 }
 
-void ide_read_sector(uint8_t *buf, uint32_t lba, ide_dev *dev) {
-	uint8_t drive = dev->drive;
-	uint16_t io = dev->io;
+void ide_read_sector(uint8_t* buf, uint32_t lba, ide_dev* dev) {
+	uint8_t  drive = dev->drive;
+	uint16_t io    = dev->io;
 
 	bool    is_primary    = drive == ATA_PRIMARY_DRIVE;
 	uint8_t command       = is_primary ? 0xE0 : 0xF0;
@@ -223,13 +223,13 @@ void ide_read_sector(uint8_t *buf, uint32_t lba, ide_dev *dev) {
 	ide_poll(io);
 
 	for (uint32_t i = 0; i < 256; i++) {
-		uint16_t data = inw(io + ATA_REG_DATA);
-		*(uint16_t *)(buf +i * 2) = data;
+		uint16_t data             = inw(io + ATA_REG_DATA);
+		*(uint16_t*)(buf + i * 2) = data;
 	}
 	ide_400ns_delay(io);
 }
 
-void ata_read(uint8_t *buf, uint32_t lba, uint32_t numsects, ide_dev *dev) {
+void ata_read(uint8_t* buf, uint32_t lba, uint32_t numsects, ide_dev* dev) {
 	for (uint32_t i = 0; i < numsects; i++) {
 		ide_read_sector(buf, lba + i, dev);
 		buf += 512;

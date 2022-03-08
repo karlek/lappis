@@ -32,9 +32,14 @@ void handle(uint8_t x) {
 		bool button_right  = (stat_raw & 0x02) != 0;
 		bool button_left   = (stat_raw & 0x01) != 0;
 
-		printf("flag: yo xo ys xs ao bm br bl                             ", 0, 280, NULL);
-		printf("bool: %d  %d  %d  %d  %d  %d  %d  %d                            ", 0, 300, NULL, y_overflow, x_overflow, y_signed, x_signed, always_one, button_middle, button_right, button_left);
-		printf("poss: %d  %d  %d  %d                              ", 0, 320, NULL, mouse_cursor_x, mouse_cursor_y, xrel_raw, yrel_raw);
+		printf("flag: yo xo ys xs ao bm br bl                             ", 0,
+		       280, NULL);
+		printf(
+			"bool: %d  %d  %d  %d  %d  %d  %d  %d                            ",
+			0, 300, NULL, y_overflow, x_overflow, y_signed, x_signed,
+			always_one, button_middle, button_right, button_left);
+		printf("poss: %d  %d  %d  %d                              ", 0, 320,
+		       NULL, mouse_cursor_x, mouse_cursor_y, xrel_raw, yrel_raw);
 
 		mouse_cursor_x += (int8_t)xrel_raw;
 		mouse_cursor_y -= (int8_t)yrel_raw;
@@ -47,10 +52,10 @@ void handle(uint8_t x) {
 		}
 
 		if (mouse_cursor_x >= WIDTH) {
-			mouse_cursor_x = WIDTH-1;
+			mouse_cursor_x = WIDTH - 1;
 		}
 		if (mouse_cursor_y >= HEIGHT) {
-			mouse_cursor_y = HEIGHT-1;
+			mouse_cursor_y = HEIGHT - 1;
 		}
 
 		draw_cursor(mouse_cursor_x, mouse_cursor_y);
@@ -58,9 +63,9 @@ void handle(uint8_t x) {
 		break;
 	}
 
-
 	/* asm("cli; hlt"); */
-	/* printf("mouse_count: %x %x %x                               ", 0, 300, NULL, stat_raw, xrel_raw, yrel_raw); */
+	/* printf("mouse_count: %x %x %x                               ", 0, 300,
+	 * NULL, stat_raw, xrel_raw, yrel_raw); */
 	mouse_count = (mouse_count + 1) % 3;
 }
 
@@ -69,7 +74,7 @@ extern void mouse_handler() {
 
 	for (;;) {
 		uint8_t st = inb(CMD_PORT);
-		if ((st&0x01) == 0) {
+		if ((st & 0x01) == 0) {
 			break;
 		}
 		uint8_t x = inb(DATA_PORT);

@@ -2,7 +2,7 @@ bool is_print(uint8_t c) {
 	return (c >= ' ' && c <= '~');
 }
 
-uint32_t strlen(uint8_t * s) {
+uint32_t strlen(uint8_t* s) {
 	uint32_t len = 0;
 	while (*s++) {
 		len++;
@@ -11,7 +11,7 @@ uint32_t strlen(uint8_t * s) {
 }
 
 // inb4 vulns
-void strcat(uint8_t *dest, const uint8_t *src) {
+void strcat(uint8_t* dest, const uint8_t* src) {
 	while (*dest) {
 		dest++;
 	}
@@ -21,7 +21,7 @@ void strcat(uint8_t *dest, const uint8_t *src) {
 	*dest = '\0';
 }
 
-void memcpy(uint8_t *dest, const uint8_t *src, uint64_t n) {
+void memcpy(uint8_t* dest, const uint8_t* src, uint64_t n) {
 	if (n <= 0) {
 		return;
 	}
@@ -30,11 +30,11 @@ void memcpy(uint8_t *dest, const uint8_t *src, uint64_t n) {
 	}
 }
 
-void itoa(int64_t num, uint8_t *str) {
+void itoa(int64_t num, uint8_t* str) {
 	bool is_negative = false;
 	if (num < 0) {
 		is_negative = true;
-		num = -num;
+		num         = -num;
 	}
 
 	// Handle MinInt case.
@@ -52,7 +52,7 @@ void itoa(int64_t num, uint8_t *str) {
 		str++;
 	}
 
-	uint8_t offset = 0;
+	uint8_t offset  = 0;
 	uint8_t tmp[10] = {0};
 	while (num > 0) {
 		tmp[offset++] = (num % 10) + '0';
@@ -65,7 +65,7 @@ void itoa(int64_t num, uint8_t *str) {
 }
 
 // TODO: This is pretty wonky.
-void htox(int64_t num, uint8_t *str, bool prefix) {
+void htox(int64_t num, uint8_t* str, bool prefix) {
 	uint8_t offset = 0;
 	uint8_t tmp[8] = {0};
 	if (num > 0) {
@@ -96,7 +96,7 @@ void htox(int64_t num, uint8_t *str, bool prefix) {
 }
 
 // Does not handle null pointers.
-bool streq(uint8_t *s1, uint8_t *s2) {
+bool streq(uint8_t* s1, uint8_t* s2) {
 	if (s1 == NULL || s2 == NULL) {
 		return false;
 	}

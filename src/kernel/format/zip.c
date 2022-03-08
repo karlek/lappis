@@ -9,9 +9,8 @@ typedef struct {
 	uint32_t num_files;
 } zip_fs_t;
 
-
 void read(uint8_t* buf, uint64_t n, uint64_t* cur, uint8_t* dest) {
-	memcpy(dest, buf+*cur, n);
+	memcpy(dest, buf + *cur, n);
 	(*cur) += n;
 }
 
@@ -46,10 +45,10 @@ void read_local_file(uint8_t* buf, uint64_t* cur, file_t* file) {
 	uint8_t crc32_uncompressed[4] = {0};
 	read(buf, sizeof crc32_uncompressed, cur, crc32_uncompressed);
 
-	uint32_t compressed_size = read_uint32(buf, cur);
+	uint32_t compressed_size   = read_uint32(buf, cur);
 	uint32_t uncompressed_size = read_uint32(buf, cur);
 
-	uint16_t file_name_length = read_uint16(buf, cur);
+	uint16_t file_name_length   = read_uint16(buf, cur);
 	uint16_t extra_field_length = read_uint16(buf, cur);
 
 	uint8_t* file_name = malloc(file_name_length + 1);
@@ -89,12 +88,12 @@ void read_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint8_t crc32_uncompressed[4] = {0};
 	read(buf, sizeof crc32_uncompressed, cur, crc32_uncompressed);
 
-	uint32_t compressed_size = read_uint32(buf, cur);
+	uint32_t compressed_size   = read_uint32(buf, cur);
 	uint32_t uncompressed_size = read_uint32(buf, cur);
 
 	uint16_t file_name_length = read_uint16(buf, cur);
 
-	uint16_t extra_field_length = read_uint16(buf, cur);
+	uint16_t extra_field_length  = read_uint16(buf, cur);
 	uint16_t file_comment_length = read_uint16(buf, cur);
 
 	uint16_t disk_number_start_raw = read_uint16(buf, cur);
@@ -105,7 +104,7 @@ void read_central_directory(uint8_t* buf, uint64_t* cur) {
 
 	uint32_t relative_offset_of_local_header = read_uint32(buf, cur);
 
-	uint8_t* file_name = malloc(file_name_length+1);
+	uint8_t* file_name = malloc(file_name_length + 1);
 	read(buf, file_name_length, cur, file_name);
 	file_name[file_name_length] = 0;
 
@@ -118,11 +117,15 @@ void read_central_directory(uint8_t* buf, uint64_t* cur) {
 
 void read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint16_t disk_number = read_uint16(buf, cur);
-	uint16_t disk_number_with_start_of_central_directory = read_uint16(buf, cur);
-	uint16_t number_of_central_directory_entries_on_this_disk = read_uint16(buf, cur);
+	uint16_t disk_number_with_start_of_central_directory =
+		read_uint16(buf, cur);
+	uint16_t number_of_central_directory_entries_on_this_disk =
+		read_uint16(buf, cur);
 	uint16_t number_of_central_directory_entries = read_uint16(buf, cur);
-	uint32_t size_of_central_directory = read_uint32(buf, cur);
-	uint32_t offset_of_start_of_central_directory_with_respect_to_starting_disk_number = read_uint32(buf, cur);
+	uint32_t size_of_central_directory           = read_uint32(buf, cur);
+	uint32_t
+		offset_of_start_of_central_directory_with_respect_to_starting_disk_number =
+			read_uint32(buf, cur);
 	uint16_t zip_file_comment_length = read_uint16(buf, cur);
 
 	uint8_t* zip_file_comment = malloc(zip_file_comment_length);
@@ -141,9 +144,9 @@ bool is_end_of_central_directory(uint8_t* section_type) {
 	return section_type[0] == 0x05 && section_type[1] == 0x06;
 }
 
-void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
+void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 	file_t** files = malloc(16 * sizeof(file_t*));
-	zipfs->files = files;
+	zipfs->files   = files;
 
 	uint32_t num_files = 0;
 
@@ -161,7 +164,7 @@ void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
 		read(buf, 2, &cur, section_type);
 		if (is_local_file_header(section_type)) {
 			debug("Local file header");
-			file_t *file = malloc(sizeof(file_t));
+			file_t* file = malloc(sizeof(file_t));
 			read_local_file(buf, &cur, file);
 			zipfs->files[num_files] = file;
 			num_files++;

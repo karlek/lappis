@@ -59,7 +59,7 @@ enum KEYCODE {
 };
 
 static char* _qwertyuiop = "qwertyuiop"; // 0x10-0x1c
-static char* _asdfghjkl  = "asdfghjkl";   // 0x1e-0x2c
+static char* _asdfghjkl  = "asdfghjkl";  // 0x1e-0x2c
 static char* _zxcvbnm    = "zxcvbnm";
 static char* _num        = "0123456789";
 
@@ -70,124 +70,124 @@ uint8_t keyboard_to_ascii(uint8_t key) {
 	}
 
 	switch (key) {
-		case Q:
-			return _qwertyuiop[0];
-		case W:
-			return _qwertyuiop[1];
-		case E:
-			return _qwertyuiop[2];
-		case R:
-			return _qwertyuiop[3];
-		case T:
-			return _qwertyuiop[4];
-		case Y:
-			return _qwertyuiop[5];
-		case U:
-			return _qwertyuiop[6];
-		case I:
-			return _qwertyuiop[7];
-		case O:
-			return _qwertyuiop[8];
-		case P:
-			return _qwertyuiop[9];
+	case Q:
+		return _qwertyuiop[0];
+	case W:
+		return _qwertyuiop[1];
+	case E:
+		return _qwertyuiop[2];
+	case R:
+		return _qwertyuiop[3];
+	case T:
+		return _qwertyuiop[4];
+	case Y:
+		return _qwertyuiop[5];
+	case U:
+		return _qwertyuiop[6];
+	case I:
+		return _qwertyuiop[7];
+	case O:
+		return _qwertyuiop[8];
+	case P:
+		return _qwertyuiop[9];
 
-		case A:
-			return _asdfghjkl[0];
-		case S:
-			return _asdfghjkl[1];
-		case D:
-			return _asdfghjkl[2];
-		case F:
-			return _asdfghjkl[3];
-		case G:
-			return _asdfghjkl[4];
-		case H:
-			return _asdfghjkl[5];
-		case J:
-			return _asdfghjkl[6];
-		case K:
-			return _asdfghjkl[7];
-		case L:
-			return _asdfghjkl[8];
+	case A:
+		return _asdfghjkl[0];
+	case S:
+		return _asdfghjkl[1];
+	case D:
+		return _asdfghjkl[2];
+	case F:
+		return _asdfghjkl[3];
+	case G:
+		return _asdfghjkl[4];
+	case H:
+		return _asdfghjkl[5];
+	case J:
+		return _asdfghjkl[6];
+	case K:
+		return _asdfghjkl[7];
+	case L:
+		return _asdfghjkl[8];
 
-		case Z:
-			return _zxcvbnm[0];
-		case X:
-			return _zxcvbnm[1];
-		case C:
-			return _zxcvbnm[2];
-		case V:
-			return _zxcvbnm[3];
-		case B:
-			return _zxcvbnm[4];
-		case N:
-			return _zxcvbnm[5];
-		case M:
-			return _zxcvbnm[6];
+	case Z:
+		return _zxcvbnm[0];
+	case X:
+		return _zxcvbnm[1];
+	case C:
+		return _zxcvbnm[2];
+	case V:
+		return _zxcvbnm[3];
+	case B:
+		return _zxcvbnm[4];
+	case N:
+		return _zxcvbnm[5];
+	case M:
+		return _zxcvbnm[6];
 
-		case ZERO:
-			return _num[0];
-		case ONE:
-			return _num[1];
-		case TWO:
-			return _num[2];
-		case THREE:
-			return _num[3];
-		case FOUR:
-			return _num[4];
-		case FIVE:
-			return _num[5];
-		case SIX:
-			return _num[6];
-		case SEVEN:
-			return _num[7];
-		case EIGHT:
-			return _num[8];
-		case NINE:
-			return _num[9];
+	case ZERO:
+		return _num[0];
+	case ONE:
+		return _num[1];
+	case TWO:
+		return _num[2];
+	case THREE:
+		return _num[3];
+	case FOUR:
+		return _num[4];
+	case FIVE:
+		return _num[5];
+	case SIX:
+		return _num[6];
+	case SEVEN:
+		return _num[7];
+	case EIGHT:
+		return _num[8];
+	case NINE:
+		return _num[9];
 
-		case BACKTICK:
-			return '`';
-		case HYPHEN:
-			return '-';
-		case EQUAL:
-			return '=';
-		case LEFT_BRACKET:
-			return '[';
-		case RIGHT_BRACKET:
-			return ']';
-		case SEMICOLON:
-			return ';';
-		case SINGLE_QUOTE:
-			return '\'';
-		case BACKSLASH:
-			return '\\';
-		case COMMA:
-			return ',';
-		case PERIOD:
-			return '.';
-		case FORWARD_SLASH:
-			return '/';
-		case LESS_THAN:
-			return '<';
+	case BACKTICK:
+		return '`';
+	case HYPHEN:
+		return '-';
+	case EQUAL:
+		return '=';
+	case LEFT_BRACKET:
+		return '[';
+	case RIGHT_BRACKET:
+		return ']';
+	case SEMICOLON:
+		return ';';
+	case SINGLE_QUOTE:
+		return '\'';
+	case BACKSLASH:
+		return '\\';
+	case COMMA:
+		return ',';
+	case PERIOD:
+		return '.';
+	case FORWARD_SLASH:
+		return '/';
+	case LESS_THAN:
+		return '<';
 
-		case SPACE:
-			return ' ';
-		case ENTER:
-			return '\n';
-		case ESCAPE:
-			return '\x1b';
-		case BACKSPACE:
-			return '\b';
+	case SPACE:
+		return ' ';
+	case ENTER:
+		return '\n';
+	case ESCAPE:
+		return '\x1b';
+	case BACKSPACE:
+		return '\b';
 
-		default:
-			return 0;
+	default:
+		return 0;
 	}
 }
 
 enum KEY_STATE {
 	KEY_STATE_RELEASED = 0,
-	KEY_STATE_PRESSED = 1,
+	KEY_STATE_PRESSED  = 1,
 };
 
 /* struct Key { */
@@ -195,8 +195,8 @@ enum KEY_STATE {
 /* 	KEY_STATE pressed; */
 /* }; */
 
-uint32_t caret_x = 0;
-uint32_t caret_y = 3*LARGE_FONT_CELL_HEIGHT;
+uint32_t    caret_x = 0;
+uint32_t    caret_y = 3 * LARGE_FONT_CELL_HEIGHT;
 extern void keyboard_handler() {
 	PIC_sendEOI(0x22);
 
@@ -223,7 +223,7 @@ extern void keyboard_handler() {
 			printf("%c", caret_x, caret_y, NULL, ' ');
 		}
 	} else if (c == '\n') {
-		caret_x  = 0;
+		caret_x = 0;
 		caret_y += LARGE_FONT_CELL_HEIGHT;
 	}
 }
