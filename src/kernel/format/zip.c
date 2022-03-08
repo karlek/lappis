@@ -129,6 +129,18 @@ void read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	read(buf, zip_file_comment_length, cur, zip_file_comment);
 }
 
+bool is_local_file_header(uint8_t* section_type) {
+	return section_type[0] == 0x03 && section_type[1] == 0x04;
+}
+
+bool is_central_directory(uint8_t* section_type) {
+	return section_type[0] == 0x01 && section_type[1] == 0x02;
+}
+
+bool is_end_of_central_directory(uint8_t* section_type) {
+	return section_type[0] == 0x05 && section_type[1] == 0x06;
+}
+
 void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
 	file_t** files = malloc(16 * sizeof(file_t*));
 	zipfs->files = files;
@@ -137,19 +149,27 @@ void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
 
 	uint64_t cur = 0;
 	while (cur < len) {
-		uint8_t signature[4] = {0};
-		read(buf, sizeof signature, &cur, signature);
-		debug_num(cur);
-		debug_num(len);
+		uint8_t* magic = malloc(2);
+		read(buf, 2, &cur, magic);
+		if (magic[0] != 0x50 || magic[1] != 0x4b) {
+			error("Invalid zip file!");
+			debug_buffer(magic, 2);
+			return;
+		}
 
-		if (signature[2] == 0x03 && signature[3] == 0x04) {
+		uint8_t* section_type = malloc(2);
+		read(buf, 2, &cur, section_type);
+		if (is_local_file_header(section_type)) {
+			debug("Local file header");
 			file_t *file = malloc(sizeof(file_t));
 			read_local_file(buf, &cur, file);
 			zipfs->files[num_files] = file;
 			num_files++;
-		} else if (signature[2] == 0x01 && signature[3] == 0x02) {
+		} else if (is_central_directory(section_type)) {
+			debug("Central directory");
 			read_central_directory(buf, &cur);
-		} else if (signature[2] == 0x05 && signature[3] == 0x06) {
+		} else if (is_end_of_central_directory(section_type)) {
+			debug("End of central directory");
 			read_end_of_central_directory(buf, &cur);
 
 			// Unknown length, so we're done.
@@ -158,7 +178,7 @@ void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
 			}
 		} else {
 			error("Invalid zip file!");
-			debug_buffer(signature, sizeof signature);
+			debug_buffer(section_type, 2);
 			return;
 		}
 	}
