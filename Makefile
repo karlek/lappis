@@ -93,7 +93,10 @@ bin:
 
 # For debug symbols.
 bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
-	@ld -o $@ -T linker.ld $^
+	@ld \
+		--output $@ \
+		--script linker.ld \
+		$^
 
 build: bin/kernel.iso
 
