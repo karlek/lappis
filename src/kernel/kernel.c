@@ -73,14 +73,14 @@ void main(struct multiboot_info* boot_info) {
 	for (uint32_t i = 0; i < zipfs.num_files; i++) {
 		file_t* file = zipfs.files[i];
 		debug(file->name);
-		if (streq(file->name, "zipfs/dog.raw") == false) {
+		if (streq(file->name, "zipfs/bg.raw") == false) {
 			continue;
 		}
-		debug("found dog.raw!");
+		debug("found bg.raw!");
 		for (uint32_t x = 0; x < WIDTH; x++) {
 			for (uint32_t y = 0; y < HEIGHT; y++) {
-				uint8_t* dog_pixel = &(file->data[(y * WIDTH)*4 + (x*4)]);
-				set_pixel(x, y, dog_pixel);
+				uint8_t* bg_pixel = &(file->data[(y * WIDTH)*4 + (x*4)]);
+				set_pixel(x, y, bg_pixel);
 			}
 		}
 	}
