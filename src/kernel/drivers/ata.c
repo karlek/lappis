@@ -91,16 +91,12 @@ typedef struct ide_dev {
 
 extern void ata_primary_handler() {
 	debug("Primary handler");
-	asm volatile("cli");
 	PIC_sendEOI(0x20 + ATA_PRIMARY_IRQ);
-	asm volatile("sti");
 }
 
 extern void ata_secondary_handler() {
 	debug("Secondary handler");
-	asm volatile("cli");
 	PIC_sendEOI(0x20 + ATA_SECONDARY_IRQ);
-	asm volatile("sti");
 }
 
 void ide_select_drive(uint8_t bus, uint8_t drive) {

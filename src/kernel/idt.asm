@@ -8,6 +8,7 @@ extern ata_primary_handler
 extern ata_secondary_handler
 
 isr_double_fault:
+	cli
 	push rdi
 
 	mov rdi, 0x8
@@ -15,9 +16,11 @@ isr_double_fault:
 	call exception_handler
 
 	pop rdi
+	sti
 	iretq
 
 isr_general_protection_fault:
+	cli
 	push rdi
 
 	mov rdi, 0xd
@@ -25,9 +28,11 @@ isr_general_protection_fault:
 	call exception_handler
 
 	pop rdi
+	sti
 	iretq
 
 isr_page_fault:
+	cli
 	push rdi
 
 	mov rdi, 0xe
@@ -35,9 +40,11 @@ isr_page_fault:
 	call exception_handler
 
 	pop rdi
+	sti
 	iretq
 
 irq_timer:
+	cli
 	push rax
 
 	; End of interrupt.
@@ -45,26 +52,36 @@ irq_timer:
     out 0x20, al
 
     pop rax
+	sti
 	iretq
 
 irq_keyboard:
+	cli
 	call keyboard_handler
+	sti
 	iretq
 
 irq_mouse:
+	cli
 	call mouse_handler
+	sti
 	iretq
 
 irq_primary_ata:
+	cli
 	call ata_primary_handler
+	sti
 	iretq
 
 irq_secondary_ata:
+	cli
 	call ata_secondary_handler
+	sti
 	iretq
 
 %macro reserved 1
 reserved_%1:
+	cli
 	; Maybe overly cautious to push rdi when we later hlt.
 	push rdi
 
@@ -78,6 +95,7 @@ reserved_%1:
 
 %macro not_implemented 1
 not_implemented_%1:
+	cli
 	; Maybe overly cautious to push rdi when we later hlt.
 	push rdi
 

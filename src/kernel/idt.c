@@ -146,7 +146,7 @@ extern void* isr_stub_table[];
 // 
 // __attribute__((noreturn)) 
 void exception_handler() {
-	__asm__ volatile("cli; hlt"); // Completely hangs the computer
+	__asm__ volatile("hlt"); // Completely hangs the computer
 }
 
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
