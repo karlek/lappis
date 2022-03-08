@@ -141,7 +141,11 @@ static idtr_t idtr;
 // Defined in idt.asm
 extern void* isr_stub_table[];
 
-__attribute__((noreturn)) void exception_handler() {
+// This does not return, but gcc will complain if we give it the noreturn
+// attribute... So here it is for your benefit.
+// 
+// __attribute__((noreturn)) 
+void exception_handler() {
 	__asm__ volatile("cli; hlt"); // Completely hangs the computer
 }
 
