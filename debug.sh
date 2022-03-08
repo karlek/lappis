@@ -20,10 +20,7 @@ alacritty --class qemu-terminal -e \
 
 gdb \
 	--quiet \
-	-ex 'target remote localhost:1234' \
-	-ex 'symbol-file bin/kernel.dbg' \
-	-ex 'b kernel/format/zip.c:68' \
-	-ex 'continue'
+	-command=debug.gdb
 
 ps ax | grep alacritty | grep lapis-serial-log | awk '{print $1}' | xargs kill
 ps ax | grep qemu-system-x86_64 | grep kernel\.iso | awk '{print $1}' | xargs kill
