@@ -56,21 +56,3 @@ uint8_t* get_tag_name(uint8_t tag_type) {
 		return "Unknown";
 	}
 }
-
-/* struct multiboot_tag { */
-/*     uint32_t type; */
-/*     uint32_t size; */
-/* }; */
-
-/* int i = 0; */
-/* struct multiboot_tag *tag = boot_info->tags; */
-/* while (tag->type != 0) { */
-/* 	switch (tag->type) { */
-/* 		default: */
-/* 			uint32_t next = ((tag->size+8) / 8); */
-/* 			printf("Skipping: %s\n", 300, 300+i*LARGE_FONT_CELL_HEIGHT, NULL,
- * get_tag_name(tag->type)); */
-/* 			tag += next; */
-/* 	} */
-/* 	i++; */
-/* } */
