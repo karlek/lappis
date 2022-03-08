@@ -1,4 +1,4 @@
-#define FRAME_BUFFER 0x20000000
+#define FRAME_BUFFER 0x4800000
 #define WIDTH        1280
 #define HEIGHT       1024
 
