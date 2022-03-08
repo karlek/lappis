@@ -47,7 +47,7 @@ void debug(char *string) {
 }
 
 void error(char *string) {
-	serial_write_string(SERIAL_COM1_PORT, "\033[35;1;1m[DEBUG]\033[0m ");
+	serial_write_string(SERIAL_COM1_PORT, "\033[35;1;1m[ERROR]\033[0m ");
 	serial_write_string(SERIAL_COM1_PORT, string);
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }
