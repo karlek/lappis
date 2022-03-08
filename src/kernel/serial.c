@@ -25,7 +25,7 @@ static bool init_serial(uint16_t port) {
 }
 
 bool is_transmit_empty(uint16_t port) {
-	return inb(port + 5) & 0x20 == 1;
+	return (inb(port + 5) & 0x20) == 1;
 }
 
 void serial_write_byte(uint16_t port, uint8_t a) {
