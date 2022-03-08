@@ -1,3 +1,5 @@
+bits 64
+
 extern exception_handler
 extern warn_interrupt
 extern keyboard_handler
