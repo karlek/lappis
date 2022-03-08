@@ -201,7 +201,7 @@ extern void keyboard_handler() {
 	PIC_sendEOI(0x22);
 
 	uint8_t rawkey = inb(0x60);
-
+	// Currently not handling released keys.
 	if (rawkey > 0x80) {
 		PIC_sendEOI(0x22);
 		return;
