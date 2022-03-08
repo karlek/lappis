@@ -15,5 +15,10 @@ jobs:
       - name: install dependencies
         run: sudo apt install -y nasm
 
+      - name: versions
+        run: |
+          gcc --version
+          ld --version
+
       - name: make
         run: make
