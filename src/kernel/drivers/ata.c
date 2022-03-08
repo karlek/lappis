@@ -174,7 +174,7 @@ void ide_400ns_delay(uint16_t io) {
 	}
 }
 
-void ide_poll(uint16_t io) {
+void ide_poll(uint16_t io, bool advanced_check) {
 	ide_400ns_delay(io);
 
 	for (;;) {
@@ -185,19 +185,28 @@ void ide_poll(uint16_t io) {
 		}
 	}
 
-	for (;;) {
-		uint8_t status = inb(io + ATA_REG_STATUS);
-		bool    is_err = (status & ATA_SR_ERR) != 0;
-		if (is_err) {
-			printf("ide_poll: error", 0, 300, NULL);
-			return;
-		}
-
-		bool is_drq = (status & ATA_SR_DRQ) != 0;
-		if (is_drq) {
-			break;
-		}
+	if (!advanced_check) {
+		return;
 	}
+
+	uint8_t status = inb(io + ATA_REG_STATUS);
+	bool    is_err = (status & ATA_SR_ERR) != 0;
+	if (is_err) {
+		printf("ide_poll: error", 0, 300, NULL);
+		return;
+	}
+	bool is_device_fault = (status & ATA_SR_DF) != 0;
+	if (is_device_fault) {
+		printf("ide_poll: device fault", 0, 300, NULL);
+		return;
+	}
+	bool is_not_drq = (status & ATA_SR_DRQ) == 0;
+	if (is_not_drq) {
+		printf("ide_poll: DRQ not set", 0, 300, NULL);
+		return;
+	}
+
+	// We are done!
 }
 
 void ide_read_sector(uint8_t* buf, uint32_t lba, ide_dev* dev) {
@@ -216,7 +225,7 @@ void ide_read_sector(uint8_t* buf, uint32_t lba, ide_dev* dev) {
 	outb(io + ATA_REG_LBA2, (uint8_t)(lba >> 16));
 	outb(io + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
 
-	ide_poll(io);
+	ide_poll(io, true);
 
 	for (uint32_t i = 0; i < 256; i++) {
 		uint16_t data             = inw(io + ATA_REG_DATA);
