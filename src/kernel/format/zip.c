@@ -171,11 +171,8 @@ void read_zip(uint8_t *buf, uint64_t len, zip_fs_t *zipfs) {
 		} else if (is_end_of_central_directory(section_type)) {
 			debug("End of central directory");
 			read_end_of_central_directory(buf, &cur);
-
-			// Unknown length, so we're done.
-			if (len == -1) {
-				break;
-			}
+			// We are done!
+			break;
 		} else {
 			error("Invalid zip file!");
 			debug_buffer(section_type, 2);
