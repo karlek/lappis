@@ -2,6 +2,7 @@
 #define SERIAL_COM2_PORT 0x2F8
 
 #define debug(...)  debug_context(__FILE__, __func__, __LINE__, __VA_ARGS__)
+#define error(...)  error_context(__FILE__, __func__, __LINE__, __VA_ARGS__)
 
 static bool init_serial(uint16_t port) {
 	outb(port + 1, 0x00); // Disable all interrupts
@@ -47,17 +48,6 @@ void serial_write_string(uint16_t port, uint8_t* string) {
 	}
 }
 
-uint64_t strrchr(const uint8_t* str, uint8_t c) {
-	uint64_t i = strlen(str)-1;
-	while (i >= 0) {
-		if (str[i] == c) {
-			return i;
-		}
-		i--;
-	}
-	return 0;
-}
-
 void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, char *format, ...) {
 	char buffer[256];
 	va_list args;
@@ -88,14 +78,32 @@ void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr,
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }
 
-void error(char* format, ...) {
+void error_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, char *format, ...) {
 	char buffer[256];
 	va_list args;
 	va_start(args, format);
 	tfp_vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
+	char s_linenr[10] = {0};
+	itoa(linenr, s_linenr);
+
+	// TODO: Shitty basename.
+	filename += strrchr(filename, '/')+1;
+
 	serial_write_string(SERIAL_COM1_PORT, "\033[35;1;1m[ERROR]\033[0m ");
+	serial_write_string(SERIAL_COM1_PORT, "\033[34m");
+	serial_write_string(SERIAL_COM1_PORT, filename);
+	serial_write_string(SERIAL_COM1_PORT, "\033[0m");
+	serial_write_string(SERIAL_COM1_PORT, ":");
+	serial_write_string(SERIAL_COM1_PORT, "\033[35m");
+	serial_write_string(SERIAL_COM1_PORT, (uint8_t*)func_name);
+	serial_write_string(SERIAL_COM1_PORT, "\033[0m");
+	serial_write_string(SERIAL_COM1_PORT, ":");
+	serial_write_string(SERIAL_COM1_PORT, "\033[37m");
+	serial_write_string(SERIAL_COM1_PORT, s_linenr);
+	serial_write_string(SERIAL_COM1_PORT, "\033[0m");
+	serial_write_string(SERIAL_COM1_PORT, " ");
 	serial_write_string(SERIAL_COM1_PORT, buffer);
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }

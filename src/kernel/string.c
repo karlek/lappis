@@ -30,7 +30,7 @@ void memcpy(uint8_t* dest, const uint8_t* src, uint64_t n) {
 	}
 }
 
-uint64_t strrchr(const uint8_t* str, uint8_t c) {
+uint64_t strrchr(uint8_t* str, uint8_t c) {
 	uint64_t i = strlen(str)-1;
 	while (i >= 0) {
 		if (str[i] == c) {
