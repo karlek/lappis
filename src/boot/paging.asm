@@ -55,7 +55,11 @@ set_up_page_tables:
 	; Set flags `page size`, `present` and `writeable`.
 	or eax, PRESENT|WRITABLE|PAGE_SIZE
 	mov [p2_table + ecx*8], eax
-
+	cmp ecx, 0
+	je .next
+	; Make only the range 0x000000-0x200000 (2MiB) executable.
+	mov dword [p2_table + ecx*8 + 4], 1 << 31
+.next:
 	inc ecx
 	cmp ecx, NUM_PAGES
 	jne .map_p2_table
@@ -69,6 +73,7 @@ map_kernel_stack:
 	; Make it a `guard` page by removing WRITABLE.
 	or eax, PRESENT|PAGE_SIZE
 	mov [p2_table + ecx*8], eax
+	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
 
 .loop:
@@ -77,6 +82,7 @@ map_kernel_stack:
 
 	or eax, PRESENT|WRITABLE|PAGE_SIZE
 	mov [p2_table + ecx*8], eax
+	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
 
 	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
@@ -89,6 +95,7 @@ map_kernel_stack:
 	; Make it a `guard` page by removing WRITABLE.
 	or eax, PRESENT|PAGE_SIZE
 	mov [p2_table + ecx*8], eax
+	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
 
 	ret
@@ -106,6 +113,7 @@ map_frame_buffer:
 	add eax, 0x200000
 .store:
 	mov [p2_table + ecx*8], eax
+	mov dword [p2_table + ecx*8 + 4], 1 << 31
 
 	inc ecx
 	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES+NUM_FRAME_BUFFER_PAGES)
