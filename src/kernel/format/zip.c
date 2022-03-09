@@ -144,6 +144,117 @@ bool is_end_of_central_directory(uint8_t* section_type) {
 	return section_type[0] == 0x05 && section_type[1] == 0x06;
 }
 
+void peek_local_file(uint8_t* buf, uint64_t* cur) {
+	// version
+	*cur += 2;
+	// flag
+	*cur += 2;
+	// compression method
+	*cur += 2;
+	// last mod date
+	*cur += 2;
+	// last mod time
+	*cur += 2;
+	// crc32
+	*cur += 4;
+	// compressed size
+	*cur += 4;
+
+	uint32_t uncompressed_size  = read_uint32(buf, cur);
+	uint16_t file_name_length   = read_uint16(buf, cur);
+	uint16_t extra_field_length = read_uint16(buf, cur);
+
+	*cur += file_name_length;
+	*cur += extra_field_length;
+	*cur += uncompressed_size;
+}
+
+void peek_central_directory(uint8_t* buf, uint64_t* cur) {
+	// version made by
+	*cur += 2;
+	// version needed
+	*cur += 2;
+	// flags
+	*cur += 2;
+	// compression method
+	*cur += 2;
+	// last mod date
+	*cur += 2;
+	// last mod time
+	*cur += 2;
+	// crc32 uncompressed
+	*cur += 4;
+	// compressed size
+	*cur += 4;
+	// uncompressed size
+	*cur += 4;
+	// file name length
+	uint16_t file_name_length = read_uint16(buf, cur);
+	// extra field length
+	uint16_t extra_field_length = read_uint16(buf, cur);
+	// file comment length
+	uint16_t file_comment_length = read_uint16(buf, cur);
+	// disk number start
+	*cur += 2;
+	// internal file attributes
+	*cur += 2;
+	// external file attributes
+	*cur += 4;
+	// relative offset of local header
+	*cur += 4;
+
+	*cur += file_name_length;
+	*cur += extra_field_length;
+	*cur += file_comment_length;
+}
+	
+void peek_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
+	// disk number
+	*cur += 2;
+	// disk number with start of central directory
+	*cur += 2;
+	// number of central directory entries on this disk
+	*cur += 2;
+	// number of central directory entries
+	*cur += 2;
+	// size of central directory
+	*cur += 4;
+	// offset of start of central directory with respect to starting disk number
+	*cur += 4;
+	// zip file comment length
+	uint16_t zip_file_comment_length = read_uint16(buf, cur);
+	*cur += zip_file_comment_length;
+}
+
+uint64_t peek_zip(uint8_t* buf) {
+	uint64_t cur = 0;
+	for (;;) {
+		uint8_t* magic = malloc(2);
+		read(buf, 2, &cur, magic);
+		if (magic[0] != 0x50 || magic[1] != 0x4b) {
+			error("Invalid zip file!");
+			debug_buffer(magic, 2);
+			return 0;
+		}
+
+		uint8_t* section_type = malloc(2);
+		read(buf, 2, &cur, section_type);
+		if (is_local_file_header(section_type)) {
+			peek_local_file(buf, &cur);
+		} else if (is_central_directory(section_type)) {
+			peek_central_directory(buf, &cur);
+		} else if (is_end_of_central_directory(section_type)) {
+			peek_end_of_central_directory(buf, &cur);
+			// We are done!
+			return cur;
+		} else {
+			error("Invalid zip file!");
+			debug_buffer(section_type, 2);
+			return 0;
+		}
+	}
+}
+
 void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 	file_t** files = malloc(16 * sizeof(file_t*));
 	zipfs->files   = files;
@@ -163,16 +274,13 @@ void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 		uint8_t* section_type = malloc(2);
 		read(buf, 2, &cur, section_type);
 		if (is_local_file_header(section_type)) {
-			debug("Local file header");
 			file_t* file = malloc(sizeof(file_t));
 			read_local_file(buf, &cur, file);
 			zipfs->files[num_files] = file;
 			num_files++;
 		} else if (is_central_directory(section_type)) {
-			debug("Central directory");
 			read_central_directory(buf, &cur);
 		} else if (is_end_of_central_directory(section_type)) {
-			debug("End of central directory");
 			read_end_of_central_directory(buf, &cur);
 			// We are done!
 			break;
@@ -183,5 +291,4 @@ void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 		}
 	}
 	zipfs->num_files = num_files;
-	debug("Done!");
 }

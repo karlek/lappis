@@ -81,10 +81,7 @@ bin/kernel.o: src/kernel/kernel.c | bin
 		-c $< \
 		-o $@
 
-bin/zipfs.zip: bin/nested.zip | bin
-	zip -0 -r $@ $<
-
-bin/nested.zip: | bin
+bin/zipfs.zip: | bin
 	zip -0 -r $@ zipfs
 
 bin/fs.img: bin/zipfs.zip | bin

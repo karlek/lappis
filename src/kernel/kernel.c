@@ -64,16 +64,13 @@ void main(struct multiboot_info* boot_info) {
 	ata_read(read_buf, 0, buf_size / 512, &dev);
 	debug("< ATA");
 
-	debug("> first zipfs layer");
-	zip_fs_t first_layer;
-	read_zip(read_buf, -1, &first_layer);
-	debug("< first zipfs layer");
-
-	debug("> inner zipfs layer");
+	debug("> zipfs");
+	uint64_t zipfs_size = peek_zip(read_buf);
 	zip_fs_t zipfs;
+	read_zip(read_buf, zipfs_size, &zipfs);
+	debug("< zipfs layer");
 
-	printf("File system initialized.\n", 0, 0, NULL);
-	read_zip(first_layer.files[0]->data, first_layer.files[0]->size, &zipfs);
+	debug("File system initialized.");
 	for (uint32_t i = 0; i < zipfs.num_files; i++) {
 		file_t* file = zipfs.files[i];
 		debug(file->name);
@@ -88,7 +85,6 @@ void main(struct multiboot_info* boot_info) {
 			}
 		}
 	}
-	debug("< inner zipfs layer");
 
 	while (1) {}
 }
