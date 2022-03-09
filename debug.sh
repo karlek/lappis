@@ -18,6 +18,7 @@ alacritty --class qemu-terminal -e \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
+	-drive media=disk,index=1,file=bin/fat32.img,format=raw,if=ide \
 	-cdrom bin/kernel.iso &
 
 gdb \
