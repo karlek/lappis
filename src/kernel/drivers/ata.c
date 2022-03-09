@@ -90,12 +90,12 @@ typedef struct ide_dev {
 } ide_dev;
 
 extern void ata_primary_handler() {
-	debug("Primary handler");
+	/* debug("Primary handler"); */
 	PIC_sendEOI(0x20 + ATA_PRIMARY_IRQ);
 }
 
 extern void ata_secondary_handler() {
-	debug("Secondary handler");
+	/* debug("Secondary handler"); */
 	PIC_sendEOI(0x20 + ATA_SECONDARY_IRQ);
 }
 
