@@ -83,9 +83,9 @@ bin/kernel.o: src/kernel/kernel.c | bin
 		-o $@
 
 bin/zipfs.zip: | bin
-	zip -0 -r $@ zipfs
+	zip -0 -j -r $@ fs
 
-bin/fs.img: bin/zipfs.zip | bin
+bin/zipfs.img: bin/zipfs.zip | bin
 	dd if=bin/zipfs.zip of=$@ bs=1M conv=sync
 
 bin:
@@ -98,12 +98,12 @@ bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
 		--script linker.ld \
 		$^
 
-build: bin/kernel.iso
+build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 
-debug: bin/kernel.iso bin/kernel.dbg bin/fs.img
+debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 	./debug.sh
 
-run: bin/kernel.iso bin/fs.img
+run: bin/kernel.iso bin/zipfs.img bin/fat32.img
 	./run.sh
 
 bin/kernel.iso: bin/kernel.elf grub.cfg | bin

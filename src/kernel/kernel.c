@@ -75,7 +75,7 @@ void main(struct multiboot_info* boot_info) {
 	for (uint32_t i = 0; i < zipfs.num_files; i++) {
 		file_t* file = zipfs.files[i];
 		debug(file->name);
-		if (streq(file->name, "zipfs/bg.raw") == false) {
+		if (streq(file->name, "bg.raw") == false) {
 			continue;
 		}
 		debug("found bg.raw!");
