@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#include "tinyprintf.c"
 #include "multiboot.c"
 
 #include "ports.c"
@@ -19,8 +20,7 @@
 #include "format/zip.c"
 
 void warn_interrupt(uint8_t interrupt_number) {
-	error("Interrupt!");
-	debug_num(interrupt_number);
+	error("Interrupt: %d/%x!", interrupt_number, interrupt_number);
 
 	uint8_t  red[4]     = {255, 0, 0, 0xff};
 	uint8_t* error_name = malloc(256);
@@ -41,7 +41,9 @@ void main(struct multiboot_info* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
 
-	debug("Kernel started.");
+	init_printf(NULL, serial_debug_write_byte);
+
+	debug("Kernel started: %d == %x", 42, 42);
 	// Setup interrupts.
 	idt_init();
 

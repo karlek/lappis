@@ -30,6 +30,17 @@ void memcpy(uint8_t* dest, const uint8_t* src, uint64_t n) {
 	}
 }
 
+uint64_t strrchr(const uint8_t* str, uint8_t c) {
+	uint64_t i = strlen(str)-1;
+	while (i >= 0) {
+		if (str[i] == c) {
+			return i;
+		}
+		i--;
+	}
+	return 0;
+}
+
 void itoa(int64_t num, uint8_t* str) {
 	bool is_negative = false;
 	if (num < 0) {

@@ -22,7 +22,7 @@ uint8_t ps2_read(uint32_t port) {
 		return inb(port);
 	}
 
-	printf("ps2_read fail\n", 0, 400, NULL);
+	error("ps2_read: fail");
 
 	return -1;
 }
@@ -33,7 +33,7 @@ bool ps2_write(uint32_t port, uint8_t b) {
 		return true;
 	}
 
-	printf("ps2_write fail\n", 0, 500, NULL);
+	error("ps2_write: fail");
 
 	return false;
 }
