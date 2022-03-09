@@ -10,6 +10,8 @@ sleep 1
 
 alacritty --class qemu-terminal -e \
 	qemu-system-x86_64 \
+	-no-reboot \
+	-no-shutdown \
 	-S \
 	-gdb tcp::1234 \
 	-m size=128M \
