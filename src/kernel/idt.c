@@ -180,8 +180,10 @@ void idt_init() {
 
 	// Load the new IDT.
 	__asm__ volatile("lidt %0" : : "m"(idtr));
+
 	// Set the interrupt flag.
 	__asm__ volatile("sti");
 
+	// TODO: This print is broken? If we put it before `sti`, it works.
 	debug("idt_init: IDT initialized");
 }

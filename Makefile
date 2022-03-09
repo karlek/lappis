@@ -72,6 +72,7 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 #     Place the primary output in file file.
 bin/kernel.o: src/kernel/kernel.c | bin
 	@$(CC) \
+		-DTINYPRINTF_OVERRIDE_LIBC=0 \
 		-mno-red-zone \
 		-masm=intel \
 		-nostdlib \
