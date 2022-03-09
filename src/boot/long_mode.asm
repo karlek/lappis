@@ -28,6 +28,7 @@ bits 32
 init_long_mode:
 	; ebx contains the 32-bit physical address of the Multiboot2 information
 	; structure provided by the boot loader.
+	mov esp, temp_stack_top
 	push ebx
 
 	call set_up_page_tables
