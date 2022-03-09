@@ -32,14 +32,12 @@ void handle(uint8_t x) {
 		bool button_right  = (stat_raw & 0x02) != 0;
 		bool button_left   = (stat_raw & 0x01) != 0;
 
-		printf("flag: yo xo ys xs ao bm br bl                             ", 0,
-		       280, NULL);
-		printf(
-			"bool: %d  %d  %d  %d  %d  %d  %d  %d                            ",
-			0, 300, NULL, y_overflow, x_overflow, y_signed, x_signed,
+		kprintf(0,
+		       280, NULL, "flag: yo xo ys xs ao bm br bl                             ");
+		kprintf( 0, 300, NULL, "bool: %d  %d  %d  %d  %d  %d  %d  %d                            ",y_overflow, x_overflow, y_signed, x_signed,
 			always_one, button_middle, button_right, button_left);
-		printf("poss: %d  %d  %d  %d                              ", 0, 320,
-		       NULL, mouse_cursor_x, mouse_cursor_y, xrel_raw, yrel_raw);
+		kprintf(0, 320,
+		       NULL, "poss: %d  %d  %d  %d                              ", mouse_cursor_x, mouse_cursor_y, xrel_raw, yrel_raw);
 
 		mouse_cursor_x += (int8_t)xrel_raw;
 		mouse_cursor_y -= (int8_t)yrel_raw;
@@ -63,9 +61,6 @@ void handle(uint8_t x) {
 		break;
 	}
 
-	/* asm("cli; hlt"); */
-	/* printf("mouse_count: %x %x %x                               ", 0, 300,
-	 * NULL, stat_raw, xrel_raw, yrel_raw); */
 	mouse_count = (mouse_count + 1) % 3;
 }
 

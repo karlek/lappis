@@ -106,7 +106,7 @@ void ide_select_drive(uint8_t bus, uint8_t drive) {
 	} else if (bus == ATA_SECONDARY_BUS) {
 		io = ATA_SECONDARY_IO;
 	} else {
-		printf("ide_select_drive: Invalid bus!", 0, 400, NULL);
+		error("Invalid bus!");
 		return;
 	}
 
@@ -116,7 +116,7 @@ void ide_select_drive(uint8_t bus, uint8_t drive) {
 	} else if (drive == ATA_SECONDARY_DRIVE) {
 		command = 0xB0;
 	} else {
-		printf("ide_select_drive: Invalid drive!", 0, 400, NULL);
+		error("Invalid drive!");
 		return;
 	}
 	outb(io + ATA_REG_HDDEVSEL, command);
@@ -138,21 +138,21 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t* ide_buf) {
 
 	uint8_t status = inb(io + ATA_REG_STATUS);
 	if (!status) {
-		printf("Status was empty", 0, 400, NULL);
+		error("Status was empty!");
 		return false;
 	}
 
 	while (inb(io + ATA_REG_STATUS) & ATA_SR_BSY != 0) {}
 	status = inb(io + ATA_REG_STATUS);
 	if (status & ATA_SR_ERR) {
-		printf("ide_identify: error", 0, 400, NULL);
+		error("unknown error: TODO: implement IDE error handling");
 		return false;
 	}
 
 	while (!(status & ATA_SR_DRQ)) {
 		status = inb(io + ATA_REG_STATUS);
 		if (status & ATA_SR_ERR) {
-			printf("ide_identify: error", 0, 400, NULL);
+			error("unknown error: TODO: implement IDE error handling");
 			return false;
 		}
 	}
@@ -192,17 +192,17 @@ void ide_poll(uint16_t io, bool advanced_check) {
 	uint8_t status = inb(io + ATA_REG_STATUS);
 	bool    is_err = (status & ATA_SR_ERR) != 0;
 	if (is_err) {
-		printf("ide_poll: error", 0, 300, NULL);
+		error("Unknown IDE error. TODO: implement IDE error handling");
 		return;
 	}
 	bool is_device_fault = (status & ATA_SR_DF) != 0;
 	if (is_device_fault) {
-		printf("ide_poll: device fault", 0, 300, NULL);
+		error("Device fault. TODO: implement IDE error handling");
 		return;
 	}
 	bool is_not_drq = (status & ATA_SR_DRQ) == 0;
 	if (is_not_drq) {
-		printf("ide_poll: DRQ not set", 0, 300, NULL);
+		error("DRQ not set. TODO: implement IDE error handling");
 		return;
 	}
 

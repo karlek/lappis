@@ -209,18 +209,18 @@ extern void keyboard_handler() {
 
 	uint8_t c = keyboard_to_ascii(rawkey);
 	if (!c) {
-		printf("Unk key: %d  ", 200, 200, NULL, rawkey);
+		kprintf(200, 200, NULL, "Unk key: %d  ", rawkey);
 		PIC_sendEOI(0x22);
 		return;
 	}
 
 	if (is_print(c)) {
-		printf("%c", caret_x, caret_y, NULL, c);
+		kprintf(caret_x, caret_y, NULL, "%c", c);
 		caret_x += LARGE_FONT_CELL_WIDTH;
 	} else if (c == '\b') {
 		if (caret_x > 0) {
 			caret_x -= LARGE_FONT_CELL_WIDTH;
-			printf("%c", caret_x, caret_y, NULL, ' ');
+			kprintf(caret_x, caret_y, NULL, "%c", ' ');
 		}
 	} else if (c == '\n') {
 		caret_x = 0;
