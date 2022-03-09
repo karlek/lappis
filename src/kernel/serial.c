@@ -55,7 +55,7 @@ void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr,
 	tfp_vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	char s_linenr[10] = {0};
+	uint8_t s_linenr[10] = {0};
 	itoa(linenr, s_linenr);
 
 	// TODO: Shitty basename.
