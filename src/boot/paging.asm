@@ -135,6 +135,8 @@ enable_paging:
 	mov ecx, 0xC0000080
 	rdmsr
 	or eax, 1 << 8
+	; Set the NX bit.
+	or eax, 1 << 11
 	wrmsr
 
 	; Enable paging in the CR0 register.
