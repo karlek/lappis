@@ -21,6 +21,10 @@ void print_box(uint8_t* s, uint32_t x, uint32_t y, uint8_t* color) {
 	const uint8_t bottom_right_corner = 0xd9;
 
 	uint8_t* tmp = malloc(256);
+	if (tmp == NULL) {
+		error("malloc failed");
+		return;
+	}
 	uint32_t len = strlen(s) + 2; // +2 for the pipe and the spacing.
 
 	uint32_t xoffset = 0;
