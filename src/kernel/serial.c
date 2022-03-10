@@ -37,6 +37,8 @@ void serial_write_byte(uint16_t port, uint8_t a) {
 	outb(port, a);
 }
 
+// Unfortunately, the signature must (void* p, char c) to be compatible with
+// tinyprintf.
 void serial_debug_write_byte(void* p, char c) {
 	serial_write_byte(SERIAL_COM1_PORT, (uint8_t)c);
 }
@@ -48,8 +50,8 @@ void serial_write_string(uint16_t port, uint8_t* string) {
 	}
 }
 
-void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, char *format, ...) {
-	char buffer[256];
+void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, uint8_t *format, ...) {
+	uint8_t buffer[256];
 	va_list args;
 	va_start(args, format);
 	tfp_vsnprintf(buffer, sizeof(buffer), format, args);
@@ -78,14 +80,14 @@ void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr,
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }
 
-void error_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, char *format, ...) {
-	char buffer[256];
+void error_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr, uint8_t* format, ...) {
+	uint8_t buffer[256];
 	va_list args;
 	va_start(args, format);
-	tfp_vsnprintf(buffer, sizeof(buffer), format, args);
+	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	char s_linenr[10] = {0};
+	uint8_t s_linenr[10] = {0};
 	itoa(linenr, s_linenr);
 
 	// TODO: Shitty basename.

@@ -138,6 +138,10 @@ regs Kusti, 23.10.2004
 # define _TFP_SPECIFY_PRINTF_FMT(fmt_idx,arg1_idx)
 #endif
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 typedef void (*putcf) (void *, char);
 
 /*
@@ -173,6 +177,10 @@ void tfp_printf(char *fmt, ...) _TFP_SPECIFY_PRINTF_FMT(1, 2);
 # if TINYPRINTF_OVERRIDE_LIBC
 #  define printf tfp_printf
 # endif
+#endif
+
+#ifdef  __cplusplus
+}
 #endif
 
 #endif

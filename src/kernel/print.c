@@ -1,8 +1,12 @@
 void kprintf(uint32_t x, uint32_t y, uint8_t* color, uint8_t* format, ...) {
 	uint8_t* buffer = malloc(256);
+	if (buffer == NULL) {
+		error("kprintf: malloc failed");
+		return;
+	}
 	va_list args;
 	va_start(args, format);
-	tfp_vsnprintf(buffer, sizeof(buffer), format, args);
+	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	draw_string(buffer, x, y, color);

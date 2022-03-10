@@ -28,7 +28,7 @@ void warn_interrupt(uint8_t interrupt_number) {
 	num_to_error_name(interrupt_number, error_name);
 
 	uint8_t* tmp = malloc(256);
-	tfp_sprintf(tmp, "Warning! Interrupt occurred: %s [%d/%x]", error_name, interrupt_number, interrupt_number);
+	snprintf(tmp, 256, "Warning! Interrupt occurred: %s [%d/%x]", error_name, interrupt_number, interrupt_number);
 	print_box(tmp, LARGE_FONT_CELL_WIDTH, 2, red);
 }
 
