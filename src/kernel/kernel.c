@@ -65,26 +65,30 @@ void main(multiboot_info_t* boot_info) {
 		ATA_PRIMARY_DRIVE,
 		ATA_PRIMARY_IO,
 	};
-	uint64_t buf_size = 0x501000;
-	uint8_t* read_buf = malloc(buf_size);
+	uint64_t fsbuf_size = 0x501000;
+	uint8_t* fsbuf = malloc(fsbuf_size);
+	if (fsbuf == NULL) {
+		error("Could not allocate memory for file system buffer!");
+		return;
+	}
 	// TODO: implement an actual file system.
 	debug("> ATA");
-	ata_read(read_buf, 0, buf_size / 512, &dev);
+	ata_read(fsbuf, 0, fsbuf_size / 512, &dev);
 	debug("< ATA");
 
 	debug("> zipfs");
-	uint64_t zipfs_size = peek_zip(read_buf);
+	uint64_t zipfs_size = peek_zip(fsbuf);
 	if (zipfs_size == 0) {
-		error("Malformed zipfs! Maybe `buf_size` is too small? Aborting.");
+		error("Malformed zipfs! Maybe `fsbuf_size` is too small? Aborting.");
 		return;
 	}
-	if (zipfs_size >= buf_size) {
-		error("Unable to read file system: `buf_size` is too small!");
+	if (zipfs_size >= fsbuf_size) {
+		error("Unable to read file system: `fsbuf_size` is too small!");
 		return;
 	}
 
 	zip_fs_t zipfs;
-	read_zip(read_buf, zipfs_size, &zipfs);
+	read_zip(fsbuf, zipfs_size, &zipfs);
 	debug("< zipfs");
 
 	debug("File system initialized.");

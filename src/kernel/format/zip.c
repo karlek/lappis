@@ -26,7 +26,7 @@ uint32_t read_uint32(uint8_t* buf, uint64_t* cur) {
 	return raw[0] | (raw[1] << 8) | (raw[2] << 16) | (raw[3] << 24);
 }
 
-void read_local_file(uint8_t* buf, uint64_t* cur, file_t* file) {
+bool read_local_file(uint8_t* buf, uint64_t* cur, file_t* file) {
 	uint8_t version[2] = {0};
 	read(buf, sizeof version, cur, version);
 
@@ -52,21 +52,34 @@ void read_local_file(uint8_t* buf, uint64_t* cur, file_t* file) {
 	uint16_t extra_field_length = read_uint16(buf, cur);
 
 	uint8_t* file_name = malloc(file_name_length + 1);
+	if (file_name == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, file_name_length, cur, file_name);
 	file_name[file_name_length] = 0;
 
 	uint8_t* extra_fields = malloc(extra_field_length);
+	if (extra_fields == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, extra_field_length, cur, extra_fields);
 
 	uint8_t* uncompressed = malloc(uncompressed_size);
+	if (uncompressed == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, uncompressed_size, cur, uncompressed);
 
 	file->name = file_name;
 	file->data = uncompressed;
 	file->size = uncompressed_size;
+	return true;
 }
 
-void read_central_directory(uint8_t* buf, uint64_t* cur) {
+bool read_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint8_t version_made_by[2] = {0};
 	read(buf, sizeof version_made_by, cur, version_made_by);
 
@@ -105,17 +118,31 @@ void read_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint32_t relative_offset_of_local_header = read_uint32(buf, cur);
 
 	uint8_t* file_name = malloc(file_name_length + 1);
+	if (file_name == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, file_name_length, cur, file_name);
 	file_name[file_name_length] = 0;
 
 	uint8_t* extra_fields = malloc(extra_field_length);
+	if (extra_fields == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, extra_field_length, cur, extra_fields);
 
 	uint8_t* file_comment = malloc(file_comment_length);
+	if (file_comment == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, file_comment_length, cur, file_comment);
+
+	return true;
 }
 
-void read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
+bool read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint16_t disk_number = read_uint16(buf, cur);
 	uint16_t disk_number_with_start_of_central_directory =
 		read_uint16(buf, cur);
@@ -129,7 +156,12 @@ void read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	uint16_t zip_file_comment_length = read_uint16(buf, cur);
 
 	uint8_t* zip_file_comment = malloc(zip_file_comment_length);
+	if (zip_file_comment == NULL) {
+		error("malloc failed");
+		return false;
+	}
 	read(buf, zip_file_comment_length, cur, zip_file_comment);
+	return true;
 }
 
 bool is_local_file_header(uint8_t* section_type) {
@@ -229,7 +261,7 @@ void peek_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 uint64_t peek_zip(uint8_t* buf) {
 	uint64_t cur = 0;
 	for (;;) {
-		uint8_t* magic = malloc(2);
+		uint8_t magic[2] = {0};
 		read(buf, 2, &cur, magic);
 		if (magic[0] != 0x50 || magic[1] != 0x4b) {
 			error("Invalid zip file. Unknown magic: %x%x", magic[0], magic[1]);
@@ -237,7 +269,7 @@ uint64_t peek_zip(uint8_t* buf) {
 			return 0;
 		}
 
-		uint8_t* section_type = malloc(2);
+		uint8_t section_type[2] = {0};
 		read(buf, 2, &cur, section_type);
 		if (is_local_file_header(section_type)) {
 			peek_local_file(buf, &cur);
@@ -257,13 +289,17 @@ uint64_t peek_zip(uint8_t* buf) {
 
 void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 	file_t** files = malloc(16 * sizeof(file_t*));
+	if (files == NULL) {
+		error("malloc failed");
+		return;
+	}
 	zipfs->files   = files;
 
 	uint32_t num_files = 0;
 
 	uint64_t cur = 0;
 	while (cur < len) {
-		uint8_t* magic = malloc(2);
+		uint8_t magic[2] = {0};
 		read(buf, 2, &cur, magic);
 		if (magic[0] != 0x50 || magic[1] != 0x4b) {
 			error("Invalid zip file!");
@@ -271,17 +307,30 @@ void read_zip(uint8_t* buf, uint64_t len, zip_fs_t* zipfs) {
 			return;
 		}
 
-		uint8_t* section_type = malloc(2);
+		uint8_t section_type[2] = {0};
 		read(buf, 2, &cur, section_type);
 		if (is_local_file_header(section_type)) {
 			file_t* file = malloc(sizeof(file_t));
-			read_local_file(buf, &cur, file);
+			if (file == NULL) {
+				error("malloc failed");
+				return;
+			}
+			if (read_local_file(buf, &cur, file) == false) {
+				error("Failed to read local file header");
+				return;
+			}
 			zipfs->files[num_files] = file;
 			num_files++;
 		} else if (is_central_directory(section_type)) {
-			read_central_directory(buf, &cur);
+			if (read_central_directory(buf, &cur) == false) {
+				error("Unable to read central directory");
+				return;
+			}
 		} else if (is_end_of_central_directory(section_type)) {
-			read_end_of_central_directory(buf, &cur);
+			if (read_end_of_central_directory(buf, &cur) == false) {
+				error("Unable to read end of central directory");
+				return;
+			}
 			// We are done!
 			break;
 		} else {
