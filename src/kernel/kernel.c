@@ -4,6 +4,7 @@
 #include <stdarg.h>
 
 #include "tinyprintf.c"
+#include "memcpy.c"
 
 #include "ports.c"
 #include "string.c"
@@ -81,12 +82,7 @@ void main(multiboot_info_t* boot_info) {
 			continue;
 		}
 		debug("found bg.raw!");
-		for (uint32_t y = 0; y < HEIGHT; y++) {
-			for (uint32_t x = 0; x < WIDTH; x++) {
-				uint8_t* bg_pixel = &(file->data[(y * WIDTH) * 4 + (x * 4)]);
-				set_pixel(x, y, bg_pixel);
-			}
-		}
+		set_frame(file->data);
 	}
 
 	while (1) {}

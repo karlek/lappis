@@ -21,15 +21,6 @@ void strcat(uint8_t* dest, const uint8_t* src) {
 	*dest = '\0';
 }
 
-void memcpy(uint8_t* dest, const uint8_t* src, uint64_t n) {
-	if (n <= 0) {
-		return;
-	}
-	for (uint64_t i = 0; i < n; i++) {
-		dest[i] = src[i];
-	}
-}
-
 uint64_t strrchr(uint8_t* str, uint8_t c) {
 	uint64_t i = strlen(str)-1;
 	while (i >= 0) {

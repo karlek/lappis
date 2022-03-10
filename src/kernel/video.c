@@ -16,6 +16,10 @@ void set_pixel(uint32_t x, uint32_t y, uint8_t color[4]) {
 	fb[(y * WIDTH + x) * 4 + 3] = color[3];
 }
 
+void set_frame(uint8_t* frame) {
+	memcpy((uint8_t*)FRAME_BUFFER, frame, WIDTH * HEIGHT * 4);
+}
+
 void draw_char(uint8_t c, uint32_t x, uint32_t y, uint8_t* color) {
 	uint8_t black[4] = {0, 0, 0, 0xff};
 	uint8_t white[4] = {255, 255, 255, 0xff};
