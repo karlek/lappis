@@ -102,5 +102,7 @@ void main(multiboot_info_t* boot_info) {
 		set_frame(file->data);
 	}
 
-	while (1) {}
+	while (1) {
+		sleep(10);
+	}
 }

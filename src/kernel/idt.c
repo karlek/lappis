@@ -5,6 +5,21 @@
 
 #define IDT_MAX_DESCRIPTORS 256
 
+uint64_t countdown = 0;
+extern void timer_handler() {
+	if (countdown > 0) {
+		countdown--;
+	}
+	PIC_sendEOI(0x20);
+}
+
+void sleep(uint64_t ms) {
+	countdown = ms;
+	while (countdown > 0) {
+		asm volatile("hlt");
+	}
+}
+
 void num_to_error_name(uint8_t interrupt_number, uint8_t* error_name) {
 	switch (interrupt_number) {
 	case 0:

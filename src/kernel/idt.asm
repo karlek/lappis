@@ -6,6 +6,7 @@ extern keyboard_handler
 extern mouse_handler
 extern ata_primary_handler
 extern ata_secondary_handler
+extern timer_handler
 
 isr_double_fault:
 	cli
@@ -45,13 +46,7 @@ isr_page_fault:
 
 irq_timer:
 	cli
-	push rax
-
-	; End of interrupt.
-	mov al, 0x20
-    out 0x20, al
-
-    pop rax
+	call timer_handler
 	sti
 	iretq
 
