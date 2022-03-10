@@ -43,7 +43,7 @@ void main(multiboot_info_t* boot_info) {
 
 	init_printf(NULL, serial_debug_write_byte);
 
-	debug("Kernel started: %d == %x", 42, 42);
+	debug("Kernel started");
 	// Setup interrupts.
 	idt_init();
 
@@ -59,7 +59,7 @@ void main(multiboot_info_t* boot_info) {
 	};
 
 	debug("> ATA");
-	uint64_t buf_size = 0xa00000;
+	uint64_t buf_size = 0x501000;
 	uint8_t* read_buf = malloc(buf_size);
 	// TODO: Warn if there's data left on disk, but buf_size is too small.
 	// Or even better, only parse the header of the zip file and ascertain
