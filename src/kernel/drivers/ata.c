@@ -174,6 +174,36 @@ void ide_400ns_delay(uint16_t io) {
 	}
 }
 
+void ide_print_error(uint16_t io) {
+	error("IDE:");
+
+	uint8_t status = inb(io + ATA_REG_ERROR);
+	if (status & ATA_ER_AMNF) {
+		error("- No Address Mark Found");
+	}
+	if (status & ATA_ER_TK0NF) {
+		error("- No Media or Media Error");
+	}
+	if (status & ATA_ER_ABRT) {
+		error("- Command Aborted");
+	}
+	if (status & ATA_ER_MCR) {
+		error("- No Media or Media Error");
+	}
+	if (status & ATA_ER_IDNF) {
+		error("- ID mark not Found");
+	}
+	if (status & ATA_ER_MC) {
+		error("- No Media or Media Error");
+	}
+	if (status & ATA_ER_UNC) {
+		error("- Uncorrectable Data Error");
+	}
+	if (status & ATA_ER_BBK) {
+		error("- Bad Sectors");
+	}
+}
+
 void ide_poll(uint16_t io, bool advanced_check) {
 	ide_400ns_delay(io);
 
@@ -193,6 +223,7 @@ void ide_poll(uint16_t io, bool advanced_check) {
 	bool    is_err = (status & ATA_SR_ERR) != 0;
 	if (is_err) {
 		error("Unknown IDE error. TODO: implement IDE error handling");
+		ide_print_error(io);
 		return;
 	}
 	bool is_device_fault = (status & ATA_SR_DF) != 0;
