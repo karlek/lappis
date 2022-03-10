@@ -232,7 +232,7 @@ uint64_t peek_zip(uint8_t* buf) {
 		uint8_t* magic = malloc(2);
 		read(buf, 2, &cur, magic);
 		if (magic[0] != 0x50 || magic[1] != 0x4b) {
-			error("Invalid zip file!");
+			error("Invalid zip file. Unknown magic: %x%x", magic[0], magic[1]);
 			debug_buffer(magic, 2);
 			return 0;
 		}
@@ -248,7 +248,7 @@ uint64_t peek_zip(uint8_t* buf) {
 			// We are done!
 			return cur;
 		} else {
-			error("Invalid zip file!");
+			error("Invalid zip file. Unknown section type: %x%x", section_type[0], section_type[1]);
 			debug_buffer(section_type, 2);
 			return 0;
 		}

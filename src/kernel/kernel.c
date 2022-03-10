@@ -57,19 +57,24 @@ void main(multiboot_info_t* boot_info) {
 		ATA_PRIMARY_DRIVE,
 		ATA_PRIMARY_IO,
 	};
-
-	debug("> ATA");
 	uint64_t buf_size = 0x501000;
 	uint8_t* read_buf = malloc(buf_size);
-	// TODO: Warn if there's data left on disk, but buf_size is too small.
-	// Or even better, only parse the header of the zip file and ascertain
-	// whether the size is too small.
-	// Or even better, implement an actual file system.
+	// TODO: implement an actual file system.
+	debug("> ATA");
 	ata_read(read_buf, 0, buf_size / 512, &dev);
 	debug("< ATA");
 
 	debug("> zipfs");
 	uint64_t zipfs_size = peek_zip(read_buf);
+	if (zipfs_size == 0) {
+		error("Malformed zipfs! Maybe `buf_size` is too small? Aborting.");
+		return;
+	}
+	if (zipfs_size >= buf_size) {
+		error("Unable to read file system: `buf_size` is too small!");
+		return;
+	}
+
 	zip_fs_t zipfs;
 	read_zip(read_buf, zipfs_size, &zipfs);
 	debug("< zipfs");
