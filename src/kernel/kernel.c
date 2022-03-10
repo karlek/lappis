@@ -71,7 +71,7 @@ void main(multiboot_info_t* boot_info) {
 	uint64_t zipfs_size = peek_zip(read_buf);
 	zip_fs_t zipfs;
 	read_zip(read_buf, zipfs_size, &zipfs);
-	debug("< zipfs layer");
+	debug("< zipfs");
 
 	debug("File system initialized.");
 	for (uint32_t i = 0; i < zipfs.num_files; i++) {
