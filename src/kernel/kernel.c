@@ -4,11 +4,11 @@
 #include <stdarg.h>
 
 #include "tinyprintf.c"
-#include "multiboot.c"
 
 #include "ports.c"
 #include "string.c"
 #include "serial.c"
+#include "multiboot.c"
 #include "heap.c"
 #include "terminal-font.h"
 #include "video.c"
@@ -36,7 +36,7 @@ void end_of_execution() {
 	print_box("End of execution.", LARGE_FONT_CELL_WIDTH, 2, green);
 }
 
-void main(struct multiboot_info* boot_info) {
+void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
 
@@ -45,6 +45,8 @@ void main(struct multiboot_info* boot_info) {
 	debug("Kernel started: %d == %x", 42, 42);
 	// Setup interrupts.
 	idt_init();
+
+	parse_multiboot_header(boot_info);
 
 	// Enable floating point operations.
 	enable_fpu();
