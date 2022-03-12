@@ -21,6 +21,12 @@ void strcat(uint8_t* dest, const uint8_t* src) {
 	*dest = '\0';
 }
 
+void memset(uint8_t* dest, uint8_t val, uint32_t len) {
+	for (uint32_t i = 0; i < len; i++) {
+		dest[i] = val;
+	}
+}
+
 uint64_t strrchr(uint8_t* str, uint8_t c) {
 	uint64_t i = strlen(str)-1;
 	while (i >= 0) {
