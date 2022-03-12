@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdarg.h>
+#include <cpuid.h>
 
 #include "tinyprintf.c"
 #include "memcpy.c"
@@ -45,6 +46,41 @@ void end_of_execution() {
 	print_box("End of execution.", LARGE_FONT_CELL_WIDTH, 2, green);
 }
 
+
+uint8_t* get_cpu_vendor() {
+	uint32_t eax, ebx, ecx, edx, unused;
+    __cpuid(0, eax, ebx, ecx, edx);
+
+	uint8_t* vendor_string = malloc(13);
+	vendor_string[0]  = ebx & 0xff;
+	vendor_string[1]  = (ebx >> 8)  & 0xff;
+	vendor_string[2]  = (ebx >> 16) & 0xff;
+	vendor_string[3]  = (ebx >> 24) & 0xff;
+	vendor_string[4]  = edx & 0xff;
+	vendor_string[5]  = (edx >> 8)  & 0xff;
+	vendor_string[6]  = (edx >> 16) & 0xff;
+	vendor_string[7]  = (edx >> 24) & 0xff;
+	vendor_string[8]  = ecx & 0xff;
+	vendor_string[9]  = (ecx >> 8)  & 0xff;
+	vendor_string[10] = (ecx >> 16) & 0xff;
+	vendor_string[11] = (ecx >> 24) & 0xff;
+	vendor_string[12] = 0;
+
+	debug("Highest CPUID leaf: %d", eax);
+
+	return vendor_string;
+}
+
+void get_cpu_features() {
+	uint32_t eax, edx, unused;
+	if (__get_cpuid(1, &eax, &unused, &unused, &edx) == false) {
+		error("Could not get CPU features!");
+		return;
+	}
+
+	debug("CPU features: %x", edx);
+}
+
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -54,6 +90,10 @@ void main(multiboot_info_t* boot_info) {
 	debug("Kernel started");
 	// Setup interrupts.
 	idt_init();
+
+	uint8_t* vendor = get_cpu_vendor();
+	debug("Vendor: %s", vendor);
+	get_cpu_features();
 
 	parse_multiboot_header(boot_info);
 
