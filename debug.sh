@@ -19,7 +19,6 @@ alacritty --class qemu-starter -e \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
 	-drive media=disk,index=1,file=bin/fat32.img,format=raw,if=ide \
-	-device e1000,netdev=n1,mac=52:54:00:12:34:56 \
 	-cdrom bin/kernel.iso &
 
 gdb \

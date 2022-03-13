@@ -8,97 +8,126 @@ extern ata_primary_handler
 extern ata_secondary_handler
 extern timer_handler
 
+%macro pushaq 0
+	push rdi
+	push rsi
+	push rdx
+	push rcx
+	push rax
+	push r8
+	push r9
+%endmacro
+
+%macro popaq 0
+	pop r9
+	pop r8
+	pop rax
+	pop rcx
+	pop rdx
+	pop rsi
+	pop rdi
+%endmacro
+
 isr_double_fault:
 	cli
-	push rdi
+	pushaq
 
 	mov rdi, 0x8
 	call warn_interrupt
 	call exception_handler
 
-	pop rdi
+	popaq
 	sti
 	iretq
 
 isr_general_protection_fault:
 	cli
-	push rdi
+	pushaq
 
 	mov rdi, 0xd
 	call warn_interrupt
 	call exception_handler
 
-	pop rdi
-	sti
+	popaq
 	iretq
 
 isr_page_fault:
 	cli
-	push rdi
+	pushaq
 
 	mov rdi, 0xe
 	call warn_interrupt
 	call exception_handler
 
-	pop rdi
-	sti
+	popaq
 	iretq
 
 irq_timer:
 	cli
+	pushaq
+
 	call timer_handler
-	sti
+
+	popaq
 	iretq
 
 irq_keyboard:
 	cli
+	pushaq
+
 	call keyboard_handler
-	sti
+
+	popaq
 	iretq
 
 irq_mouse:
 	cli
+	pushaq
+
 	call mouse_handler
-	sti
+
+	popaq
 	iretq
 
 irq_primary_ata:
 	cli
+	pushaq
+
 	call ata_primary_handler
-	sti
+
+	popaq
 	iretq
 
 irq_secondary_ata:
 	cli
+	pushaq
+
 	call ata_secondary_handler
-	sti
+
+	popaq
 	iretq
 
 %macro reserved 1
 reserved_%1:
 	cli
-	; Maybe overly cautious to push rdi when we later hlt.
-	push rdi
+	pushaq
 
 	mov rdi, %1
 	call warn_interrupt
 
-	pop rdi
-	hlt
+	popaq
 	nop
 %endmacro
 
 %macro not_implemented 1
 not_implemented_%1:
 	cli
-	; Maybe overly cautious to push rdi when we later hlt.
-	push rdi
+	pushaq
 
 	mov rdi, %1
 	call warn_interrupt
 
-	pop rdi
-	hlt
+	popaq
 	nop
 %endmacro
 
