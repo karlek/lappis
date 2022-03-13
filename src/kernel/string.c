@@ -28,7 +28,7 @@ void memset(uint8_t* dest, uint8_t val, uint32_t len) {
 }
 
 uint64_t strrchr(uint8_t* str, uint8_t c) {
-	uint64_t i = strlen(str)-1;
+	uint64_t i = strlen(str);
 	while (i >= 0) {
 		if (str[i] == c) {
 			return i;
