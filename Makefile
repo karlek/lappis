@@ -21,6 +21,8 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
+		-Lbin \
+		-lhello \
 		$^
 
 # -masm=dialect
@@ -70,7 +72,9 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 #
 # -o file
 #     Place the primary output in file file.
-bin/kernel.o: src/kernel/kernel.c | bin
+bin/kernel.o: src/kernel/kernel.c bin/libhello.a | bin
+	# -Wno-pointer-sign should be investigated in the future, right now it's
+	#  just annoying af.
 	@$(CC) \
 		-DLITTLE_ENDIAN \
 		-DINDEXED_COPY \
@@ -99,14 +103,26 @@ bin/fat32.img: | bin
 bin:
 	@mkdir -p $@
 
+bin/libhello.a: src/kernel/zig/hello.zig | bin
+	@zig build-obj \
+		--color on \
+		--cache-dir bin/zig-cache \
+		-isystem src/kernel \
+		-mno-red-zone \
+		-target x86_64-freestanding-gnu \
+		-femit-bin=$@ \
+		$<
+
 # For debug symbols.
 bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
 	@ld \
 		--output $@ \
 		--script linker.ld \
+		-Lbin \
+		-lhello \
 		$^
 
-build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
+build: bin/kernel.iso bin/kernel.dbg
 
 debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 	./debug.sh

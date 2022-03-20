@@ -15,6 +15,9 @@ jobs:
       - name: install dependencies
         run: sudo apt install -y nasm clang mtools
 
+      - name: install zig
+        run: sudo snap install zig --classic --beta
+
       - name: versions
         run: |
           clang --version
