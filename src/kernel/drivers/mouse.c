@@ -56,7 +56,7 @@ void handle(uint8_t x) {
 			mouse_cursor_y = HEIGHT - 1;
 		}
 
-		draw_cursor(mouse_cursor_x, mouse_cursor_y);
+		draw_cursor();
 
 		break;
 	}
