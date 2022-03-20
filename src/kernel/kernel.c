@@ -21,6 +21,8 @@
 #include "fpu.c"
 #include "format/zip.c"
 
+#include "zig/hello.h"
+
 void warn_interrupt(uint8_t interrupt_number) {
 	error("Interrupt: %d/%x!", interrupt_number, interrupt_number);
 
@@ -87,6 +89,7 @@ void main(multiboot_info_t* boot_info) {
 
 	init_printf(NULL, serial_debug_write_byte);
 
+	debug("zig: %d", foo(1));
 	debug("Kernel started");
 	// Setup interrupts.
 	idt_init();
