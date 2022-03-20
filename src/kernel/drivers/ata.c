@@ -142,6 +142,8 @@ bool ide_identify(uint8_t bus, uint8_t drive, uint8_t* ide_buf) {
 		return false;
 	}
 
+	// TODO: This hangs when precedence is correct! Right now it's bugged and
+	// working.. Maybe we should invert the equality?
 	while (inb(io + ATA_REG_STATUS) & ATA_SR_BSY != 0) {}
 	status = inb(io + ATA_REG_STATUS);
 	if (status & ATA_SR_ERR) {
