@@ -13,13 +13,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: install dependencies
-        run: sudo apt install -y nasm gcc-11 mtools
+        run: sudo apt install -y nasm clang mtools
 
       - name: versions
         run: |
-          gcc --version
-          gcc-11 --version
+          clang --version
           ld --version
 
       - name: make
-        run: CC=gcc-11 make
+        run: CC=clang make
