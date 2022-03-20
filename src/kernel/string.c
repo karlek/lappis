@@ -46,7 +46,7 @@ void itoa(int64_t num, uint8_t* str) {
 	}
 
 	// Handle MinInt case.
-	if (num == (-1 << 31)) {
+	if (num == -2147483648) {
 		strcat(str, "-2147483648");
 		return;
 	}
