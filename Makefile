@@ -107,6 +107,7 @@ bin/libhello.a: src/kernel/zig/hello.zig | bin
 	@zig build-obj \
 		--color on \
 		--cache-dir bin/zig-cache \
+		-isystem src/kernel \
 		-mno-red-zone \
 		-target x86_64-freestanding-gnu \
 		-femit-bin=$@ \

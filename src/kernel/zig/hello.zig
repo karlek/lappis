@@ -1,5 +1,5 @@
 const c = @cImport({
-    @cInclude("/home/_/src/karlek/lapis/src/kernel/serial.h");
+    @cInclude("serial.h");
 });
 
 // comptime {
