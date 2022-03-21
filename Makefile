@@ -16,13 +16,11 @@ bin/boot.o: src/boot/boot.asm | bin
 #     Turn off page alignment of sections, and disable linking against shared
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
-bin/kernel.elf: bin/boot.o bin/kernel.o | bin
+bin/kernel.elf: bin/boot.o bin/kernel.o bin/libhello.o | bin
 	@ld \
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
-		-Lbin \
-		-lhello \
 		$^
 
 # -masm=dialect
@@ -72,7 +70,7 @@ bin/kernel.elf: bin/boot.o bin/kernel.o | bin
 #
 # -o file
 #     Place the primary output in file file.
-bin/kernel.o: src/kernel/kernel.c bin/libhello.a | bin
+bin/kernel.o: src/kernel/kernel.c | bin
 	# -Wno-pointer-sign should be investigated in the future, right now it's
 	#  just annoying af.
 	@$(CC) \
@@ -103,23 +101,20 @@ bin/fat32.img: | bin
 bin:
 	@mkdir -p $@
 
-bin/libhello.a: src/kernel/zig/hello.zig | bin
+bin/libhello.o: src/kernel/zig/hello.zig | bin
 	@zig build-obj \
-		--color on \
 		--cache-dir bin/zig-cache \
-		-isystem src/kernel \
+		-I src/kernel \
 		-mno-red-zone \
 		-target x86_64-freestanding-gnu \
 		-femit-bin=$@ \
 		$<
 
 # For debug symbols.
-bin/kernel.dbg: bin/boot.o bin/kernel.o | bin
+bin/kernel.dbg: bin/boot.o bin/kernel.o bin/libhello.o | bin
 	@ld \
 		--output $@ \
 		--script linker.ld \
-		-Lbin \
-		-lhello \
 		$^
 
 build: bin/kernel.iso bin/kernel.dbg

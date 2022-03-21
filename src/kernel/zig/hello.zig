@@ -2,10 +2,6 @@ const c = @cImport({
     @cInclude("serial.h");
 });
 
-// comptime {
-//     @export(hello, .{ .name = "foo", .linkage = .Strong });
-// }
-
 export fn foo(
     asdf: usize,
 ) callconv(.C) usize {
