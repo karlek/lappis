@@ -5,7 +5,7 @@ const c = @cImport({
 export fn foo(
     asdf: usize,
 ) callconv(.C) usize {
-    const buf = "Zig zag zaggazoo";
+    const buf = "Zig zag zaggazoo\n";
     c.debug_buffer(@ptrCast([*]const u8, buf), buf.len);
 
     return asdf + 1337;
