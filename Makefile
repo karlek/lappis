@@ -16,9 +16,16 @@ bin/boot.o: src/boot/boot.asm | bin
 #     Turn off page alignment of sections, and disable linking against shared
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
-bin/kernel.elf: bin/boot.o bin/kernel.o bin/libhello.o | bin
+bin/kernel.elf: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
 		--nmagic \
+		--output $@ \
+		--script linker.ld \
+		$^
+
+# For debug symbols.
+bin/kernel.dbg: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+	@ld \
 		--output $@ \
 		--script linker.ld \
 		$^
@@ -110,12 +117,10 @@ bin/libhello.o: src/kernel/zig/hello.zig | bin
 		-femit-bin=$@ \
 		$<
 
-# For debug symbols.
-bin/kernel.dbg: bin/boot.o bin/kernel.o bin/libhello.o | bin
-	@ld \
-		--output $@ \
-		--script linker.ld \
-		$^
+bin/libfloof.a: src/kernel/rust/src/lib.rs
+	cd src/kernel/rust; cargo build
+	mv src/kernel/rust/target/os/debug/libfloof.a bin
+
 
 build: bin/kernel.iso bin/kernel.dbg
 
