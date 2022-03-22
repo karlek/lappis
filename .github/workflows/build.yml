@@ -18,6 +18,12 @@ jobs:
       - name: install zig
         run: sudo snap install zig --classic --beta
 
+      - name: install rust nightly
+        run: rustup toolchain install nightly
+
+      - name: switch rust default channel to nightly
+        run: rustup default nightly
+
       - name: versions
         run: |
           clang --version
