@@ -6,3 +6,4 @@ tags
 .venv
 # Ignore lapis background images.
 *.raw
+**/rust/target
