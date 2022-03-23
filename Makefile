@@ -115,7 +115,6 @@ bin/libhello.o: src/kernel/zig/hello.zig | bin
 	@zig build-obj \
 		--cache-dir bin/zig-cache \
 		-I src/kernel \
-		-I /usr/include \
 		-mno-red-zone \
 		-target x86_64-freestanding-gnu \
 		-femit-bin=$@ \
