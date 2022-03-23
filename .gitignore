@@ -7,3 +7,4 @@ tags
 # Ignore lapis background images.
 *.raw
 **/rust/target
+.cache

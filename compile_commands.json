@@ -1,0 +1,23 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-DLITTLE_ENDIAN",
+      "-DINDEXED_COPY",
+      "-DMEMCPY_64BIT",
+      "-mno-red-zone",
+      "-masm=intel",
+      "-fno-stack-protector",
+      "-ffreestanding",
+      "-Wno-pointer-sign",
+      "-g",
+      "-c",
+      "-o",
+      "bin/kernel.o",
+      "src/kernel/kernel.c"
+    ],
+    "directory": "/home/_/src/karlek/lapis",
+    "file": "/home/_/src/karlek/lapis/src/kernel/kernel.c",
+    "output": "/home/_/src/karlek/lapis/bin/kernel.o"
+  }
+]
