@@ -32,9 +32,5 @@ jobs:
           clang --version
           ld --version
 
-      - name: find bits/libc-header-start.h
-        run: |
-          find / -type f -iname 'libc-header-start.h' 2> /dev/null
-
       - name: make
         run: CC=clang make
