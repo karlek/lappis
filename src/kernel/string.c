@@ -1,3 +1,5 @@
+#include "string.h"
+
 bool is_print(uint8_t c) {
 	return (c >= ' ' && c <= '~');
 }

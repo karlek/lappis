@@ -1,3 +1,5 @@
+#include "fpu.h"
+
 /**
  * Set the FPU control word
  *

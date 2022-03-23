@@ -1,10 +1,10 @@
-#include "multiboot2.h"
+#include "multiboot.h"
 
-typedef struct multiboot_info {
+struct multiboot_info {
 	uint32_t             total_size;
 	uint32_t             reserved;
 	struct multiboot_tag tags[0];
-} multiboot_info_t;
+};
 
 uint8_t* get_tag_name(uint8_t tag_type) {
 	switch (tag_type) {

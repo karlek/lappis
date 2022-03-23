@@ -1,13 +1,4 @@
-typedef struct {
-	uint8_t* name;
-	uint8_t* data;
-	uint32_t size;
-} file_t;
-
-typedef struct {
-	file_t** files;
-	uint32_t num_files;
-} zip_fs_t;
+#include "zip.h"
 
 void read(uint8_t* buf, uint64_t n, uint64_t* cur, uint8_t* dest) {
 	memcpy(dest, buf + *cur, n);

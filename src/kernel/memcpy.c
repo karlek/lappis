@@ -320,7 +320,9 @@ void *memcpy(void *dest, const void *src, size_t count)
 {
     if((uint64_t)dest + count < 4096 || (uint64_t)src + count < 4096){
         /* panic("MEMCPY: Copy to/from NULL or overflow!"); */   
-		1 / 0;
+		int i = 0;
+		int j = 1;
+		j = j/i;
     }
     UInt8* dst8 = (UInt8*)dest;
     UInt8* src8 = (UInt8*)src;

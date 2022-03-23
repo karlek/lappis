@@ -1,5 +1,4 @@
-#define CMD_PORT  0x64
-#define DATA_PORT 0x60
+#include "ps2.h"
 
 bool ps2_wait_write() {
 	uint32_t timer = 500;

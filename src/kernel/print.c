@@ -1,3 +1,5 @@
+#include "print.h"
+
 void kprintf(uint32_t x, uint32_t y, uint8_t* color, uint8_t* format, ...) {
 	uint8_t* buffer = malloc(256);
 	if (buffer == NULL) {

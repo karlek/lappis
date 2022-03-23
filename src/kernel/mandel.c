@@ -1,5 +1,4 @@
-#define ZOOM       1.0
-#define ITERATIONS 20
+#include "mandel.h"
 
 int32_t mandel(double cr, double ci) {
 	double zr = 0;
@@ -23,7 +22,7 @@ int32_t mandel(double cr, double ci) {
 
 void to_mandel_space(double x, double y, double* cr, double* ci) {
 	*cr = 2.0 / ZOOM * (2.0 * (x / WIDTH) - 1);
-	*ci = (WIDTH / HEIGHT) * 2.0 / ZOOM * (2.0 * (y / HEIGHT) - 1);
+	*ci = ((float)WIDTH / (float)HEIGHT) * 2.0 / ZOOM * (2.0 * (y / HEIGHT) - 1);
 }
 
 void draw_mandel() {

@@ -1,3 +1,5 @@
+#include "mouse.h"
+
 static int32_t mouse_count = 0;
 
 static int32_t stat_raw = 0;

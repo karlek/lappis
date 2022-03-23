@@ -77,7 +77,7 @@ bin/kernel.dbg: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 #
 # -o file
 #     Place the primary output in file file.
-bin/kernel.o: src/kernel/kernel.c | bin
+bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kernel/string.c src/kernel/format/zip.c src/kernel/ports.c src/kernel/idt.c src/kernel/fpu.c src/kernel/drivers/ata.c src/kernel/multiboot.c src/kernel/pic.c src/kernel/memcpy.c src/kernel/tinyprintf.c src/kernel/video.c src/kernel/drivers/mouse.c src/kernel/drivers/keyboard.c src/kernel/ps2.c src/kernel/print.c | bin
 	# -Wno-pointer-sign should be investigated in the future, right now it's
 	#  just annoying af.
 	@$(CC) \
@@ -87,10 +87,13 @@ bin/kernel.o: src/kernel/kernel.c | bin
 		-mno-red-zone \
 		-masm=intel \
 		-nostdlib \
+		-static \
+		-r \
 		-fno-stack-protector \
 		-ffreestanding \
+		-Wno-pointer-sign \
 		-g \
-		-c $< \
+		$^ \
 		-o $@
 
 bin/zipfs.zip: | bin
@@ -112,12 +115,14 @@ bin/libhello.o: src/kernel/zig/hello.zig | bin
 	@zig build-obj \
 		--cache-dir bin/zig-cache \
 		-I src/kernel \
+		-I /usr/include \
 		-mno-red-zone \
 		-target x86_64-freestanding-gnu \
 		-femit-bin=$@ \
 		$<
 
 bin/libfloof.a: src/kernel/rust/src/lib.rs
+	@# make creates a sub-shell per line.
 	cd src/kernel/rust; cargo build -Zbuild-std ; cargo build
 	mv src/kernel/rust/target/os/debug/libfloof.a bin
 

@@ -1,3 +1,5 @@
+#include "keyboard.h"
+
 enum KEYCODE {
 	NULL_KEY = 0,
 

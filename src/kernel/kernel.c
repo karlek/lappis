@@ -4,22 +4,23 @@
 #include <stdarg.h>
 #include <cpuid.h>
 
-#include "tinyprintf.c"
-#include "memcpy.c"
+#include "tinyprintf.h"
+#include "memcpy.h"
 
-#include "ports.c"
-#include "string.c"
-#include "serial.c"
-#include "multiboot.c"
-#include "heap.c"
+#include "ports.h"
+#include "serial.h"
+#include "string.h"
+#include "multiboot.h"
+#include "heap.h"
+#include "video.h"
 #include "terminal-font.h"
-#include "video.c"
-#include "mandel.c"
-#include "print.c"
-#include "pic.c"
-#include "idt.c"
-#include "fpu.c"
-#include "format/zip.c"
+#include "mandel.h"
+#include "print.h"
+#include "pic.h"
+#include "idt.h"
+#include "fpu.h"
+
+#include "format/zip.h"
 
 #include "zig/hello.h"
 #include "rust/floof.h"
@@ -52,7 +53,7 @@ void end_of_execution() {
 
 uint8_t* get_cpu_vendor() {
 	uint32_t eax, ebx, ecx, edx, unused;
-    __cpuid(0, eax, ebx, ecx, edx);
+	__cpuid(0, eax, ebx, ecx, edx);
 
 	uint8_t* vendor_string = malloc(13);
 	vendor_string[0]  = ebx & 0xff;
@@ -106,7 +107,7 @@ void main(multiboot_info_t* boot_info) {
 	// Enable floating point operations.
 	enable_fpu();
 
-	ide_dev dev = {
+	ide_dev_t dev = {
 		ATA_PRIMARY_BUS,
 		ATA_PRIMARY_DRIVE,
 		ATA_PRIMARY_IO,

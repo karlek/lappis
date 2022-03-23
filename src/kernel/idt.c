@@ -1,9 +1,4 @@
-#include "ps2.c"
-#include "drivers/keyboard.c"
-#include "drivers/mouse.c"
-#include "drivers/ata.c"
-
-#define IDT_MAX_DESCRIPTORS 256
+#include "idt.h"
 
 uint64_t countdown = 0;
 extern void timer_handler() {
@@ -153,7 +148,6 @@ __attribute__((aligned(0x10))) static idt_entry_t idt[IDT_MAX_DESCRIPTORS];
 
 static idtr_t idtr;
 
-// Defined in idt.asm
 extern void* isr_stub_table[];
 
 // This does not return, but gcc will complain if we give it the noreturn

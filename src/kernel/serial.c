@@ -1,10 +1,6 @@
-#define SERIAL_COM1_PORT 0x3F8
-#define SERIAL_COM2_PORT 0x2F8
+#include "serial.h"
 
-#define debug(...)  debug_context(__FILE__, __func__, __LINE__, __VA_ARGS__)
-#define error(...)  error_context(__FILE__, __func__, __LINE__, __VA_ARGS__)
-
-static bool init_serial(uint16_t port) {
+bool init_serial(uint16_t port) {
 	outb(port + 1, 0x00); // Disable all interrupts
 	outb(port + 3, 0x80); // Enable DLAB (set baud rate divisor)
 	outb(port + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
@@ -110,7 +106,7 @@ void error_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr,
 	serial_write_string(SERIAL_COM1_PORT, "\n");
 }
 
-void debug_buffer(uint8_t* buffer, uint64_t size) {
+void debug_buffer(const uint8_t* buffer, uint64_t size) {
 	for (uint64_t i = 0; i < size; i++) {
 		serial_write_byte(SERIAL_COM2_PORT, buffer[i]);
 	}
