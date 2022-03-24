@@ -152,8 +152,8 @@ extern void* isr_stub_table[];
 
 // This does not return, but gcc will complain if we give it the noreturn
 // attribute... So here it is for your benefit.
-// 
-// __attribute__((noreturn)) 
+//
+// __attribute__((noreturn))
 void exception_handler() {
 	__asm__ volatile("hlt"); // Completely hangs the computer
 }

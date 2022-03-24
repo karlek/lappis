@@ -24,7 +24,7 @@ jobs:
       - name: switch rust default channel to nightly
         run: rustup default nightly
 
-      - name: Add rust src 
+      - name: Add rust src
         run: rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 
       - name: versions
