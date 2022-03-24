@@ -143,7 +143,7 @@ format:
 	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
 
 lint:
-	@find . -iname '*.c' ! -path './tools/*' | xargs -I '{}' clang-tidy \
+	@find . -iname '*.c' ! -path './tools/*' | grep -v -x -f ./.clang-tidy-ignore | xargs -I '{}' clang-tidy \
 		-format-style=file \
 		--use-color \
 		--quiet \
