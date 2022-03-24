@@ -143,7 +143,13 @@ format:
 	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
 
 lint:
-	@find . -iname '*.c' ! -path './tools/*' | grep -v pci.c | xargs -I '{}' clang-tidy -header-filter='.*' -checks="modernize-*,readability-*,performance-*" -fix
+	@find . -iname '*.c' ! -path './tools/*' | xargs -I '{}' clang-tidy \
+		-format-style=file \
+		--use-color \
+		--quiet \
+		-header-filter='.*' \
+		-checks="modernize-*,readability-*,performance-*,-readability-magic-numbers,llvm-header-guard,llvm-include-order" \
+		-fix '{}'
 
 dump-format-config:
 	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
