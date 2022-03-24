@@ -177,12 +177,13 @@ static int a2d(char ch)
 {
     if (ch >= '0' && ch <= '9') {
         return ch - '0';
-    } if (ch >= 'a' && ch <= 'f')
+    } if (ch >= 'a' && ch <= 'f') {
         return ch - 'a' + 10;
-    else if (ch >= 'A' && ch <= 'F')
-        return ch - 'A' + 10;
-    else
-        return -1;
+    }
+	if (ch >= 'A' && ch <= 'F') {
+		return ch - 'A' + 10;
+	}
+	return -1;
 }
 
 static char a2u(char ch, const char **src, int base, unsigned int *nump)

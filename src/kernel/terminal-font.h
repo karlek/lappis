@@ -54,4 +54,6 @@
 #define LARGE_FONT_CELL_HEIGHT 17
 #define LARGE_FONT_MASK 7
 
-extern uint16_t large_font[255][17];
+extern uint16_t large_font[256][17];
+
+#endif

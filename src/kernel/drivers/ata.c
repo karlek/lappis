@@ -159,7 +159,6 @@ void ide_read_sector(uint8_t* buf, uint32_t lba, ide_dev_t* dev) {
 
 	bool    is_primary    = drive == ATA_PRIMARY_DRIVE;
 	uint8_t command       = is_primary ? 0xE0 : 0xF0;
-	uint8_t secondary_bit = !is_primary;
 
 	outb(io + ATA_REG_HDDEVSEL, command | (uint8_t)((lba >> 24) & 0x0F));
 	outb(io + 1, 0x00);

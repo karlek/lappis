@@ -58,8 +58,8 @@ void print_box(uint8_t* s, uint32_t x, uint32_t y, uint8_t* color) {
 uint32_t line_number = 0;
 
 typedef struct lines {
-	char*         line;
-	struct lines* next;
+	const uint8_t* line;
+	struct lines*  next;
 } lines_t;
 
 lines_t kernel_lines = {
