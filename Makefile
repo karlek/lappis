@@ -148,7 +148,7 @@ lint:
 		--use-color \
 		--quiet \
 		-header-filter='.*' \
-		-checks="modernize-*,readability-*,performance-*,-readability-magic-numbers,llvm-header-guard,llvm-include-order" \
+		-checks="modernize-*,readability-*,performance-*,-readability-magic-numbers,llvm-include-order" \
 		-fix '{}'
 
 dump-format-config:
