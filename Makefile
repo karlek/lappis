@@ -142,6 +142,9 @@ bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 format:
 	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
 
+lint:
+	@find . -iname '*.c' ! -path './tools/*' | grep -v pci.c | xargs -I '{}' clang-tidy -header-filter='.*' -checks="modernize-*,readability-*,performance-*" -fix
+
 dump-format-config:
 	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
 
