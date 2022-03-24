@@ -155,15 +155,15 @@ bool read_end_of_central_directory(uint8_t* buf, uint64_t* cur) {
 	return true;
 }
 
-bool is_local_file_header(uint8_t* section_type) {
+bool is_local_file_header(const uint8_t* section_type) {
 	return section_type[0] == 0x03 && section_type[1] == 0x04;
 }
 
-bool is_central_directory(uint8_t* section_type) {
+bool is_central_directory(const uint8_t* section_type) {
 	return section_type[0] == 0x01 && section_type[1] == 0x02;
 }
 
-bool is_end_of_central_directory(uint8_t* section_type) {
+bool is_end_of_central_directory(const uint8_t* section_type) {
 	return section_type[0] == 0x05 && section_type[1] == 0x06;
 }
 

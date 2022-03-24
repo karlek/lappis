@@ -52,7 +52,11 @@ void end_of_execution() {
 
 
 uint8_t* get_cpu_vendor() {
-	uint32_t eax, ebx, ecx, edx, unused;
+	uint32_t eax;
+	uint32_t ebx;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t unused;
 	__cpuid(0, eax, ebx, ecx, edx);
 
 	uint8_t* vendor_string = malloc(13);
@@ -76,7 +80,9 @@ uint8_t* get_cpu_vendor() {
 }
 
 void get_cpu_features() {
-	uint32_t eax, edx, unused;
+	uint32_t eax;
+	uint32_t edx;
+	uint32_t unused;
 	if (__get_cpuid(1, &eax, &unused, &unused, &edx) == false) {
 		error("Could not get CPU features!");
 		return;

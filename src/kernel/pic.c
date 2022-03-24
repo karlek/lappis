@@ -16,7 +16,8 @@ arguments:
 */
 void PIC_remap(uint16_t offset1, uint16_t offset2) {
 	debug("PIC_remap: start.");
-	uint8_t a1, a2;
+	uint8_t a1;
+	uint8_t a2;
 
 	// Save masks.
 	a1 = inb(PIC1_DATA);

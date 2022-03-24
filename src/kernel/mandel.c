@@ -13,7 +13,7 @@ int32_t mandel(double cr, double ci) {
 		zr = zr1;
 		zi = zi1;
 
-		if (zr * zr + zi * zi > 4.0f) {
+		if (zr * zr + zi * zi > 4.0F) {
 			return i;
 		}
 	}

@@ -88,8 +88,9 @@ static void _TFP_GCC_NO_INLINE_ ulli2a(
     int n = 0;
     unsigned long long int d = 1;
     char *bf = p->bf;
-    while (num / d >= p->base)
+    while (num / d >= p->base) {
         d *= p->base;
+}
     while (d != 0) {
         int dgt = num / d;
         num %= d;
@@ -118,8 +119,9 @@ static void uli2a(unsigned long int num, struct param *p)
     int n = 0;
     unsigned long int d = 1;
     char *bf = p->bf;
-    while (num / d >= p->base)
+    while (num / d >= p->base) {
         d *= p->base;
+}
     while (d != 0) {
         int dgt = num / d;
         num %= d;
@@ -147,8 +149,9 @@ static void ui2a(unsigned int num, struct param *p)
     int n = 0;
     unsigned int d = 1;
     char *bf = p->bf;
-    while (num / d >= p->base)
+    while (num / d >= p->base) {
         d *= p->base;
+}
     while (d != 0) {
         int dgt = num / d;
         num %= d;
@@ -172,9 +175,9 @@ static void i2a(int num, struct param *p)
 
 static int a2d(char ch)
 {
-    if (ch >= '0' && ch <= '9')
+    if (ch >= '0' && ch <= '9') {
         return ch - '0';
-    else if (ch >= 'a' && ch <= 'f')
+    } if (ch >= 'a' && ch <= 'f')
         return ch - 'a' + 10;
     else if (ch >= 'A' && ch <= 'F')
         return ch - 'A' + 10;
@@ -188,8 +191,9 @@ static char a2u(char ch, const char **src, int base, unsigned int *nump)
     unsigned int num = 0;
     int digit;
     while ((digit = a2d(ch)) >= 0) {
-        if (digit > base)
+        if (digit > base) {
             break;
+}
         num = num * base + digit;
         ch = *p++;
     }
@@ -205,24 +209,29 @@ static void putchw(void *putp, putcf putf, struct param *p)
     char *bf = p->bf;
 
     /* Number of filling characters */
-    while (*bf++ && n > 0)
+    while (*bf++ && n > 0) {
         n--;
-    if (p->sign)
+}
+    if (p->sign) {
         n--;
-    if (p->alt && p->base == 16)
+}
+    if (p->alt && p->base == 16) {
         n -= 2;
-    else if (p->alt && p->base == 8)
+    } else if (p->alt && p->base == 8) {
         n--;
+}
 
     /* Fill with space to align to the right, before alternate or sign */
     if (!p->lz && !p->align_left) {
-        while (n-- > 0)
+        while (n-- > 0) {
             putf(putp, ' ');
+}
     }
 
     /* print sign */
-    if (p->sign)
+    if (p->sign) {
         putf(putp, p->sign);
+}
 
     /* Alternate */
     if (p->alt && p->base == 16) {
@@ -234,19 +243,22 @@ static void putchw(void *putp, putcf putf, struct param *p)
 
     /* Fill with zeros, after alternate or sign */
     if (p->lz) {
-        while (n-- > 0)
+        while (n-- > 0) {
             putf(putp, '0');
+}
     }
 
     /* Put actual buffer */
     bf = p->bf;
-    while ((ch = *bf++))
+    while ((ch = *bf++)) {
         putf(putp, ch);
+}
 
     /* Fill with space to align to the left, after string */
     if (!p->lz && p->align_left) {
-        while (n-- > 0)
+        while (n-- > 0) {
             putf(putp, ' ');
+}
     }
 }
 
@@ -313,11 +325,12 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
 # ifdef PRINTF_LONG_SUPPORT
             if (ch == 'z') {
                 ch = *(fmt++);
-                if (sizeof(size_t) == sizeof(unsigned long int))
+                if (sizeof(size_t) == sizeof(unsigned long int)) {
                     lng = 1;
 #  ifdef PRINTF_LONG_LONG_SUPPORT
-                else if (sizeof(size_t) == sizeof(unsigned long long int))
+                } else if (sizeof(size_t) == sizeof(unsigned long long int)) {
                     lng = 2;
+}
 #  endif
             } else
 # endif
@@ -342,15 +355,16 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 p.base = 10;
 #ifdef PRINTF_LONG_SUPPORT
 #ifdef PRINTF_LONG_LONG_SUPPORT
-                if (2 == lng)
+                if (2 == lng) {
                     ulli2a(va_arg(va, unsigned long long int), &p);
-                else
+                } else
 #endif
-                  if (1 == lng)
+                  if (1 == lng) {
                     uli2a(va_arg(va, unsigned long int), &p);
-                else
+                } else {
 #endif
                     ui2a(va_arg(va, unsigned int), &p);
+}
                 putchw(putp, putf, &p);
                 break;
             case 'd':
@@ -358,15 +372,16 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 p.base = 10;
 #ifdef PRINTF_LONG_SUPPORT
 #ifdef PRINTF_LONG_LONG_SUPPORT
-                if (2 == lng)
+                if (2 == lng) {
                     lli2a(va_arg(va, long long int), &p);
-                else
+                } else
 #endif
-                  if (1 == lng)
+                  if (1 == lng) {
                     li2a(va_arg(va, long int), &p);
-                else
+                } else {
 #endif
                     i2a(va_arg(va, int), &p);
+}
                 putchw(putp, putf, &p);
                 break;
 #ifdef SIZEOF_POINTER
@@ -386,15 +401,16 @@ void tfp_format(void *putp, putcf putf, const char *fmt, va_list va)
                 p.uc = (ch == 'X')?1:0;
 #ifdef PRINTF_LONG_SUPPORT
 #ifdef PRINTF_LONG_LONG_SUPPORT
-                if (2 == lng)
+                if (2 == lng) {
                     ulli2a(va_arg(va, unsigned long long int), &p);
-                else
+                } else
 #endif
-                  if (1 == lng)
+                  if (1 == lng) {
                     uli2a(va_arg(va, unsigned long int), &p);
-                else
+                } else {
 #endif
                     ui2a(va_arg(va, unsigned int), &p);
+}
                 putchw(putp, putf, &p);
                 break;
             case 'o':
@@ -450,8 +466,9 @@ struct _vsnprintf_putcf_data
 static void _vsnprintf_putcf(void *p, char c)
 {
   struct _vsnprintf_putcf_data *data = (struct _vsnprintf_putcf_data*)p;
-  if (data->num_chars < data->dest_capacity)
+  if (data->num_chars < data->dest_capacity) {
     data->dest[data->num_chars] = c;
+}
   data->num_chars ++;
 }
 
@@ -459,18 +476,20 @@ int tfp_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
   struct _vsnprintf_putcf_data data;
 
-  if (size < 1)
+  if (size < 1) {
     return 0;
+}
 
   data.dest = str;
   data.dest_capacity = size-1;
   data.num_chars = 0;
   tfp_format(&data, _vsnprintf_putcf, format, ap);
 
-  if (data.num_chars < data.dest_capacity)
+  if (data.num_chars < data.dest_capacity) {
     data.dest[data.num_chars] = '\0';
-  else
+  } else {
     data.dest[data.dest_capacity] = '\0';
+}
 
   return data.num_chars;
 }

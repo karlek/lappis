@@ -68,7 +68,7 @@ lines_t kernel_lines = {
 };
 lines_t* current_lines = &kernel_lines;
 
-void kprint(uint8_t* s) {
+void kprint(const uint8_t* s) {
 	lines_t next = {
 		.line = s,
 		.next = NULL,

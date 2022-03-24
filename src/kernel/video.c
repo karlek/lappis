@@ -1,6 +1,6 @@
 #include "video.h"
 
-void set_pixel(uint32_t x, uint32_t y, uint8_t color[4]) {
+void set_pixel(uint32_t x, uint32_t y, const uint8_t color[4]) {
 	volatile uint8_t* fb = (volatile uint8_t*)FRAME_BUFFER;
 
 	// Colors are written in little endian order.
@@ -40,7 +40,7 @@ void draw_char(uint8_t c, uint32_t x, uint32_t y, uint8_t* color) {
 	}
 }
 
-void draw_string(uint8_t* str, uint32_t x, uint32_t y, uint8_t* color) {
+void draw_string(const uint8_t* str, uint32_t x, uint32_t y, uint8_t* color) {
 	const uint32_t letter_spacing = 0;
 
 	for (uint32_t i = 0; str[i] != '\0'; i++) {

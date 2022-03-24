@@ -19,4 +19,4 @@ void debug_context(uint8_t* filename, const uint8_t* func_name, uint32_t linenr,
 
 void serial_debug_write_byte(void* p, char c);
 
-void debug_buffer(const uint8_t*, size_t);
+void debug_buffer(const uint8_t* /*buffer*/, size_t /*size*/);
