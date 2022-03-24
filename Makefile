@@ -1,6 +1,6 @@
 .PHONY: all kernel debug clean format
 
-CC ?= gcc
+CC ?= clang
 
 all: build
 
