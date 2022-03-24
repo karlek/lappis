@@ -1,5 +1,8 @@
-#include <stdint.h>
+#ifndef PS2_H
+#define PS2_H
+
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "ports.h"
 #include "serial.h"
@@ -9,3 +12,5 @@
 
 bool ps2_write(uint32_t port, uint8_t b);
 uint8_t ps2_read(uint32_t port);
+
+#endif

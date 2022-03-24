@@ -1,3 +1,6 @@
+#ifndef MULTIBOOT2_H
+#define MULTIBOOT2_H
+
 /*  multiboot2.h - Multiboot 2 header file.  */
 /*  Copyright (C) 1999,2003,2007,2008,2009,2010  Free Software Foundation, Inc.
  *
@@ -26,9 +29,6 @@ struct RSDPDescriptor {
 	uint8_t Revision;
 	uint32_t RsdtAddress;
 } __attribute__ ((packed));
-
-#ifndef MULTIBOOT_HEADER
-#define MULTIBOOT_HEADER 1
 
 /* How many bytes from the start of the file we search for the header.  */
 #define MULTIBOOT_SEARCH			32768

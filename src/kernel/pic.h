@@ -1,3 +1,6 @@
+#ifndef PIC_H
+#define PIC_H
+
 #include <stdint.h>
 
 #include "ports.h"
@@ -34,3 +37,5 @@ arguments:
 */
 void PIC_remap(uint16_t offset1, uint16_t offset2);
 void PIC_sendEOI(uint8_t irq);
+
+#endif

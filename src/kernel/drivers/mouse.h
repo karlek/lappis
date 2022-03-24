@@ -1,10 +1,15 @@
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#ifndef MOUSE_H
+#define MOUSE_H
 
-#include "../print.h"
-#include "../video.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "../pic.h"
+#include "../print.h"
 #include "../ps2.h"
+#include "../video.h"
 
 void enable_mouse();
+
+#endif

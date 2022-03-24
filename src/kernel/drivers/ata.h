@@ -1,8 +1,11 @@
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef ATA_H
+#define ATA_H
 
-#include "../pic.h"
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "../heap.h"
+#include "../pic.h"
 
 #define ATA_SR_BSY  0x80
 #define ATA_SR_DRDY 0x40
@@ -97,3 +100,5 @@ typedef struct ide_dev {
 
 void enable_ata();
 void ata_read(uint8_t* buf, uint32_t lba, uint32_t numsects, ide_dev_t* dev);
+
+#endif

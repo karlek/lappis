@@ -1,3 +1,6 @@
+#ifndef FONT_H
+#define FONT_H
+
 /**
  * @file apps/terminal-font.h
  * @brief Fallback font used to render text where the TrueType renderer would be inappropriate.

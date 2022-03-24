@@ -1,29 +1,29 @@
-#include <stdint.h>
+#include <cpuid.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdarg.h>
-#include <cpuid.h>
+#include <stdint.h>
 
-#include "tinyprintf.h"
 #include "memcpy.h"
+#include "tinyprintf.h"
 
+#include "fpu.h"
+#include "heap.h"
+#include "idt.h"
+#include "mandel.h"
+#include "multiboot.h"
+#include "pic.h"
 #include "ports.h"
+#include "print.h"
 #include "serial.h"
 #include "string.h"
-#include "multiboot.h"
-#include "heap.h"
-#include "video.h"
 #include "terminal-font.h"
-#include "mandel.h"
-#include "print.h"
-#include "pic.h"
-#include "idt.h"
-#include "fpu.h"
+#include "video.h"
 
 #include "format/zip.h"
 
-#include "zig/hello.h"
 #include "rust/floof.h"
+#include "zig/hello.h"
 
 void warn_interrupt(uint8_t interrupt_number) {
 	error("Interrupt: %d/%x!", interrupt_number, interrupt_number);

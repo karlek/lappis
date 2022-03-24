@@ -1,3 +1,6 @@
+#ifndef MEMCPY_H
+#define MEMCPY_H
+
 /********************************************************************
  ** File:     memcpy.h
  **
@@ -61,4 +64,6 @@ void *memcpy(void *dest, const void *src, size_t count);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

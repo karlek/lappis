@@ -1,3 +1,6 @@
+#ifndef HEAP_H
+#define HEAP_H
+
 #include <stdint.h>
 
 #include "serial.h"
@@ -10,3 +13,5 @@
 // Frame buffer:       0x4800000 - 0x4e00000
 
 void* malloc(uint64_t size);
+
+#endif
