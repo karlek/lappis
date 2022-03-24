@@ -1,6 +1,6 @@
 #include "terminal-font.h"
 
-static uint16_t large_font[255][17] = {
+uint16_t large_font[255][17] = {
 	/* 0 32 */
 	{
 		/*          */
