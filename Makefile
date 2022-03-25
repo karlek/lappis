@@ -146,6 +146,7 @@ format:
 lint:
 	@find . -iname '*.c' ! -path './tools/*' | grep -v -x -f ./.clang-tidy-ignore | xargs -I '{}' clang-tidy \
 		-format-style=file \
+		--extra-arg="-I./src/kernel" \
 		--use-color \
 		--quiet \
 		-header-filter='.*' \
