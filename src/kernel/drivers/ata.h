@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../heap.h"
-#include "../pic.h"
+#include "heap.h"
+#include "pic.h"
 
 #define ATA_SR_BSY  0x80
 #define ATA_SR_DRDY 0x40

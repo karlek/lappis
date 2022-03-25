@@ -89,6 +89,7 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 		-nostdlib \
 		-static \
 		-r \
+		-I./src/kernel \
 		-fno-stack-protector \
 		-ffreestanding \
 		-Wno-pointer-sign \

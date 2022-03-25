@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../heap.h"
-#include "../memcpy.h"
+#include "heap.h"
+#include "memcpy.h"
 
 typedef struct {
 	uint8_t* name;

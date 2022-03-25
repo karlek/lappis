@@ -5,10 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../pic.h"
-#include "../print.h"
-#include "../ps2.h"
-#include "../video.h"
+#include "pic.h"
+#include "print.h"
+#include "ps2.h"
+#include "video.h"
 
 void enable_mouse();
 
