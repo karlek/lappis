@@ -2,7 +2,9 @@ target remote localhost:1234
 symbol-file bin/kernel.dbg
 
 # Any break points should be set here.
-break long_mode_start
+# break main
+break enter_userland
+break yay_userland
 
 # Run until the program first breakpoint.
 continue

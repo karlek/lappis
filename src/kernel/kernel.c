@@ -91,6 +91,8 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
+extern void enter_userland();
+
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -154,6 +156,8 @@ void main(multiboot_info_t* boot_info) {
 		debug("found bg.raw!");
 		set_frame(file->data);
 	}
+
+	enter_userland();
 
 	while (1) {
 		sleep(10);

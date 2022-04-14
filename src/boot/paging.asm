@@ -21,9 +21,10 @@ NUM_FRAME_BUFFER_PAGES: equ 3
 ; Remember, skip the last guard page.
 STACK_TOP: equ (2 << 20) * (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
 
-PRESENT:   equ 0x1
-WRITABLE:  equ 0x2
-PAGE_SIZE: equ 0x80
+PRESENT:     equ 0x1
+WRITABLE:    equ 0x2
+USER_ACCESS: equ 0x4
+PAGE_SIZE:   equ 0x80
 
 CR0_WRITE_PROTECT: equ 1 << 16
 CR0_PAGING: equ 1 << 31
@@ -34,13 +35,13 @@ set_up_page_tables:
 	; Map the first P4 entry to P3 table.
 	mov eax, p3_table
 	; Set flags `present` and `writeable`.
-	or eax, PRESENT|WRITABLE
+	or eax, PRESENT|WRITABLE|USER_ACCESS
 	mov [p4_table], eax
 
 	; Map the first P3 entry to P2 table.
 	mov eax, p2_table
 	; Set flags `present` and `writeable`.
-	or eax, PRESENT|WRITABLE
+	or eax, PRESENT|WRITABLE|USER_ACCESS
 	mov [p3_table], eax
 
 	; Counter variable for each entry.
@@ -53,7 +54,7 @@ set_up_page_tables:
 	; Note: `mul reg` stores the answer in *ax registers.
 	mul ecx
 	; Set flags `page size`, `present` and `writeable`.
-	or eax, PRESENT|WRITABLE|PAGE_SIZE
+	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
 	mov [p2_table + ecx*8], eax
 	cmp ecx, 0
 	je .next
@@ -71,7 +72,7 @@ map_kernel_stack:
 	mul ecx
 
 	; Make it a `guard` page by removing WRITABLE.
-	or eax, PRESENT|PAGE_SIZE
+	or eax, PRESENT|PAGE_SIZE|USER_ACCESS
 	mov [p2_table + ecx*8], eax
 	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
@@ -80,7 +81,7 @@ map_kernel_stack:
 	mov eax, 0x200000
 	mul ecx
 
-	or eax, PRESENT|WRITABLE|PAGE_SIZE
+	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
 	mov [p2_table + ecx*8], eax
 	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
@@ -93,7 +94,7 @@ map_kernel_stack:
 	mul ecx
 
 	; Make it a `guard` page by removing WRITABLE.
-	or eax, PRESENT|PAGE_SIZE
+	or eax, PRESENT|PAGE_SIZE|USER_ACCESS
 	mov [p2_table + ecx*8], eax
 	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
@@ -106,7 +107,7 @@ map_frame_buffer:
 	; Start mapping the frame buffer at address 0x8000000.
 	mov eax, 0xfd000000
 	; Set flags `page size`, `present` and `writeable`.
-	or eax, PRESENT|WRITABLE|PAGE_SIZE
+	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
 	jmp .store
 
 .loop:

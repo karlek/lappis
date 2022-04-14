@@ -19,9 +19,46 @@ gdt64:
 	;
 	; Code segment
 	dq (1<<43) | (1<<44) | (1<<47) | (1<<53)
+.data: equ $ - gdt64
+	dq           (1<<44) | (1<<47) | (1<<53)
+.user_code: equ $ - gdt64
+	dq (1<<43) | (1<<44) | (1<<45) | (1<<46) | (1<<47) | (1<<53)
+.user_data: equ $ - gdt64
+	dq           (1<<44) | (1<<45) | (1<<46) | (1<<47) | (1<<53)
+; .tss: equ $ - gdt64
+; 	dq (1<<41) | (1<<43) |                     (1<<47) | (1<<53)
+
+.tss: equ $ - gdt64
+	.limit_low        dw    0
+	.base_low         dw    (tss64 - $$) & 0xffff
+	.base_middle      db    ((tss64 - $$) >> 16) & 0xff
+	.access           db    10001001b
+	.limit_high_flags db    00000000b
+	.base_high        db    ((tss64 - $$) >> 24) & 0xff
+	.base_highest     dd    ((tss64 - $$) >> 32)
+	.reserved         dd    0x00000000
+
+; In most systems, the DPLs of TSS descriptors are set to values less than 3,
+; so that only privileged software can perform task switching. However, in
+; multitasking applications, DPLs for some TSS descriptors may be set to 3 to
+; allow task switching at the application (or user) privilege level.
+
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
+
+tss64:
+	.rsp0 dq 0x3000
+	.rsp1 dq 0
+	.rsp2 dq 0
+	.ist1 dq 0x3100
+	.ist2 dq 0x3200
+	.ist3 dq 0x3300
+	.ist4 dq 0
+	.ist5 dq 0
+	.ist6 dq 0
+	.ist7 dq 0
+	.iopb dw 0          ; no IOPB
 
 section .text
 bits 32
@@ -37,6 +74,11 @@ init_long_mode:
 
 	call enable_paging
 	lgdt [gdt64.pointer]
+
+	; Fifth 8-byte selector, symbolically OR-ed with 0 to set the RPL (requested
+	; privilege level).
+	mov ax, gdt64.tss | 3
+	ltr ax
 
 	jmp gdt64.code:long_mode_start
 
