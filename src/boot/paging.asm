@@ -19,6 +19,7 @@ NUM_KERNEL_STACK_PAGES: equ 4
 NUM_FRAME_BUFFER_PAGES: equ 3
 
 ; Remember, skip the last guard page.
+IST1_TOP: equ (2 << 20) * (NUM_PAGES+NUM_KERNEL_STACK_PAGES-2)
 STACK_TOP: equ (2 << 20) * (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
 
 PRESENT:     equ 0x1

@@ -13,6 +13,7 @@
       "-g",
       "-c",
       "-o",
+      "-Isrc/kernel",
       "bin/kernel.o",
       "src/kernel/kernel.c"
     ],

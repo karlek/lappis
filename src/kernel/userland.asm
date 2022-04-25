@@ -2,17 +2,36 @@ bits 64
 
 global enter_userland
 
+USER_STACK_GS: equ 0x10
+
 syscall_landing_pad:
-	mov rax, 0x1122334455667788
-	jmp $
+	; rax = syscall number
+	cli
+
+	swapgs                      ; Swap GS base to kernel PCR
+	mov gs:[USER_STACK_GS], rsp ; Save user stack
+
+	mov rsp, [tss64.rsp0]         ; Switch to kernel stack
+
+	; Handle syscall by calling the appropriate handler.
+	; TODO
+	; jmp $
+
+	mov rsp, gs:[USER_STACK_GS] ; Restore user stack
+	swapgs                      ; Switch to usermode gs
+
+	sti
+	sysret
 
 yay_userland:
-	mov rcx, 0xdeadcafebeefdead
-	jmp $
-
-tss:
-	dw 0
-	dw 0x4800000
+	push 1
+	mov rcx, 0
+	mov rax, 0xdeadcafebeefdead
+	; syscall
+	; div rcx
+.loop:
+	inc rcx
+	jmp .loop
 
 enter_userland:
 	; SYSCALL function pointer
@@ -37,21 +56,36 @@ enter_userland:
 	; 32-47 kernel segment base
 	; 48-63   user segment base
 	;
-	; eax: eip syscall return address
+	; eax: eip syscall EIP
 	; edx: kernel_base << 16 | user_base
 	mov rcx, 0xc0000081
 	rdmsr
-	mov edx, gdt64.code << 16 | gdt64.user_code
-	wrmsr
 
-	; Fifth 8-byte selector, symbolically OR-ed with 0 to set the RPL (requested
-	; privilege level).
-	; mov ax, (5 * 8) | 3
-	; ltr ax
+	; xor rax, rax
+	mov edx, 0x130008
+	; mov edx, (gdt64.user_code << 16) | gdt64.code
+	wrmsr
 
 	; rcx: userland entrypoint
 	; r11: RFLAGS
+	; Disable interrupts. We enable interrupts with RFLAGS in userland.
+	; 0x2      | 0x200             | 0x200000
+	; Always 1 | enable interrupts | cpuid
+	cli
+
+	; push 0x20 | 3 ; Stack segment, ss
+	; push 0x34000 ; rsp
+	; push 0x200 ; rflags
+	; push 0x18 | 3 ; Code segment, cs
+	; push yay_userland ; rip
+	; iretq
+
+	xor rax, rax
+	mov ds, rax
 	mov rcx, yay_userland
-	mov r11, 0x202
+	mov r11, 0x200202
+
+	mov qword [tss64.rsp0], rsp
+	mov rsp, 0x340000
 
 	o64 sysret

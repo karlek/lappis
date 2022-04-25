@@ -1,42 +1,160 @@
 section .rodata
+
+
+; Base          | Flags | Limit | Access        | Base
+; 31         24 | 3   0 | 19 16 | 7           0 | 23         16
+; Base                          | Limit
+; 15                          0 | 15                          0
+
+; # Access byte
+
+; 7 | 6   5 | 4 | 3 | 2  | 1  | 0
+; P |  DPL  | S | E | DC | RW | A
+
+; P: Present bit. Allows an entry to refer to a valid segment. Must be set (1)
+; for any valid segment.
+
+; DPL: Descriptor privilege level field. Contains the CPU Privilege level of the
+; segment.
+
+; 	0 = highest privilege (kernel), 3 = lowest privilege (user applications).
+
+; S: Descriptor type bit.
+; 	If clear (0) the descriptor defines a system segment (eg. a Task State
+; 	Segment).
+; 	If set (1) it defines a code or data segment.
+
+; E: Executable bit.
+; 	If clear (0) the descriptor defines a data segment.
+; 	If set (1) it defines a code segment which can be executed from.
+
+; DC: Direction bit/Conforming bit.
+; 	For data selectors: Direction bit.
+; 		If clear (0) the segment grows up.
+
+; 		If set (1) the segment grows down, ie. the Offset has to be greater
+; 		than the Limit.
+
+; 	For code selectors: Conforming bit.
+; 		If clear (0) code in this segment can only be executed from the ring
+; 		set in Privl.
+
+; 		If set (1) code in this segment can be executed from an equal or lower
+; 		privilege level. For example, code in ring 3 can far-jump to conforming
+; 		code in a ring 2 segment. The Privl field represent the highest
+; 		privilege level that is allowed to execute the segment. For example,
+; 		code in ring 0 cannot far-jump to a conforming code segment where Privl
+; 		is 2, while code in ring 2 and 3 can. Note that the privilege level
+; 		remains the same, ie. a far-jump from ring 3 to a segment with a Privl
+; 		of 2 remains in ring 3 after the jump. 
+
+; RW: Readable bit/Writable bit.
+; 	For code segments: Readable bit. If clear (0), read access for this segment
+; 	is not allowed. If set (1) read access is allowed. Write access is never
+; 	allowed for code segments.
+; 	For data segments: Writeable bit. If clear (0), write access for this
+; 	segment is not allowed. If set (1) write access is allowed. Read access is
+; 	always allowed for data segments. 
+
+; A: Accessed bit. Best left clear (0), the CPU will set it when the segment is
+; accessed. 
+
+; Flags
+; 3 | 2  | 1 | 0
+; G | DB | L | Reserved
+
+; G: Granularity flag, indicates the size the Limit value is scaled by.
+; 	If clear (0), the Limit is in 1 Byte blocks (byte granularity).
+; 	If set (1), the Limit is in 4 KiB blocks (page granularity).
+
+; DB: Size flag.
+; 	If clear (0), the descriptor defines a 16-bit protected mode segment.
+; 	If set (1) it defines a 32-bit protected mode segment. A GDT can have both 16-bit and 32-bit selectors at once.
+
+; L: Long-mode code flag.
+; 	If set (1), the descriptor defines a 64-bit code segment. When set, Sz should always be clear.
+; 	For any other type of segment (other code types or any data segment), it should be clear (0). 
+
 gdt64:
 	dq 0 ; Zero entry
 .code: equ $ - gdt64
-	; [Descriptor type, present, executable, long mode flag]
-	;
-	; Descriptor type bit. If clear (0) the descriptor defines a system segment
-	; (eg. a Task State Segment). If set (1) it defines a code or data segment.
-	;
-	; Pr: Present bit. Allows an entry to refer to a valid segment. Must be set
-	; (1) for any valid segment.
-	;
-	; Ex: Executable bit. If clear (0) the descriptor defines a data segment.
-	; If set (1) it defines a code segment which can be executed from.
-	;
-	; L: Long-mode code flag. If set (1), the descriptor defines a 64-bit code
-	; segment. When set, Sz should always be clear. For any other type of
-	; segment (other code types or any data segment), it should be clear (0).
-	;
-	; Code segment
-	dq (1<<43) | (1<<44) | (1<<47) | (1<<53)
+	; Limit
+	dw 0xffff
+	; Base
+	dw 0x0000
+	; Base (mid)
+	db 0x00
+	; Access
+	; present, dpl=0, execute, readable
+	db 0x9a
+	; Flags & base
+	; Long mode, granularity
+	db (1 << 5) | (1 << 7) | 0x0f
+	; Base (high)
+	db 0x00
 .data: equ $ - gdt64
-	dq           (1<<44) | (1<<47) | (1<<53)
-.user_code: equ $ - gdt64
-	dq (1<<43) | (1<<44) | (1<<45) | (1<<46) | (1<<47) | (1<<53)
+	; Limit
+	dw 0xffff
+	; Base
+	dw 0x0000
+	; Base (mid)
+	db 0x00
+	; Access
+	; Present, dpl=0, writable
+	db 0x92
+	; Flags & base
+	; Long mode, granularity
+	db (1 << 5) | (1 << 7) | 0x0f
+	; Base (high)
+	db 0x00
 .user_data: equ $ - gdt64
-	dq           (1<<44) | (1<<45) | (1<<46) | (1<<47) | (1<<53)
-; .tss: equ $ - gdt64
-; 	dq (1<<41) | (1<<43) |                     (1<<47) | (1<<53)
-
+	; Limit
+	dw 0xffff
+	; Base
+	dw 0x0000
+	; Base (mid)
+	db 0x00
+	; Access
+	; Present, dpl=3, writeable
+	db 0xf2
+	; Flags & base
+	; Long mode, granularity
+	db (1 << 5) | (1 << 6) | (1 << 7) | 0x0f
+	; Base (high)
+	db 0x00
+.user_code: equ $ - gdt64
+	; Limit
+	dw 0xffff
+	; Base
+	dw 0x0000
+	; Base (mid)
+	db 0x00
+	; Access
+	; Present, dpl=3, execute, readable
+	db 0xfa
+	; Flags & base
+	; Long mode, granularity
+	db (1 << 5) | (1 << 7) | 0x0f
+	; Base (high)
+	db 0x00
 .tss: equ $ - gdt64
-	.limit_low        dw    0
-	.base_low         dw    (tss64 - $$) & 0xffff
-	.base_middle      db    ((tss64 - $$) >> 16) & 0xff
-	.access           db    10001001b
-	.limit_high_flags db    00000000b
-	.base_high        db    ((tss64 - $$) >> 24) & 0xff
-	.base_highest     dd    ((tss64 - $$) >> 32)
-	.reserved         dd    0x00000000
+	; Limit
+	dw 0x67 ; Sizeof tss64
+	; Base
+	dw (tss64 - $$) & 0xffff
+	; Base (mid)
+	db ((tss64 - $$) >> 16) & 0xff
+	; Access
+	; Present | TSS (0x9)
+	db 10001001b
+	; Flags & base
+	db 00000000b
+	; Base high
+	db ((tss64 - $$) >> 24) & 0xff
+	; Base highest
+	dd ((tss64 - $$) >> 32)
+	; Reserved
+	dd 0
 
 ; In most systems, the DPLs of TSS descriptors are set to values less than 3,
 ; so that only privileged software can perform task switching. However, in
@@ -48,17 +166,21 @@ gdt64:
 	dq gdt64
 
 tss64:
-	.rsp0 dq 0x3000
-	.rsp1 dq 0
-	.rsp2 dq 0
-	.ist1 dq 0x3100
-	.ist2 dq 0x3200
-	.ist3 dq 0x3300
-	.ist4 dq 0
-	.ist5 dq 0
-	.ist6 dq 0
-	.ist7 dq 0
-	.iopb dw 0          ; no IOPB
+	           dd 0 ; Reserved
+	.rsp0      dq STACK_TOP
+	.rsp1      dq 0
+	.rsp2      dq 0
+	           dq 0 ; Reserved
+	.ist1      dq 0
+	.ist2      dq 0
+	.ist3      dq 0
+	.ist4      dq 0
+	.ist5      dq 0
+	.ist6      dq 0
+	.ist7      dq 0
+	           dq 0 ; Reserved
+	           dw 0 ; Reserved
+	.iopb      dw 0 ; no IOPB
 
 section .text
 bits 32
@@ -75,9 +197,8 @@ init_long_mode:
 	call enable_paging
 	lgdt [gdt64.pointer]
 
-	; Fifth 8-byte selector, symbolically OR-ed with 0 to set the RPL (requested
-	; privilege level).
-	mov ax, gdt64.tss | 3
+	; Load the TSS
+	mov ax, gdt64.tss
 	ltr ax
 
 	jmp gdt64.code:long_mode_start
@@ -99,6 +220,9 @@ long_mode_start:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
+
+	mov rbx, gdt64.data
+	mov ds, rbx
 
 	mov rbx, 0
 	mov rcx, 0
