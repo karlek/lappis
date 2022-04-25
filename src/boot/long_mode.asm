@@ -75,6 +75,11 @@ section .rodata
 ; 	If set (1), the descriptor defines a 64-bit code segment. When set, Sz should always be clear.
 ; 	For any other type of segment (other code types or any data segment), it should be clear (0). 
 
+; 0x08 .code 
+; 0x10 .data
+; 0x18 .user_data
+; 0x20 .user_code
+; 0x28 .tss
 gdt64:
 	dq 0 ; Zero entry
 .code: equ $ - gdt64
@@ -85,11 +90,12 @@ gdt64:
 	; Base (mid)
 	db 0x00
 	; Access
-	; present, dpl=0, execute, readable
-	db 0x9a
-	; Flags & base
+	; present, dpl=0, descriptor, execute, readable
+	db 10011010b
+	; Flags & limit
 	; Long mode, granularity
-	db (1 << 5) | (1 << 7) | 0x0f
+	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
+	db 10101111b
 	; Base (high)
 	db 0x00
 .data: equ $ - gdt64
@@ -100,11 +106,12 @@ gdt64:
 	; Base (mid)
 	db 0x00
 	; Access
-	; Present, dpl=0, writable
-	db 0x92
-	; Flags & base
+	; Present, dpl=0, descriptor, writable
+	db 10010010b
+	; Flags & limit
 	; Long mode, granularity
-	db (1 << 5) | (1 << 7) | 0x0f
+	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
+	db 10101111b
 	; Base (high)
 	db 0x00
 .user_data: equ $ - gdt64
@@ -117,9 +124,9 @@ gdt64:
 	; Access
 	; Present, dpl=3, writeable
 	db 0xf2
-	; Flags & base
+	; Flags & limit
 	; Long mode, granularity
-	db (1 << 5) | (1 << 6) | (1 << 7) | 0x0f
+	db 10101111b
 	; Base (high)
 	db 0x00
 .user_code: equ $ - gdt64
@@ -132,27 +139,27 @@ gdt64:
 	; Access
 	; Present, dpl=3, execute, readable
 	db 0xfa
-	; Flags & base
+	; Flags & limit
 	; Long mode, granularity
-	db (1 << 5) | (1 << 7) | 0x0f
+	db 10101111b
 	; Base (high)
 	db 0x00
 .tss: equ $ - gdt64
 	; Limit
 	dw 0x67 ; Sizeof tss64
 	; Base
-	dw (tss64 - $$) & 0xffff
+	dw (tss64 - $$ + 0x100000 + 0x30) & 0xffff
 	; Base (mid)
-	db ((tss64 - $$) >> 16) & 0xff
+	db ((tss64 - $$ + 0x100000 + 0x30) >> 16) & 0xff
 	; Access
 	; Present | TSS (0x9)
 	db 10001001b
-	; Flags & base
+	; Flags & limit
 	db 00000000b
 	; Base high
-	db ((tss64 - $$) >> 24) & 0xff
+	db ((tss64 - $$ + 0x100000 + 0x30) >> 24) & 0xff
 	; Base highest
-	dd ((tss64 - $$) >> 32)
+	dd ((tss64 - $$ + 0x100000 + 0x30) >> 32)
 	; Reserved
 	dd 0
 
