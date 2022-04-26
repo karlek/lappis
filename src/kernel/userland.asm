@@ -39,9 +39,7 @@ enter_userland:
 	mov rdx, syscall_landing_pad
 	shr rdx, 32
 
-	; mov edx, syscall_landing_pad >> 32
 	mov eax, syscall_landing_pad
-	; mov eax, syscall_landing_pad & 0xffffffff
 	mov rcx, 0xc0000082
 	; Write to model specific register.
 	wrmsr
@@ -61,26 +59,18 @@ enter_userland:
 	mov rcx, 0xc0000081
 	rdmsr
 
-	; xor rax, rax
 	mov edx, 0x130008
-	; mov edx, (gdt64.user_code << 16) | gdt64.code
 	wrmsr
 
-	; rcx: userland entrypoint
-	; r11: RFLAGS
-	; Disable interrupts. We enable interrupts with RFLAGS in userland.
-	; 0x2      | 0x200             | 0x200000
-	; Always 1 | enable interrupts | cpuid
+	; Disable interrupts.
+	; We enable interrupts when RFLAGS is restored.
 	cli
 
-	; push gdt64.user_data | 3 ; Stack segment, ss
-	; push 0x34000 ; rsp
-	; push 0x200 ; rflags
-	; push gdt64.user_code | 3 ; Code segment, cs
-	; push yay_userland ; rip
-	; iretq
-
+	; rcx: userland entrypoint
 	mov rcx, yay_userland
+	; r11: RFLAGS
+	; 0x200000 | 0x200             | 0x2
+	; cpuid    | enable interrupts | Always 1
 	mov r11, 0x200202
 
 	o64 sysret
