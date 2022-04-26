@@ -4,6 +4,7 @@ bits 16
 ; org 0x800
 align 8
 
+MULTIBOOT_ORG: equ 0x100000
 
 MULTIBOOT_PAGE_ALIGN: equ 0x1
 MULTIBOOT_VIDEO_MODE: equ 0x4

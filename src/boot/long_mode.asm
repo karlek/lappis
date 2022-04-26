@@ -1,6 +1,5 @@
 section .rodata
 
-
 ; Base          | Flags | Limit | Access        | Base
 ; 31         24 | 3   0 | 19 16 | 7           0 | 23         16
 ; Base                          | Limit
@@ -148,26 +147,26 @@ gdt64:
 	; Limit
 	dw 0x67 ; Sizeof tss64
 	; Base
-	dw (tss64 - $$ + 0x100000 + 0x30) & 0xffff
+	dw (tss64 - $$ + MULTIBOOT_ORG + 0x30) & 0xffff
 	; Base (mid)
-	db ((tss64 - $$ + 0x100000 + 0x30) >> 16) & 0xff
+	db ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 16) & 0xff
 	; Access
 	; Present | TSS (0x9)
+	;
+	; "In most systems, the DPLs of TSS descriptors are set to values less than 3,
+	; so that only privileged software can perform task switching. However, in
+	; multitasking applications, DPLs for some TSS descriptors may be set to 3 to
+	; allow task switching at the application (or user) privilege level."
+	;
 	db 10001001b
 	; Flags & limit
 	db 00000000b
 	; Base high
-	db ((tss64 - $$ + 0x100000 + 0x30) >> 24) & 0xff
+	db ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 24) & 0xff
 	; Base highest
-	dd ((tss64 - $$ + 0x100000 + 0x30) >> 32)
+	dd ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 32)
 	; Reserved
 	dd 0
-
-; In most systems, the DPLs of TSS descriptors are set to values less than 3,
-; so that only privileged software can perform task switching. However, in
-; multitasking applications, DPLs for some TSS descriptors may be set to 3 to
-; allow task switching at the application (or user) privilege level.
-
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
