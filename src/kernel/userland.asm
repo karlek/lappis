@@ -73,17 +73,14 @@ enter_userland:
 	; Always 1 | enable interrupts | cpuid
 	cli
 
-	; mov qword [tss64.rsp0], rsp
-	; mov rsp, 0x300000
+	; push gdt64.user_data | 3 ; Stack segment, ss
+	; push 0x34000 ; rsp
+	; push 0x200 ; rflags
+	; push gdt64.user_code | 3 ; Code segment, cs
+	; push yay_userland ; rip
+	; iretq
 
-	push gdt64.user_data | 3 ; Stack segment, ss
-	push 0x34000 ; rsp
-	push 0x200 ; rflags
-	push gdt64.user_code | 3 ; Code segment, cs
-	push yay_userland ; rip
-	iretq
+	mov rcx, yay_userland
+	mov r11, 0x200202
 
-; 	mov rcx, yay_userland
-; 	mov r11, 0x200202
-
-; 	o64 sysret
+	o64 sysret
