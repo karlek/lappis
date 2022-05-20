@@ -164,7 +164,7 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
 	descriptor->isr_low    = (uint64_t)isr & 0xFFFF;
 	descriptor->isr_mid    = ((uint64_t)isr >> 16) & 0xFFFF;
 	descriptor->isr_high   = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
-	descriptor->kernel_cs  = 0x08; // TODO: gdt64.code
+	descriptor->kernel_cs  = 0x08; // Refers to the offset of gdt64.code from gdt64.
 	descriptor->ist        = 0;
 	descriptor->attributes = flags;
 	descriptor->reserved   = 0;
