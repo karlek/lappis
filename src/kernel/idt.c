@@ -164,7 +164,7 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
 	descriptor->isr_low    = (uint64_t)isr & 0xFFFF;
 	descriptor->isr_mid    = ((uint64_t)isr >> 16) & 0xFFFF;
 	descriptor->isr_high   = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
-	descriptor->kernel_cs  = 0x08;
+	descriptor->kernel_cs  = 0x08; // Refers to the offset of gdt64.code from gdt64.
 	descriptor->ist        = 0;
 	descriptor->attributes = flags;
 	descriptor->reserved   = 0;
@@ -181,6 +181,7 @@ void idt_init() {
 	// Highest number should correspond to the length of isr_stub_table in
 	// `idt.asm`.
 	for (uint8_t vector = 0; vector <= 47; vector++) {
+		// 64-bit Interrupt Gate: 0x8E (p=1, dpl=0b00, type=0b1110 => type_attributes=0b1000_1110=0x8E)
 		idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
 	}
 

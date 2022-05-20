@@ -14,7 +14,9 @@ alacritty --class qemu-starter -e \
 	-no-shutdown \
 	-S \
 	-gdb tcp::1234 \
+	-d int \
 	-m size=128M \
+	-monitor stdio \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \

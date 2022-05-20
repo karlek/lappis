@@ -91,6 +91,8 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
+extern void enter_userland();
+
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -118,7 +120,7 @@ void main(multiboot_info_t* boot_info) {
 		ATA_PRIMARY_DRIVE,
 		ATA_PRIMARY_IO,
 	};
-	uint64_t fsbuf_size = 0x501000;
+	uint64_t fsbuf_size = 0x801000;
 	uint8_t* fsbuf = malloc(fsbuf_size);
 	if (fsbuf == NULL) {
 		error("Could not allocate memory for file system buffer!");
@@ -153,6 +155,18 @@ void main(multiboot_info_t* boot_info) {
 		}
 		debug("found bg.raw!");
 		set_frame(file->data);
+	}
+
+	// Linear search for the win!
+	for (uint32_t i = 0; i < zipfs.num_files; i++) {
+		file_t* file = zipfs.files[i];
+		debug(file->name);
+		if (streq(file->name, "userland.o") == false) {
+			continue;
+		}
+		debug("found userland.o");
+		// Work in progress.
+		/* run_userland(file->data, file->size); */
 	}
 
 	while (1) {

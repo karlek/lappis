@@ -31,6 +31,8 @@ jobs:
         run: |
           clang --version
           ld --version
+          nasm --version
+          zig version
 
       - name: make
         run: CC=clang make

@@ -8,3 +8,4 @@ tags
 *.raw
 **/rust/target
 .cache
+*.o

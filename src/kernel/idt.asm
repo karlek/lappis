@@ -1,5 +1,7 @@
 bits 64
 
+; Interrupt Gates, interrupts are automatically disabled upon entry and reenabled upon IRET
+
 extern exception_handler
 extern warn_interrupt
 extern keyboard_handler
@@ -29,7 +31,6 @@ extern timer_handler
 %endmacro
 
 isr_double_fault:
-	cli
 	pushaq
 
 	mov rdi, 0x8
@@ -37,11 +38,9 @@ isr_double_fault:
 	call exception_handler
 
 	popaq
-	sti
 	iretq
 
 isr_general_protection_fault:
-	cli
 	pushaq
 
 	mov rdi, 0xd
@@ -52,7 +51,6 @@ isr_general_protection_fault:
 	iretq
 
 isr_page_fault:
-	cli
 	pushaq
 
 	mov rdi, 0xe
@@ -63,7 +61,6 @@ isr_page_fault:
 	iretq
 
 irq_timer:
-	cli
 	pushaq
 
 	call timer_handler
@@ -72,7 +69,6 @@ irq_timer:
 	iretq
 
 irq_keyboard:
-	cli
 	pushaq
 
 	call keyboard_handler
@@ -81,7 +77,6 @@ irq_keyboard:
 	iretq
 
 irq_mouse:
-	cli
 	pushaq
 
 	call mouse_handler
@@ -90,7 +85,6 @@ irq_mouse:
 	iretq
 
 irq_primary_ata:
-	cli
 	pushaq
 
 	call ata_primary_handler
@@ -99,7 +93,6 @@ irq_primary_ata:
 	iretq
 
 irq_secondary_ata:
-	cli
 	pushaq
 
 	call ata_secondary_handler
@@ -109,7 +102,6 @@ irq_secondary_ata:
 
 %macro reserved 1
 reserved_%1:
-	cli
 	pushaq
 
 	mov rdi, %1
@@ -121,7 +113,6 @@ reserved_%1:
 
 %macro not_implemented 1
 not_implemented_%1:
-	cli
 	pushaq
 
 	mov rdi, %1

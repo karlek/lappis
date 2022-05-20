@@ -4,6 +4,7 @@ bits 16
 ; org 0x800
 align 8
 
+MULTIBOOT_ORG: equ 0x100000
 
 MULTIBOOT_PAGE_ALIGN: equ 0x1
 MULTIBOOT_VIDEO_MODE: equ 0x4
@@ -60,3 +61,4 @@ multiboot_start:
 ; marker. The total size of the page table are 4096*4 = 16KB.
 %include "src/boot/long_mode.asm"
 %include "src/kernel/idt.asm"
+%include "src/kernel/userland.asm"
