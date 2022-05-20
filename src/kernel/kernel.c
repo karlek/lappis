@@ -93,6 +93,95 @@ void get_cpu_features() {
 
 extern void enter_userland();
 
+/* void read(uint8_t* buf, uint64_t n, uint64_t* cur, uint8_t* dest) { */
+/* 	memcpy(dest, buf + *cur, n); */
+/* 	(*cur) += n; */
+/* } */
+
+/* uint16_t read_uint16(uint8_t* buf, uint64_t* cur) { */
+/* 	uint8_t raw[2] = {0}; */
+/* 	read(buf, sizeof raw, cur, raw); */
+/* 	return raw[0] | (raw[1] << 8); */
+/* } */
+
+/* uint32_t read_uint32(uint8_t* buf, uint64_t* cur) { */
+/* 	uint8_t raw[4] = {0}; */
+/* 	read(buf, sizeof raw, cur, raw); */
+/* 	return raw[0] | (raw[1] << 8) | (raw[2] << 16) | (raw[3] << 24); */
+/* } */
+
+void parse_elf_header(uint8_t* userland_obj, size_t userland_obj_size) {
+	uint64_t cur = 0;
+
+	uint8_t magic[4] = {0};
+	read(userland_obj, 4, &cur, magic);
+	debug("ELF magic: %x %x %x %x", magic[0], magic[1], magic[2], magic[3]);
+
+	uint8_t bits = read_uint8(userland_obj, &cur);
+	debug("ELF bits: %d", bits);
+
+	uint8_t endian = read_uint8(userland_obj, &cur);
+	debug("ELF endian: %d", endian);
+
+
+	uint8_t elf_version = read_uint8(userland_obj, &cur);
+	debug("ELF version: %d", elf_version);
+
+	uint8_t os_abi = read_uint8(userland_obj, &cur);
+	debug("ELF os_abi: %d", os_abi);
+
+	uint8_t abi_version = read_uint8(userland_obj, &cur);
+	debug("ELF abi_version: %d", abi_version);
+
+	uint8_t padding[7] = {0};
+	read(userland_obj, 7, &cur, padding);
+	debug("ELF padding: %x %x %x %x %x %x %x", padding[0], padding[1], padding[2], padding[3], padding[4], padding[5], padding[6]);
+
+	uint16_t type = read_uint16(userland_obj, &cur);
+	debug("ELF type: %d", type);
+
+	uint16_t machine = read_uint16(userland_obj, &cur);
+	debug("ELF machine: %d", machine);
+
+	uint32_t version = read_uint32(userland_obj, &cur);
+	debug("ELF version: %d", version);
+
+	uint32_t entry = read_uint32(userland_obj, &cur);
+	debug("ELF entry: %x", entry);
+
+	uint32_t phoff = read_uint32(userland_obj, &cur);
+	debug("ELF phoff: %x", phoff);
+
+	uint32_t shoff = read_uint32(userland_obj, &cur);
+	debug("ELF shoff: %x", shoff);
+
+	uint32_t flags = read_uint32(userland_obj, &cur);
+	debug("ELF flags: %x", flags);
+
+	uint16_t ehsize = read_uint16(userland_obj, &cur);
+	debug("ELF ehsize: %x", ehsize);
+
+	uint16_t phentsize = read_uint16(userland_obj, &cur);
+	debug("ELF phentsize: %x", phentsize);
+
+	uint16_t phnum = read_uint16(userland_obj, &cur);
+	debug("ELF phnum: %x", phnum);
+
+	uint16_t shentsize = read_uint16(userland_obj, &cur);
+	debug("ELF shentsize: %x", shentsize);
+
+	uint16_t qtySectionHeaders = read_uint16(userland_obj, &cur);
+	debug("ELF qtySectionHeaders: %x", qtySectionHeaders);
+
+	uint16_t sectionNamesIndex = read_uint16(userland_obj, &cur);
+	debug("ELF sectionNamesIndex: %x", sectionNamesIndex);
+}
+
+void run_userland(uint8_t* userland_obj, size_t userland_obj_size) {
+	parse_elf_header(userland_obj, userland_obj_size);
+	/* enter_userland(); */
+}
+
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -120,7 +209,7 @@ void main(multiboot_info_t* boot_info) {
 		ATA_PRIMARY_DRIVE,
 		ATA_PRIMARY_IO,
 	};
-	uint64_t fsbuf_size = 0x501000;
+	uint64_t fsbuf_size = 0x801000;
 	uint8_t* fsbuf = malloc(fsbuf_size);
 	if (fsbuf == NULL) {
 		error("Could not allocate memory for file system buffer!");
@@ -157,7 +246,16 @@ void main(multiboot_info_t* boot_info) {
 		set_frame(file->data);
 	}
 
-	enter_userland();
+	// Linear search for the win!
+	for (uint32_t i = 0; i < zipfs.num_files; i++) {
+		file_t* file = zipfs.files[i];
+		debug(file->name);
+		if (streq(file->name, "userland.o") == false) {
+			continue;
+		}
+		debug("found userland.o");
+		run_userland(file->data, file->size);
+	}
 
 	while (1) {
 		sleep(10);

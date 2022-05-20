@@ -2,36 +2,18 @@ bits 64
 
 global enter_userland
 
-USER_STACK_GS: equ 0x10
-
 syscall_landing_pad:
 	; rax = syscall number
 	cli
-
-	swapgs                      ; Swap GS base to kernel PCR
-	mov gs:[USER_STACK_GS], rsp ; Save user stack
-
-	mov rsp, [tss64.rsp0]         ; Switch to kernel stack
-
-	; Handle syscall by calling the appropriate handler.
-	; TODO
-	; jmp $
-
-	mov rsp, gs:[USER_STACK_GS] ; Restore user stack
-	swapgs                      ; Switch to usermode gs
 
 	sti
 	sysret
 
 yay_userland:
-	push 1
-	mov rcx, 0
-	mov rax, 0xdeadcafebeefdead
-	; syscall
-	; div rcx
-.loop:
-	inc rcx
-	jmp .loop
+	mov rax, 1
+	syscall
+	; What to do here lol?
+	jmp $
 
 enter_userland:
 	; SYSCALL function pointer

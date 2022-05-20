@@ -97,6 +97,25 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 		$^ \
 		-o $@
 
+#
+# -r  Produce a relocatable object as output.  This is also known as partial
+#     linking.
+#
+bin/userland.o: src/userland/userland.c src/userland/tinyprintf.c | bin
+	@$(CC) \
+		-mno-red-zone \
+		-masm=intel \
+		-nostdlib \
+		-static \
+		-r \
+		-fno-stack-protector \
+		-ffreestanding \
+		-g \
+		-T userland-linker.ld \
+		$^ \
+		-o $@
+	cp $@ fs/userland.o
+
 bin/zipfs.zip: | bin
 	zip -0 -j -r $@ fs
 
