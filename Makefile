@@ -12,11 +12,15 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
+# -O ReleaseFast
+bin/boot_zig.o: src/boot/boot.zig | bin
+	zig build-obj -target x86_64-freestanding-gnu -static -I./src/kernel -mno-red-zone -femit-bin=$@ $<
+
 # --nmagic
 #     Turn off page alignment of sections, and disable linking against shared
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
-bin/kernel.elf: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
 		--nmagic \
 		--output $@ \
@@ -24,7 +28,7 @@ bin/kernel.elf: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 		$^
 
 # For debug symbols.
-bin/kernel.dbg: bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
 		--output $@ \
 		--script linker.ld \

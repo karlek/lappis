@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdint.h>
+
 struct RSDPDescriptor {
 	char Signature[8];
 	uint8_t Checksum;
