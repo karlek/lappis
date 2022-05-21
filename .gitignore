@@ -9,3 +9,5 @@ tags
 **/rust/target
 .cache
 *.o
+zig-cache
+zig-out
