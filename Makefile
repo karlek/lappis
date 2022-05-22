@@ -105,22 +105,21 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 # -r  Produce a relocatable object as output.  This is also known as partial
 #     linking.
 #
-bin/userland.o: src/userland/userland.c src/userland/tinyprintf.c | bin
+fs/userland.elf: src/userland/userland.c src/userland/tinyprintf.c | bin
 	@$(CC) \
 		-mno-red-zone \
 		-masm=intel \
 		-nostdlib \
 		-static \
-		-r \
 		-fno-stack-protector \
 		-ffreestanding \
 		-g \
 		-T userland-linker.ld \
 		$^ \
-		-o $@
-	cp $@ fs/userland.o
+		-o bin/userland.elf
+	cp bin/userland.elf $@
 
-bin/zipfs.zip: | bin
+bin/zipfs.zip: fs/userland.elf | bin
 	zip -0 -j -r $@ fs
 
 bin/zipfs.img: bin/zipfs.zip | bin
@@ -149,7 +148,7 @@ bin/libfloof.a: src/kernel/rust/src/lib.rs
 	cd src/kernel/rust; cargo build -Zbuild-std ; cargo build
 	mv src/kernel/rust/target/os/debug/libfloof.a bin
 
-build: bin/kernel.iso bin/kernel.dbg
+build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img
 
 debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 	./debug.sh
