@@ -7,6 +7,8 @@
 
 [![Compile][compile-badge]][compile]
 
+![Logo][logo]
+
 </div>
 
 A toy BIOS bootloader which kickstarts a toy 64-bit operating system.
@@ -28,5 +30,6 @@ make
 pacman -S nasm qemu mtools xorriso
 ```
 
-[compile-badge]: https://github.com/karlek/lappis/actions/workflows/build.yml/badge.svg?branch=main
-[compile]: https://github.com/karlek/lappis/actions/workflows/build.yml
+[logo]: logo/transparent-logo.png
+[compile-badge]: https://github.com/karlek/lapis/actions/workflows/build.yml/badge.svg?branch=main
+[compile]: https://github.com/karlek/lapis/actions/workflows/build.yml
