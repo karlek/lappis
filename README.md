@@ -3,11 +3,11 @@
 
 <div align="center">
 
-# Lappis
+<img src="logo/transparent-logo.png" width="400" alt="Lappis">
+
+<hr>
 
 [![Compile][compile-badge]][compile]
-
-![Logo][logo]
 
 </div>
 
