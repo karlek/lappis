@@ -1,7 +1,7 @@
 
 # rawimg
 
-Convert images to raw pixel data to be used inside Lapis.
+Convert images to raw pixel data to be used inside lappis.
 Image must be 1280x1024
 
 ```
