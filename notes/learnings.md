@@ -20,6 +20,31 @@ Are you sure you're not running qemu in `-nographics`? Test `-curses`
 
 `Ctrl-Alt-2` > `dump-guest-memory /tmp/mem`
 
+## What does the flags in `info tlb` represent?
+
+```
+// From: qemu/target/i386/monitor.c
+static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
+                      hwaddr pte, hwaddr mask)
+{
+    addr = addr_canonical(env, addr);
+
+    monitor_printf(mon, TARGET_FMT_plx ": " TARGET_FMT_plx
+                   " %c%c%c%c%c%c%c%c%c\n",
+                   addr,
+                   pte & mask,
+                   pte & PG_NX_MASK       ? 'X' : '-',
+                   pte & PG_GLOBAL_MASK   ? 'G' : '-',
+                   pte & PG_PSE_MASK      ? 'P' : '-',
+                   pte & PG_DIRTY_MASK    ? 'D' : '-',
+                   pte & PG_ACCESSED_MASK ? 'A' : '-',
+                   pte & PG_PCD_MASK      ? 'C' : '-',
+                   pte & PG_PWT_MASK      ? 'T' : '-',
+                   pte & PG_USER_MASK     ? 'U' : '-',
+                   pte & PG_RW_MASK       ? 'W' : '-');
+}
+```
+
 # X86
 
 ## Double fault everywhere, `jmp $`, double for-loop, etc.

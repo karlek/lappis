@@ -19,6 +19,7 @@
 #include "string.h"
 #include "terminal-font.h"
 #include "video.h"
+#include "elf2.h"
 
 #include "format/zip.h"
 
@@ -91,8 +92,6 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
-extern void enter_userland();
-
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -161,12 +160,12 @@ void main(multiboot_info_t* boot_info) {
 	for (uint32_t i = 0; i < zipfs.num_files; i++) {
 		file_t* file = zipfs.files[i];
 		debug(file->name);
-		if (streq(file->name, "userland.o") == false) {
+		if (streq(file->name, "userland.elf") == false) {
 			continue;
 		}
-		debug("found userland.o");
+		debug("found userland.elf");
 		// Work in progress.
-		/* run_userland(file->data, file->size); */
+		run_userland(file->data, file->size);
 	}
 
 	while (1) {
