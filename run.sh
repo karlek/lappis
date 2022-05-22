@@ -4,14 +4,14 @@ set -e
 
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
-alacritty --class lapis-serial-log -e fish -c 'tail -f /tmp/serial.raw' &
+alacritty --class lapis-serial-raw -e fish -c 'tail -f /tmp/serial.raw' &
 alacritty --class lapis-serial-log -e tail -f /tmp/serial.log &
 sleep 1
 
+swaymsg '[app_id="lapis-serial-log"] move window to workspace 4'
 qemu-system-x86_64 \
 	-no-reboot \
 	-no-shutdown \
-	-d int \
 	-m size=128M \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
@@ -20,4 +20,5 @@ qemu-system-x86_64 \
 	-monitor stdio \
 	-cdrom bin/kernel.iso
 
+ps ax | grep alacritty | grep lapis-serial-raw | awk '{print $1}' | xargs kill
 ps ax | grep alacritty | grep lapis-serial-log | awk '{print $1}' | xargs kill
