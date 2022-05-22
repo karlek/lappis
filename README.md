@@ -1,7 +1,13 @@
 
-[![Compile](https://github.com/karlek/lappis/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/karlek/lappis/actions/workflows/build.yml)
 
-# lappis
+
+<div align="center">
+
+# Lappis
+
+[![Compile][compile-badge][compile]
+
+</div>
 
 A toy BIOS bootloader which kickstarts a toy 64-bit operating system.
 
@@ -21,3 +27,6 @@ make
 # Arch
 pacman -S nasm qemu mtools xorriso
 ```
+
+[compile-badge]: https://github.com/karlek/lappis/actions/workflows/build.yml/badge.svg?branch=main
+[compile]: https://github.com/karlek/lappis/actions/workflows/build.yml
