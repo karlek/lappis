@@ -13,3 +13,4 @@ zig-cache
 zig-out
 *.elf
 .gdb_history
+fs/*
