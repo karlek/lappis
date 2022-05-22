@@ -5,7 +5,7 @@
 
 # Lappis
 
-[![Compile][compile-badge][compile]
+[![Compile][compile-badge]][compile]
 
 </div>
 
