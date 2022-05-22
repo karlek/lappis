@@ -1,13 +1,24 @@
 bits 64
 
 global enter_userland
+extern debug_buffer
 
 syscall_landing_pad:
 	; rax = syscall number
 	cli
 
+	cmp rax, 0
+	jz .sys_print
+	jnz .done
+
+.sys_print:
+	push rcx
+	call debug_buffer
+	pop rcx
+
+.done:
 	sti
-	sysret
+	o64 sysret
 
 yay_userland:
 	mov rax, 1
@@ -49,10 +60,13 @@ enter_userland:
 	cli
 
 	; rcx: userland entrypoint
-	mov rcx, yay_userland
+	mov rcx, rdi
 	; r11: RFLAGS
 	; 0x200000 | 0x200             | 0x2
 	; cpuid    | enable interrupts | Always 1
 	mov r11, 0x200202
 
 	o64 sysret
+
+	; mov rax, SYS_BECOME_KERNEL
+	; syscall
