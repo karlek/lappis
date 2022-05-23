@@ -4,7 +4,7 @@ CC := clang
 
 all: build
 
-kernel: bin/lapis.img
+kernel: bin/lappis.img
 
 bin/boot.o: src/boot/boot.asm | bin
 	@nasm \

@@ -17,8 +17,8 @@
       "bin/kernel.o",
       "src/kernel/kernel.c"
     ],
-    "directory": "/home/_/src/karlek/lapis",
-    "file": "/home/_/src/karlek/lapis/src/kernel/kernel.c",
-    "output": "/home/_/src/karlek/lapis/bin/kernel.o"
+    "directory": "/home/_/src/karlek/lappis",
+    "file": "/home/_/src/karlek/lappis/src/kernel/kernel.c",
+    "output": "/home/_/src/karlek/lappis/bin/kernel.o"
   }
 ]
