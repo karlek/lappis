@@ -1,6 +1,52 @@
 const zasm = @import("zasm");
 
-extern var p4_table: [4096]u8;
+extern var p4_table: [4096]u8 align(4096);
+extern var p2_table: [512]u64 align(4096); // [4096]u8
+
+// NUM_KERNEL_CODE_PAGES + NUM_KERNEL_DATA_PAGES = 32 (NUM_PAGES)
+const NUM_KERNEL_CODE_PAGES = 1;
+const NUM_KERNEL_DATA_PAGES = 31;
+// 1 guard page, NUM_KERNEL_STACK_PAGES-2 stack pages, 1 guard page
+const NUM_KERNEL_STACK_PAGES = 4;
+// 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
+const NUM_FRAME_BUFFER_PAGES = 3;
+
+const P2_KERNEL_CODE_FIRST_INDEX = 0; // [0, 1)
+const P2_KERNEL_DATA_FIRST_INDEX = P2_KERNEL_CODE_FIRST_INDEX + NUM_KERNEL_CODE_PAGES; // [1, 32)
+const P2_KERNEL_STACK_FIRST_INDEX = P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA_PAGES; // [32, 36)
+const P2_FRAME_BUFFER_FIRST_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STACK_PAGES; // [36, 39)
+
+const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
+
+export fn map_frame_buffer() void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable`, `user accessible`, `page size` and
+    // `no execute`.
+    var page_table_flags = page_table_entry.getFlags();
+    page_table_flags.present = true;
+    page_table_flags.writeable = true;
+    page_table_flags.user_accessible = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    page_table_flags.no_execute = true;
+    page_table_entry.setFlags(page_table_flags);
+    // Map pages of frame buffer in P2 table.
+    const p2_index_offset = P2_FRAME_BUFFER_FIRST_INDEX; // page index offset into P2 table of frame buffer pages.
+    // TODO: parse frame buffer pointer from Multiboot2 information
+    // structure provided by the boot loader.
+
+    // Start mapping the frame buffer at address 0xFD000000.
+    const frame_buffer_base_addr = 0xFD000000;
+    var page_num: usize = 0;
+    while (page_num < NUM_FRAME_BUFFER_PAGES) : (page_num += 1) {
+        // Set address of page table entry.
+        var frame_buffer_page_offset = page_num * page_size; // offset from start of frame buffer.
+        var addr = zasm.PhysAddr.initUnchecked(frame_buffer_base_addr + frame_buffer_page_offset);
+        page_table_entry.setAddr(addr);
+        // Set page table entry.
+        var p2_index = page_num + p2_index_offset;
+        p2_table[p2_index] = page_table_entry.entry;
+    }
+}
 
 export fn enable_paging() void {
     // Load P4 to CR3 register. (CPU uses this to access the P4 table).

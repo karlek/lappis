@@ -1,4 +1,5 @@
 global p4_table
+global p2_table
 
 section .bss
 
@@ -101,26 +102,5 @@ map_kernel_stack:
 	mov [p2_table + ecx*8], eax
 	mov dword [p2_table + ecx*8 + 4], 1 << 31
 	inc ecx
-
-	ret
-
-; Map the frame buffer.
-; @param ecx: First free P2 entry.
-map_frame_buffer:
-	; Start mapping the frame buffer at address 0x8000000.
-	mov eax, 0xfd000000
-	; Set flags `page size`, `present` and `writeable`.
-	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
-	jmp .store
-
-.loop:
-	add eax, 0x200000
-.store:
-	mov [p2_table + ecx*8], eax
-	mov dword [p2_table + ecx*8 + 4], 1 << 31
-
-	inc ecx
-	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES+NUM_FRAME_BUFFER_PAGES)
-	jne .loop
 
 	ret
