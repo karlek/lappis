@@ -1,6 +1,6 @@
 const zasm = @import("zasm");
 
-extern var p4_table: [4096]u8 align(4096);
+extern var p4_table: [512]u64 align(4096); // [4096]u8
 extern var p2_table: [512]u64 align(4096); // [4096]u8
 
 // NUM_KERNEL_CODE_PAGES + NUM_KERNEL_DATA_PAGES = 32 (NUM_PAGES)
@@ -17,6 +17,59 @@ const P2_KERNEL_STACK_FIRST_INDEX = P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA
 const P2_FRAME_BUFFER_FIRST_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STACK_PAGES; // [36, 39)
 
 const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
+
+export fn map_kernel_code_segment() void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable`, `user accessible` and `page size`.
+    // Note, `no execute` is not set.
+    var page_table_flags = page_table_entry.getFlags();
+    page_table_flags.present = true;
+    page_table_flags.writeable = true; // TODO: unset writeable and set no_execute for kernel code segment?
+    page_table_flags.user_accessible = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    // Make only the range 0x000000-0x200000 (2MiB) executable.
+    //page_table_flags.no_execute = true;
+    page_table_entry.setFlags(page_table_flags);
+    // Map pages of kernel code segment in P2 table.
+    const p2_index_offset = P2_KERNEL_CODE_FIRST_INDEX; // page index offset into P2 table of kernel code segment pages.
+    const kernel_code_seg_base_addr = p2_index_offset * page_size;
+    var page_num: usize = 0;
+    while (page_num < NUM_KERNEL_CODE_PAGES) : (page_num += 1) {
+        // Set address of page table entry.
+        var kernel_code_seg_page_offset = page_num * page_size; // offset from start of kernel code segment.
+        var addr = zasm.PhysAddr.initUnchecked(kernel_code_seg_base_addr + kernel_code_seg_page_offset);
+        page_table_entry.setAddr(addr);
+        // Set page table entry.
+        var p2_index = page_num + p2_index_offset;
+        p2_table[p2_index] = page_table_entry.entry;
+    }
+}
+
+export fn map_kernel_data_segment() void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable`, `user accessible`, `page size` and
+    // `no execute`.
+    var page_table_flags = page_table_entry.getFlags();
+    page_table_flags.present = true;
+    page_table_flags.writeable = true;
+    page_table_flags.user_accessible = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    page_table_flags.no_execute = true;
+    page_table_entry.setFlags(page_table_flags);
+    // Map pages of kernel data segment in P2 table.
+    const p2_index_offset = P2_KERNEL_DATA_FIRST_INDEX; // page index offset into P2 table of kernel data segment pages.
+    const kernel_data_seg_base_addr = p2_index_offset * page_size;
+    var page_num: usize = 0;
+    while (page_num < NUM_KERNEL_DATA_PAGES) : (page_num += 1) {
+        // Set address of page table entry.
+        var kernel_data_seg_page_offset = page_num * page_size; // offset from start of kernel data segment.
+        var addr = zasm.PhysAddr.initUnchecked(kernel_data_seg_base_addr + kernel_data_seg_page_offset);
+        page_table_entry.setAddr(addr);
+        // Set page table entry.
+        var p2_index = page_num + p2_index_offset;
+        p2_table[p2_index] = page_table_entry.entry;
+    }
+}
 
 export fn map_kernel_stack() void {
     var page_table_entry = zasm.PageTableEntry.init();
