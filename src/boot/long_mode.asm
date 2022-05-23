@@ -188,6 +188,7 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern set_up_page_tables
 extern map_kernel_code_segment
 extern map_kernel_data_segment
 extern map_kernel_stack
