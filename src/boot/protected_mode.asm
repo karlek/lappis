@@ -24,4 +24,3 @@ init_protected_mode:
 	ret
 
 %include "src/boot/protected_mode_gdt.asm"
-%include "src/boot/print32.asm"
