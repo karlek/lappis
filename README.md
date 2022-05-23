@@ -104,5 +104,5 @@ Later, the name affectionately became Lappis.
 
 
 [logo]: logo/transparent-logo.png
-[compile-badge]: https://github.com/karlek/lapis/actions/workflows/build.yml/badge.svg?branch=main
-[compile]: https://github.com/karlek/lapis/actions/workflows/build.yml
+[compile-badge]: https://github.com/karlek/lappis/actions/workflows/build.yml/badge.svg?branch=main
+[compile]: https://github.com/karlek/lappis/actions/workflows/build.yml
