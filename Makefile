@@ -22,7 +22,8 @@ bin/%_32_zig.o: src/boot/%_32.zig | bin
 		-static \
 		-target i386-freestanding-gnu \
 		${PKGS} \
-		-O ReleaseFast \
+		-O Debug \
+		-mcpu=_i386 \
 		-femit-bin=$@ \
 		$<
 
