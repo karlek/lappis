@@ -190,6 +190,8 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern map_kernel_code_segment
+extern map_kernel_data_segment
 extern map_kernel_stack
 extern map_frame_buffer
 extern enable_paging
@@ -209,6 +211,8 @@ init_long_mode:
 	push ebx
 
 	call set_up_page_tables
+	call map_kernel_code_segment
+	call map_kernel_data_segment
 	call map_kernel_stack
 	call map_frame_buffer
 
