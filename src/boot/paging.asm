@@ -48,24 +48,4 @@ set_up_page_tables:
 	or eax, PRESENT|WRITABLE|USER_ACCESS
 	mov [p3_table], eax
 
-	; Counter variable for each entry.
-	mov ecx, 0
-
-.map_p2_table:
-	; Map ecx-th P2 entry to a huge page that starts at address 2MiB * ecx.
-	mov eax, 0x200000          ; 2MiB
-
-	; Note: `mul reg` stores the answer in *ax registers.
-	mul ecx
-	; Set flags `page size`, `present` and `writeable`.
-	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
-	mov [p2_table + ecx*8], eax
-	cmp ecx, 0
-	je .next
-	; Make only the range 0x000000-0x200000 (2MiB) executable.
-	mov dword [p2_table + ecx*8 + 4], 0 << 31
-.next:
-	inc ecx
-	cmp ecx, NUM_PAGES
-	jne .map_p2_table
 	ret
