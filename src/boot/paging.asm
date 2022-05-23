@@ -1,3 +1,5 @@
+global p4_table
+
 section .bss
 
 ; Ensures page alignment
@@ -120,30 +122,5 @@ map_frame_buffer:
 	inc ecx
 	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES+NUM_FRAME_BUFFER_PAGES)
 	jne .loop
-
-	ret
-
-enable_paging:
-	; Load P4 to CR3 register. (CPU uses this to access the P4 table).
-	mov eax, p4_table
-	mov cr3, eax
-
-	; Enable PAE-flag in CR4 register. (Physical Address Extension).
-	mov eax, cr4
-	or eax, 1 << 5
-	mov cr4, eax
-
-	; Set the long mode bit in the EFER MSR (Model Specific Register).
-	mov ecx, 0xC0000080
-	rdmsr
-	or eax, 1 << 8
-	; Set the NX bit.
-	or eax, 1 << 11
-	wrmsr
-
-	; Enable paging in the CR0 register.
-	mov eax, cr0
-	or eax, CR0_PAGING
-	mov cr0, eax
 
 	ret
