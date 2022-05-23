@@ -188,6 +188,7 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern map_frame_buffer
 extern enable_paging
 global init_long_mode
 section .text
