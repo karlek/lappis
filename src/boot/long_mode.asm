@@ -171,7 +171,7 @@ gdt64:
 	dw $ - gdt64 - 1
 	dq gdt64
 
-tss64_addr equ 0x10b042
+tss64_addr equ 0x1e43ca
 
 tss64:
 	           dd 0 ; Reserved
@@ -190,6 +190,7 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern map_frame_buffer
 extern enable_paging
 global init_long_mode
 section .text
