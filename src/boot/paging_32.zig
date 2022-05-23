@@ -18,6 +18,37 @@ const P2_FRAME_BUFFER_FIRST_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STA
 
 const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
 
+export fn map_kernel_stack() void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable`, `user accessible`, `page size` and
+    // `no execute`. Note, `writeable` is only set for non-guard pages.
+    var page_table_flags = page_table_entry.getFlags();
+    page_table_flags.present = true;
+    page_table_flags.user_accessible = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    page_table_flags.no_execute = true;
+    // Map pages of kernel stack in P2 table.
+    const p2_index_offset = P2_KERNEL_STACK_FIRST_INDEX; // page index offset into P2 table of kernel stack pages.
+    const kernel_stack_base_addr = p2_index_offset * page_size;
+    var page_num: usize = 0;
+    while (page_num < NUM_KERNEL_STACK_PAGES) : (page_num += 1) {
+        // Make first and last pages `guard` pages by removing `writeable`.
+        if (page_num == 0 or page_num == NUM_KERNEL_STACK_PAGES - 1) {
+            page_table_flags.writeable = false;
+        } else {
+            page_table_flags.writeable = true;
+        }
+        page_table_entry.setFlags(page_table_flags);
+        // Set address of page table entry.
+        var kernel_stack_page_offset = page_num * page_size; // offset from start of kernel stack.
+        var addr = zasm.PhysAddr.initUnchecked(kernel_stack_base_addr + kernel_stack_page_offset);
+        page_table_entry.setAddr(addr);
+        // Set page table entry.
+        var p2_index = page_num + p2_index_offset;
+        p2_table[p2_index] = page_table_entry.entry;
+    }
+}
+
 export fn map_frame_buffer() void {
     var page_table_entry = zasm.PageTableEntry.init();
     // Set flags `present`, `writeable`, `user accessible`, `page size` and
