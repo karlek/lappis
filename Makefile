@@ -12,15 +12,28 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
-# -O ReleaseFast
-bin/boot_zig.o: src/boot/boot.zig | bin
-	zig build-obj -target x86_64-freestanding-gnu -static -I./src/kernel -mno-red-zone -femit-bin=$@ $<
+PKGS=--pkg-begin zasm ./src/zasm.zig --pkg-end
+
+bin/%_32_zig.o: src/boot/%_32.zig | bin
+	@zig build-obj \
+		--cache-dir bin/zig-cache \
+		-I src/kernel \
+		-mno-red-zone \
+		-static \
+		-target i386-freestanding-gnu \
+		${PKGS} \
+		-O ReleaseFast \
+		-femit-bin=$@ \
+		$<
+
+bin/%_elf64_zig.o: bin/%_32_zig.o
+	@objcopy --output-target elf64-x86-64 $< $@
 
 # --nmagic
 #     Turn off page alignment of sections, and disable linking against shared
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
-bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.elf: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
 		--nmagic \
 		--output $@ \
@@ -28,7 +41,7 @@ bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libflo
 		$^
 
 # For debug symbols.
-bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.dbg: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
 		--output $@ \
 		--script linker.ld \
