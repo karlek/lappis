@@ -1,7 +1,9 @@
+const std = @import("std");
 const zasm = @import("zasm.zig");
 
-extern var p4_table: [512]u64 align(4096); // [4096]u8
-extern var p2_table: [512]u64 align(4096); // [4096]u8
+export var p4_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
+export var p3_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
+export var p2_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
 
 // NUM_KERNEL_CODE_PAGES + NUM_KERNEL_DATA_PAGES = 32 (NUM_PAGES)
 const NUM_KERNEL_CODE_PAGES = 1;
@@ -17,6 +19,38 @@ const P2_KERNEL_STACK_FIRST_INDEX = P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA
 const P2_FRAME_BUFFER_FIRST_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STACK_PAGES; // [36, 39)
 
 const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
+
+export fn set_up_page_tables() void {
+    // Map the first P4 entry to P3 table.
+    var p4_page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable` and `user accessible`.
+    var p4_page_table_flags = p4_page_table_entry.getFlags();
+    p4_page_table_flags.present = true;
+    p4_page_table_flags.writeable = true;
+    p4_page_table_flags.user_accessible = true;
+    p4_page_table_entry.setFlags(p4_page_table_flags);
+    // Set address of page table entry.
+    const raw_p3_addr = @as(u64, @intCast(@intFromPtr(&p3_table[0])));
+    var p3_addr = zasm.PhysAddr.initUnchecked(raw_p3_addr);
+    p4_page_table_entry.setAddr(p3_addr);
+    // Set page table entry.
+    p4_table[0] = p4_page_table_entry.entry;
+
+    // Map the first P3 entry to P2 table.
+    var p3_page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable` and `user accessible`.
+    var p3_page_table_flags = p3_page_table_entry.getFlags();
+    p3_page_table_flags.present = true;
+    p3_page_table_flags.writeable = true;
+    p3_page_table_flags.user_accessible = true;
+    p3_page_table_entry.setFlags(p3_page_table_flags);
+    // Set address of page table entry.
+    const raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_table[0])));
+    var p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
+    p3_page_table_entry.setAddr(p2_addr);
+    // Set page table entry.
+    p3_table[0] = p3_page_table_entry.entry;
+}
 
 export fn map_kernel_code_segment() void {
     var page_table_entry = zasm.PageTableEntry.init();
