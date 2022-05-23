@@ -69,38 +69,3 @@ set_up_page_tables:
 	cmp ecx, NUM_PAGES
 	jne .map_p2_table
 	ret
-
-map_kernel_stack:
-.guard_page_start:
-	mov eax, 0x200000
-	mul ecx
-
-	; Make it a `guard` page by removing WRITABLE.
-	or eax, PRESENT|PAGE_SIZE|USER_ACCESS
-	mov [p2_table + ecx*8], eax
-	mov dword [p2_table + ecx*8 + 4], 1 << 31
-	inc ecx
-
-.loop:
-	mov eax, 0x200000
-	mul ecx
-
-	or eax, PRESENT|WRITABLE|PAGE_SIZE|USER_ACCESS
-	mov [p2_table + ecx*8], eax
-	mov dword [p2_table + ecx*8 + 4], 1 << 31
-	inc ecx
-
-	cmp ecx, (NUM_PAGES+NUM_KERNEL_STACK_PAGES-1)
-	jne .loop
-
-.guard_page_end:
-	mov eax, 0x200000
-	mul ecx
-
-	; Make it a `guard` page by removing WRITABLE.
-	or eax, PRESENT|PAGE_SIZE|USER_ACCESS
-	mov [p2_table + ecx*8], eax
-	mov dword [p2_table + ecx*8 + 4], 1 << 31
-	inc ecx
-
-	ret
