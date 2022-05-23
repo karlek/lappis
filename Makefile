@@ -25,7 +25,8 @@ bin/%_32_zig.o: src/boot/%_32.zig | bin
 		-mno-red-zone \
 		-static \
 		-target x86-freestanding-gnu \
-		-O ReleaseFast \
+		-O Debug \
+		-mcpu=i386 \
 		-femit-bin=$@ \
 		$<
 
