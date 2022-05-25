@@ -153,15 +153,6 @@ export fn map_frame_buffer() void {
 }
 
 export fn enable_paging() void {
-    // Load P4 to CR3 register. (CPU uses this to access the P4 table).
-    const raw_p4_addr = @intCast(u64, @ptrToInt(&p4_table[0]));
-    const p4_addr = zasm.PhysAddr.initUnchecked(raw_p4_addr);
-    const cr3_value = zasm.Cr3.Contents{
-        .phys_frame = zasm.PhysFrame.fromStartAddressUnchecked(p4_addr),
-        .cr3_flags = zasm.Cr3Flags.fromU64(0),
-    };
-    zasm.Cr3.write(cr3_value);
-
     // Enable PAE-flag in CR4 register. (Physical Address Extension).
     var cr4_value = zasm.Cr4.read();
     cr4_value.physical_address_extension = true; // 1 << 5
@@ -173,6 +164,15 @@ export fn enable_paging() void {
     // Set the NX bit.
     efer_value.no_execute_enable = true; // 1 << 11
     efer_value.write();
+
+    // Load P4 to CR3 register. (CPU uses this to access the P4 table).
+    const raw_p4_addr = @intCast(u64, @ptrToInt(&p4_table[0]));
+    const p4_addr = zasm.PhysAddr.initUnchecked(raw_p4_addr);
+    const cr3_value = zasm.Cr3.Contents{
+        .phys_frame = zasm.PhysFrame.fromStartAddressUnchecked(p4_addr),
+        .cr3_flags = zasm.Cr3Flags.fromU64(0),
+    };
+    zasm.Cr3.write(cr3_value);
 
     // Enable paging in the CR0 register.
     var cr0_value = zasm.Cr0.read();
