@@ -33,6 +33,8 @@ bin/%_32_zig.o: src/boot/%_32.zig | bin
 		-femit-bin=$@ \
 		$<
 
+# TODO: remove objcopy hack when we figure out a way to emit ELF64 objets
+# containing 32-bit code in Zig (NOTE: how is this done in C??).
 bin/%_elf64_zig.o: bin/%_32_zig.o
 	@objcopy --output-target elf64-x86-64 $< $@
 
