@@ -731,6 +731,7 @@ pub const PageTableEntry = packed struct {
 
     /// Map the entry to the specified physical address
     pub fn setAddr(self: *PageTableEntry, addr: PhysAddr) void {
+        // TODO: re-enable assert.
         //std.debug.assert(addr.isAligned(PageSize.Size4KiB.bytes()));
         self.entry = addr.value | self.getFlags().toU64();
     }
