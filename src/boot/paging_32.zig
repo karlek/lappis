@@ -17,7 +17,7 @@ export fn set_up_page_tables() void {
     p4_page_table_entry.setFlags(p4_page_table_flags);
     // Set address of page table entry.
     const raw_p3_addr = @intCast(u64, @ptrToInt(&p3_table[0]));
-    var p3_addr = zasm.PhysAddr.initUnchecked(raw_p3_addr);
+    const p3_addr = zasm.PhysAddr.initUnchecked(raw_p3_addr);
     p4_page_table_entry.setAddr(p3_addr);
     // Set page table entry.
     p4_table[0] = p4_page_table_entry.entry;
@@ -32,7 +32,7 @@ export fn set_up_page_tables() void {
     p3_page_table_entry.setFlags(p3_page_table_flags);
     // Set address of page table entry.
     const raw_p2_addr = @intCast(u64, @ptrToInt(&p2_table[0]));
-    var p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
+    const p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
     p3_page_table_entry.setAddr(p2_addr);
     // Set page table entry.
     p3_table[0] = p3_page_table_entry.entry;
@@ -56,11 +56,11 @@ export fn map_kernel_code_segment() void {
     var page_num: usize = 0;
     while (page_num < paging.NUM_KERNEL_CODE_PAGES) : (page_num += 1) {
         // Set address of page table entry.
-        var kernel_code_seg_page_offset = page_num * paging.page_size; // offset from start of kernel code segment.
-        var addr = zasm.PhysAddr.initUnchecked(kernel_code_seg_base_addr + kernel_code_seg_page_offset);
+        const kernel_code_seg_page_offset = page_num * paging.page_size; // offset from start of kernel code segment.
+        const addr = zasm.PhysAddr.initUnchecked(kernel_code_seg_base_addr + kernel_code_seg_page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
-        var p2_index = page_num + p2_index_offset;
+        const p2_index = page_num + p2_index_offset;
         p2_table[p2_index] = page_table_entry.entry;
     }
 }
@@ -82,11 +82,11 @@ export fn map_kernel_data_segment() void {
     var page_num: usize = 0;
     while (page_num < paging.NUM_KERNEL_DATA_PAGES) : (page_num += 1) {
         // Set address of page table entry.
-        var kernel_data_seg_page_offset = page_num * paging.page_size; // offset from start of kernel data segment.
-        var addr = zasm.PhysAddr.initUnchecked(kernel_data_seg_base_addr + kernel_data_seg_page_offset);
+        const kernel_data_seg_page_offset = page_num * paging.page_size; // offset from start of kernel data segment.
+        const addr = zasm.PhysAddr.initUnchecked(kernel_data_seg_base_addr + kernel_data_seg_page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
-        var p2_index = page_num + p2_index_offset;
+        const p2_index = page_num + p2_index_offset;
         p2_table[p2_index] = page_table_entry.entry;
     }
 }
@@ -113,11 +113,11 @@ export fn map_kernel_stack() void {
         }
         page_table_entry.setFlags(page_table_flags);
         // Set address of page table entry.
-        var kernel_stack_page_offset = page_num * paging.page_size; // offset from start of kernel stack.
-        var addr = zasm.PhysAddr.initUnchecked(kernel_stack_base_addr + kernel_stack_page_offset);
+        const kernel_stack_page_offset = page_num * paging.page_size; // offset from start of kernel stack.
+        const addr = zasm.PhysAddr.initUnchecked(kernel_stack_base_addr + kernel_stack_page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
-        var p2_index = page_num + p2_index_offset;
+        const p2_index = page_num + p2_index_offset;
         p2_table[p2_index] = page_table_entry.entry;
     }
 }
@@ -143,11 +143,11 @@ export fn map_frame_buffer() void {
     var page_num: usize = 0;
     while (page_num < paging.NUM_FRAME_BUFFER_PAGES) : (page_num += 1) {
         // Set address of page table entry.
-        var frame_buffer_page_offset = page_num * paging.page_size; // offset from start of frame buffer.
-        var addr = zasm.PhysAddr.initUnchecked(frame_buffer_base_addr + frame_buffer_page_offset);
+        const frame_buffer_page_offset = page_num * paging.page_size; // offset from start of frame buffer.
+        const addr = zasm.PhysAddr.initUnchecked(frame_buffer_base_addr + frame_buffer_page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
-        var p2_index = page_num + p2_index_offset;
+        const p2_index = page_num + p2_index_offset;
         p2_table[p2_index] = page_table_entry.entry;
     }
 }
@@ -155,8 +155,8 @@ export fn map_frame_buffer() void {
 export fn enable_paging() void {
     // Load P4 to CR3 register. (CPU uses this to access the P4 table).
     const raw_p4_addr = @intCast(u64, @ptrToInt(&p4_table[0]));
-    var p4_addr = zasm.PhysAddr.initUnchecked(raw_p4_addr);
-    var cr3_value = zasm.Cr3.Contents{
+    const p4_addr = zasm.PhysAddr.initUnchecked(raw_p4_addr);
+    const cr3_value = zasm.Cr3.Contents{
         .phys_frame = zasm.PhysFrame.fromStartAddressUnchecked(p4_addr),
         .cr3_flags = zasm.Cr3Flags.fromU64(0),
     };
