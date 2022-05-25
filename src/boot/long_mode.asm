@@ -198,6 +198,7 @@ global init_long_mode
 section .text
 bits 32
 init_long_mode:
+	; TODO: remove hacky work-around for bug in objcopy.
 	; NOTE: work-around for bug in objcopy when converting elf32 objects to
 	; elf64 format. The call from multiboot_start to init_long_mode is converted
 	; to call init_long_mode+4 after converting from elf32 to elf64. Thus we
