@@ -178,4 +178,7 @@ export fn enable_paging() void {
     var cr0_value = zasm.Cr0.read();
     cr0_value.paging = true; // 1 << 31
     cr0_value.write();
+
+    // Assert that long mode is active.
+    std.debug.assert(zasm.Efer.read().long_mode_active);
 }
