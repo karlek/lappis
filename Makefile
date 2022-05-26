@@ -37,7 +37,7 @@ bin/%_elf64_zig.o: bin/%_32_zig.o
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
 bin/kernel.elf: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	@ld \
+	@ld.lld \
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
@@ -45,7 +45,7 @@ bin/kernel.elf: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kerne
 
 # For debug symbols.
 bin/kernel.dbg: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	@ld \
+	@ld.lld \
 		--output $@ \
 		--script linker.ld \
 		$^
