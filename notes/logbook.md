@@ -11,3 +11,9 @@ Glitch art a la 1.44 MB style.
 *earlyclobber get's the clobb*
 
 Fix interrupt clobbering registers _semi-deterministically_.
+
+# 2022-05-26
+
+*Shellcoding on rollerblades like your in an 80is Hackers movie*
+
+A bug in `ld` caused the NX bit of page table entries to be discarded.
