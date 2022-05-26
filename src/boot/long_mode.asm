@@ -188,16 +188,31 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern set_up_page_tables
+extern map_kernel_code_segment
+extern map_kernel_data_segment
+extern map_kernel_stack
+extern map_frame_buffer
+extern enable_paging
 global init_long_mode
 section .text
 bits 32
 init_long_mode:
+	; TODO: remove hacky work-around for bug in objcopy.
+	; NOTE: work-around for bug in objcopy when converting elf32 objects to
+	; elf64 format. The call from multiboot_start to init_long_mode is converted
+	; to call init_long_mode+4 after converting from elf32 to elf64. Thus we
+	; insert four nops.
+	times 4 nop
+
 	; ebx contains the 32-bit physical address of the Multiboot2 information
 	; structure provided by the boot loader.
 	mov esp, temp_stack_top
 	push ebx
 
 	call set_up_page_tables
+	call map_kernel_code_segment
+	call map_kernel_data_segment
 	call map_kernel_stack
 	call map_frame_buffer
 
