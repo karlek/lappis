@@ -61,7 +61,10 @@ export fn map_kernel_code_segment() void {
         page_table_entry.setAddr(addr);
         // Set page table entry.
         const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
+        // TODO: uncomment when Zig 32-bit codegen bug is fixed; use work-around for now.
+        //p2_table[p2_index] = page_table_entry.entry;
+        var p: *u64 = &p2_table[p2_index];
+        p.* = page_table_entry.entry;
     }
 }
 
@@ -87,7 +90,10 @@ export fn map_kernel_data_segment() void {
         page_table_entry.setAddr(addr);
         // Set page table entry.
         const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
+        // TODO: uncomment when Zig 32-bit codegen bug is fixed; use work-around for now.
+        //p2_table[p2_index] = page_table_entry.entry;
+        var p: *u64 = &p2_table[p2_index];
+        p.* = page_table_entry.entry;
     }
 }
 
@@ -118,7 +124,10 @@ export fn map_kernel_stack() void {
         page_table_entry.setAddr(addr);
         // Set page table entry.
         const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
+        // TODO: uncomment when Zig 32-bit codegen bug is fixed; use work-around for now.
+        //p2_table[p2_index] = page_table_entry.entry;
+        var p: *u64 = &p2_table[p2_index];
+        p.* = page_table_entry.entry;
     }
 }
 
@@ -148,7 +157,10 @@ export fn map_frame_buffer() void {
         page_table_entry.setAddr(addr);
         // Set page table entry.
         const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
+        // TODO: uncomment when Zig 32-bit codegen bug is fixed; use work-around for now.
+        //p2_table[p2_index] = page_table_entry.entry;
+        var p: *u64 = &p2_table[p2_index];
+        p.* = page_table_entry.entry;
     }
 }
 
