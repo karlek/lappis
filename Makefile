@@ -20,19 +20,31 @@ bin/boot_zig.o: src/boot/boot.zig | bin
 #     Turn off page alignment of sections, and disable linking against shared
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
+#
+# --no-warn-rwx-segments
+#     Allow use of RWX segments.
 bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
+		--no-warn-rwx-segments \
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
 		$^
 
 # For debug symbols.
+#
+# --no-warn-rwx-segments
+#     Allow use of RWX segments.
 bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	@ld \
+		--no-warn-rwx-segments \
 		--output $@ \
 		--script linker.ld \
 		$^
+
+# TODO: re-enable Intel masm dialect (-masm=intel) when Clang cpuid.h has been
+# updated to support both Intel and AT&T syntax. Regression observed in Clang
+# 17.0.6.
 
 # -masm=dialect
 #     Output assembly instructions using selected dialect.  Also affects
@@ -89,7 +101,6 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 		-DINDEXED_COPY \
 		-DMEMCPY_64BIT \
 		-mno-red-zone \
-		-masm=intel \
 		-nostdlib \
 		-static \
 		-r \
@@ -161,7 +172,7 @@ bin/kernel.iso: bin/kernel.elf grub.cfg | bin
 	@mkdir -p bin/isofiles/boot/grub
 	@cp $< bin/isofiles/boot/kernel.bin
 	@cp grub.cfg bin/isofiles/boot/grub
-	@grub-mkrescue -o $@ bin/isofiles 2> /dev/null
+	grub-mkrescue -o $@ bin/isofiles
 
 format:
 	@find src -iname '*.c' -print0 | xargs -0 -I '{}' clang-format --fcolor-diagnostics --Werror --verbose --style=file -i '{}'
