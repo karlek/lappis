@@ -2,7 +2,7 @@ const std = @import("std");
 
 const multiboot2 = @cImport(@cInclude("multiboot2.h"));
 
-const MultiMupp = struct {
+const MultiMupp = extern struct {
     hdr: multiboot2.multiboot_header,
 
     // NOTE: multiboot tags must be 8 byte aligned.
@@ -20,7 +20,7 @@ export var multiboot linksection(".multiboot") = MultiMupp{
         .magic = MAGIC,
         .architecture = ARCH,
         .header_length = LENGTH,
-        .checksum = @bitCast(u32, -@bitCast(i32, (MAGIC + ARCH + LENGTH))), // gotta love bitcasts.
+        .checksum = @as(u32, @bitCast(-@as(i32, @bitCast((MAGIC + ARCH + LENGTH))))), // gotta love bitcasts.
     },
     .frame_buffer_tag = .{
         .type = multiboot2.MULTIBOOT_HEADER_TAG_FRAMEBUFFER,
@@ -41,7 +41,10 @@ export var multiboot linksection(".multiboot") = MultiMupp{
 extern fn init_long_mode() void;
 
 export fn multiboot_start() callconv(.Naked) noreturn {
-    init_long_mode();
+    //init_long_mode(); // TODO: call from Zig instead of inline asm when supported in Zig.
+    asm volatile (
+        \\ call init_long_mode
+    );
 
     while (true) {}
 }
