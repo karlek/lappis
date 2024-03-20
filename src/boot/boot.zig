@@ -20,7 +20,7 @@ export var multiboot linksection(".multiboot") = MultiMupp{
         .magic = MAGIC,
         .architecture = ARCH,
         .header_length = LENGTH,
-        .checksum = @as(u32, @bitCast(-@as(i32, @bitCast((MAGIC + ARCH + LENGTH))))), // gotta love bitcasts.
+        .checksum = @as(u32, @bitCast(-@as(i32, @bitCast(MAGIC + ARCH + LENGTH)))), // gotta love bitcasts.
     },
     .frame_buffer_tag = .{
         .type = multiboot2.MULTIBOOT_HEADER_TAG_FRAMEBUFFER,
@@ -42,6 +42,7 @@ extern fn init_long_mode() void;
 
 export fn multiboot_start() callconv(.Naked) noreturn {
     //init_long_mode(); // TODO: call from Zig instead of inline asm when supported in Zig.
+
     asm volatile (
         \\ call init_long_mode
     );
