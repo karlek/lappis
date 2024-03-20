@@ -21,11 +21,12 @@ bin/boot_zig.o: src/boot/boot.zig | bin
 #     libraries.  If the output format supports Unix style magic numbers, mark
 #     the output as "NMAGIC".
 #
+# TODO: When ubuntu-latest on github actions is updated, add this to remove nag.
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
+
 bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	@ld \
-		--no-warn-rwx-segments \
+	ld \
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
@@ -33,11 +34,11 @@ bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libflo
 
 # For debug symbols.
 #
+# TODO: When ubuntu-latest on github actions is updated, add this to remove nag.
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
 bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	@ld \
-		--no-warn-rwx-segments \
+	ld \
 		--output $@ \
 		--script linker.ld \
 		$^
