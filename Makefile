@@ -95,8 +95,8 @@ bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libflo
 # -o file
 #     Place the primary output in file file.
 bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kernel/string.c src/kernel/format/zip.c src/kernel/ports.c src/kernel/idt.c src/kernel/fpu.c src/kernel/drivers/ata.c src/kernel/multiboot.c src/kernel/pic.c src/kernel/memcpy.c src/kernel/tinyprintf.c src/kernel/video.c src/kernel/drivers/mouse.c src/kernel/drivers/keyboard.c src/kernel/ps2.c src/kernel/print.c src/kernel/terminal-font.c | bin
-	# -Wno-pointer-sign should be investigated in the future, right now it's
-	#  just annoying af.
+	@# -Wno-pointer-sign should be investigated in the future, right now it's
+	@#  just annoying af.
 	@$(CC) \
 		-DLITTLE_ENDIAN \
 		-DINDEXED_COPY \
