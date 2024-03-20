@@ -191,4 +191,5 @@ dump-format-config:
 	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
 
 clean:
+	@rm -rf zig-cache
 	@rm -rf bin
