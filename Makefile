@@ -82,6 +82,9 @@ bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libflo
 # -fno-stack-protector
 #     Do not use stack protection.
 #
+# -r  Produce a relocatable object as output.  This is also known as partial
+#     linking.
+#
 # -g
 #     Produce debugging information in the operating system's native format
 #     (stabs, COFF, XCOFF, or DWARF).  GDB can work with this debugging
@@ -113,10 +116,6 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 		$^ \
 		-o $@
 
-#
-# -r  Produce a relocatable object as output.  This is also known as partial
-#     linking.
-#
 fs/userland.elf: src/userland/userland.c src/userland/tinyprintf.c | bin
 	@$(CC) \
 		-mno-red-zone \
