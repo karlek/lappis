@@ -12,6 +12,12 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
+bin/kernel-userland.o: src/kernel/userland.asm | bin
+	@nasm \
+		-f elf64 \
+		-o $@ \
+		$<
+
 # -O ReleaseFast
 bin/boot_zig.o: src/boot/boot.zig | bin
 	zig build-obj -target x86_64-freestanding-gnu -static -I./src/kernel -mno-red-zone -femit-bin=$@ $<
@@ -25,7 +31,7 @@ bin/boot_zig.o: src/boot/boot.zig | bin
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
 
-bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	ld \
 		--nmagic \
 		--output $@ \
@@ -37,7 +43,7 @@ bin/kernel.elf: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libflo
 # TODO: When ubuntu-latest on github actions is updated, add this to remove nag.
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
-bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
+bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
 	ld \
 		--output $@ \
 		--script linker.ld \

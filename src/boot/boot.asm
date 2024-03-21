@@ -9,4 +9,3 @@ extern main
 ; marker. The total size of the page table are 4096*4 = 16KB.
 %include "src/boot/long_mode.asm"
 %include "src/kernel/idt.asm"
-%include "src/kernel/userland.asm"
