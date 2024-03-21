@@ -7,7 +7,7 @@ void sys_print(const char *m) {
 				 :: "r"(m) : "rax", "rbx");
 }
 
-void yay_userland() {
+void elf_userland() {
 	char buf[128];
 
 	sprintf(buf, "Hello, %s!", "world");
