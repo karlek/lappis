@@ -11,3 +11,4 @@ tags
 *.o
 zig-cache
 zig-out
+*.elf
