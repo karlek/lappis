@@ -16,6 +16,11 @@ yay_userland:
 	jmp $
 
 enter_userland:
+	; rdi: ptr to userland.o
+	; rsi: len of userland.o
+	mov r12, rdi
+	mov r13, rsi
+
 	; SYSCALL function pointer
 	; edx:eax = syscall_fptr
 	mov rdx, syscall_landing_pad
