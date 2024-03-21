@@ -91,7 +91,7 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
-extern void enter_userland();
+extern void enter_userland(uint8_t* data, uint32_t size);
 
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
@@ -164,9 +164,11 @@ void main(multiboot_info_t* boot_info) {
 		if (streq(file->name, "userland.elf") == false) {
 			continue;
 		}
-		debug("found userland.elf");
+		debug("found userland.elf: %d", file->size);
+
 		// Work in progress.
-		/* run_userland(file->data, file->size); */
+		enter_userland(file->data, file->size);
+		break;
 	}
 
 	while (1) {
