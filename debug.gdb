@@ -1,3 +1,7 @@
+source debug.py
+
+set disassembly-flavor intel
+
 target remote localhost:1234
 symbol-file bin/kernel.dbg
 
