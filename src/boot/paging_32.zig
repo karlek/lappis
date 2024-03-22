@@ -16,7 +16,7 @@ export fn set_up_page_tables() void {
     p4_page_table_flags.user_accessible = true;
     p4_page_table_entry.setFlags(p4_page_table_flags);
     // Set address of page table entry.
-    const raw_p3_addr = @intCast(u64, @ptrToInt(&p3_table[0]));
+    const raw_p3_addr = @as(u64, @intCast(@intFromPtr(&p3_table[0])));
     const p3_addr = zasm.PhysAddr.initUnchecked(raw_p3_addr);
     p4_page_table_entry.setAddr(p3_addr);
     // Set page table entry.
@@ -31,7 +31,7 @@ export fn set_up_page_tables() void {
     p3_page_table_flags.user_accessible = true;
     p3_page_table_entry.setFlags(p3_page_table_flags);
     // Set address of page table entry.
-    const raw_p2_addr = @intCast(u64, @ptrToInt(&p2_table[0]));
+    const raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_table[0])));
     const p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
     p3_page_table_entry.setAddr(p2_addr);
     // Set page table entry.
@@ -166,7 +166,7 @@ export fn enable_paging() void {
     efer_value.write();
 
     // Load P4 to CR3 register. (CPU uses this to access the P4 table).
-    const raw_p4_addr = @intCast(u64, @ptrToInt(&p4_table[0]));
+    const raw_p4_addr = @as(u64, @intCast(@intFromPtr(&p4_table[0])));
     const p4_addr = zasm.PhysAddr.initUnchecked(raw_p4_addr);
     const cr3_value = zasm.Cr3.Contents{
         .phys_frame = zasm.PhysFrame.fromStartAddressUnchecked(p4_addr),
