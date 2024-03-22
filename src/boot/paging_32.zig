@@ -1,5 +1,5 @@
 const std = @import("std");
-const zasm = @import("zasm");
+const zasm = @import("zasm.zig");
 const paging = @import("paging.zig");
 
 export var p4_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8

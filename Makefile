@@ -12,8 +12,6 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
-PKGS=--pkg-begin zasm ./src/zasm.zig --pkg-end
-
 bin/%_32_zig.o: src/boot/%_32.zig | bin
 	@zig build-obj \
 		--cache-dir bin/zig-cache \
@@ -21,7 +19,6 @@ bin/%_32_zig.o: src/boot/%_32.zig | bin
 		-mno-red-zone \
 		-static \
 		-target i386-freestanding-gnu \
-		${PKGS} \
 		-O Debug \
 		-mcpu=_i386 \
 		-femit-bin=$@ \
