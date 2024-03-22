@@ -12,15 +12,18 @@ bin/boot.o: src/boot/boot.asm | bin
 		-o $@ \
 		$<
 
+# NOTE: use `-fcompiler-rt` to include __zig_probe_stack symbol when linking
+# (see https://github.com/ziglang/zig/issues/6817).
 bin/%_32_zig.o: src/boot/%_32.zig | bin
 	@zig build-obj \
 		--cache-dir bin/zig-cache \
 		-I src/kernel \
 		-mno-red-zone \
+		-fcompiler-rt \
 		-static \
-		-target i386-freestanding-gnu \
+		-target x86-freestanding-gnu \
 		-O Debug \
-		-mcpu=_i386 \
+		-mcpu=i386 \
 		-femit-bin=$@ \
 		$<
 
