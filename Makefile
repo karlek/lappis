@@ -6,7 +6,7 @@ all: build
 
 kernel: bin/lappis.img
 
-bin/boot.o: src/boot/boot.asm | bin
+bin/boot.o: src/boot/*.asm | bin
 	@nasm \
 		-f elf64 \
 		-o $@ \
@@ -103,7 +103,7 @@ bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin
 #
 # -o file
 #     Place the primary output in file file.
-bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kernel/string.c src/kernel/format/zip.c src/kernel/ports.c src/kernel/idt.c src/kernel/fpu.c src/kernel/drivers/ata.c src/kernel/multiboot.c src/kernel/pic.c src/kernel/memcpy.c src/kernel/tinyprintf.c src/kernel/video.c src/kernel/drivers/mouse.c src/kernel/drivers/keyboard.c src/kernel/ps2.c src/kernel/print.c src/kernel/terminal-font.c | bin
+bin/kernel.o: src/kernel/*.c | bin
 	@# -Wno-pointer-sign should be investigated in the future, right now it's
 	@#  just annoying af.
 	@$(CC) \
@@ -122,10 +122,9 @@ bin/kernel.o: src/kernel/kernel.c src/kernel/heap.c src/kernel/serial.c src/kern
 		$^ \
 		-o $@
 
-fs/userland.elf: src/userland/userland.c src/userland/tinyprintf.c | bin
+fs/userland.elf: src/userland/*.c | bin
 	@$(CC) \
 		-mno-red-zone \
-		-masm=intel \
 		-nostdlib \
 		-static \
 		-fno-stack-protector \
