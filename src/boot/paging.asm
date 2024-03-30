@@ -60,7 +60,7 @@ set_up_page_tables:
 	cmp ecx, 0
 	je .next
 	; Make only the range 0x000000-0x200000 (2MiB) executable.
-	mov dword [p2_table + ecx*8 + 4], 1 << 31
+	mov dword [p2_table + ecx*8 + 4], 0 << 31
 .next:
 	inc ecx
 	cmp ecx, NUM_PAGES
