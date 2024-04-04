@@ -71,6 +71,7 @@ enter_userland:
 	; cpuid    | enable interrupts | Always 1
 	mov r11, 0x200202
 
+	mov rsp, 0x200000
 	o64 sysret
 
 	; mov rax, SYS_BECOME_KERNEL
