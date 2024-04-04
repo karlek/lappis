@@ -44,13 +44,13 @@ class HexDump(gdb.Command):
 
         print ('            ' , end="")
         print ('  '.join(['%01X' % (i&0x0f,) for i in range(start,start+width)]) , end="")
-        print ('  ' , end="")       
+        print ('  ' , end="")
         print (' '.join(['%01X' % (i&0x0f,) for i in range(start,start+width)]) )
 
         for group in groups_of(mem, width, pr_offset):
             print ('0x%x: ' % (pr_addr,) + '   '*(width - pr_offset), end="")
             print (' '.join(['%02X' % (ord(g),) for g in group]) + \
-                '   ' * (width - len(group) if pr_offset == width else 0) + ' ', end="")    
+                '   ' * (width - len(group) if pr_offset == width else 0) + ' ', end="")
             print (' '*(width - pr_offset) +  ' '.join(
                 [chr( int.from_bytes(g, byteorder='big')) if isgraph( int.from_bytes(g, byteorder='big')   ) or g == ' ' else '.' for g in group]))
             pr_addr += width
@@ -78,3 +78,63 @@ class HexDumpWidth(gdb.Parameter):
 HexDump()
 HexDumpAlign()
 HexDumpWidth()
+
+import gdb
+
+class StepBeforeNextCall (gdb.Command):
+    def __init__ (self):
+        super (StepBeforeNextCall, self).__init__ ("step-before-next-call",
+                                                   gdb.COMMAND_OBSCURE)
+
+    def invoke (self, arg, from_tty):
+        arch = gdb.selected_frame().architecture()
+
+        while True:
+            current_pc = addr2num(gdb.selected_frame().read_register("pc"))
+            disa = arch.disassemble(current_pc)[0]
+            if "call" in disa["asm"]: # or startswith ?
+                break
+
+            SILENT=True
+            gdb.execute("stepi", to_string=SILENT)
+
+        print("step-before-next-call: next instruction is a call.")
+        print("{}: {}".format(hex(int(disa["addr"])), disa["asm"]))
+
+def addr2num(addr):
+    try:
+        return int(addr)  # Python 3
+    except:
+        return long(addr) # Python 2
+
+StepBeforeNextCall()
+
+
+import gdb
+
+def callstack_depth():
+    depth = 1
+    frame = gdb.newest_frame()
+    while frame is not None:
+        frame = frame.older()
+        depth += 1
+    return depth
+
+class StepToNextCall (gdb.Command):
+    def __init__ (self):
+        super (StepToNextCall, self).__init__ ("step-to-next-call",
+                                               gdb.COMMAND_OBSCURE)
+
+    def invoke (self, arg, from_tty):
+        start_depth = current_depth =callstack_depth()
+
+        # step until we're one step deeper
+        while current_depth == start_depth:
+            SILENT=True
+            gdb.execute("step", to_string=SILENT)
+            current_depth = callstack_depth()
+
+        # display information about the new frame
+        gdb.execute("frame 0")
+
+StepToNextCall()
