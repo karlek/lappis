@@ -196,5 +196,6 @@ dump-format-config:
 	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
 
 clean:
+	@rm -f fs/userland.elf
 	@rm -rf zig-cache
 	@rm -rf bin
