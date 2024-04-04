@@ -8,6 +8,7 @@ symbol-file bin/kernel.dbg
 # Any break points should be set here.
 # break main
 break enter_userland
+break *(enter_userland+65)
 break yay_userland
 
 # Run until the program first breakpoint.
