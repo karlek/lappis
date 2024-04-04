@@ -129,6 +129,7 @@ fs/userland.elf: src/userland/*.c | bin
 		-static \
 		-fno-stack-protector \
 		-ffreestanding \
+		-e elf_userland \
 		-g \
 		-T userland-linker.ld \
 		$^ \
