@@ -19,6 +19,7 @@
 #include "string.h"
 #include "terminal-font.h"
 #include "video.h"
+#include "elf2.h"
 
 #include "format/zip.h"
 
@@ -91,7 +92,7 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
-extern void enter_userland(uint8_t* data, uint32_t size);
+/* extern void enter_userland(uint8_t* data, uint32_t size); */
 
 void main(multiboot_info_t* boot_info) {
 	init_serial(SERIAL_COM1_PORT);
@@ -164,10 +165,10 @@ void main(multiboot_info_t* boot_info) {
 		if (streq(file->name, "userland.elf") == false) {
 			continue;
 		}
-		debug("found userland.elf: %d", file->size);
 
+		debug("found userland.elf: %d", file->size);
 		// Work in progress.
-		enter_userland(file->data, file->size);
+		run_userland(file->data, file->size);
 		break;
 	}
 

@@ -14,6 +14,6 @@ break yay_userland
 continue
 
 # Add break points that will be added after our first breakpoint has been hit.
-break irq_timer
-break *irq_timer+24
+# break irq_timer
+# break *irq_timer+24
 # break not_implemented_0

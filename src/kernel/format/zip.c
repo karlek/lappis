@@ -5,6 +5,12 @@ void read(uint8_t* buf, uint64_t n, uint64_t* cur, uint8_t* dest) {
 	(*cur) += n;
 }
 
+uint8_t read_uint8(uint8_t* buf, uint64_t* cur) {
+	uint8_t raw[1] = {0};
+	read(buf, sizeof raw, cur, raw);
+	return raw[0];
+}
+
 uint16_t read_uint16(uint8_t* buf, uint64_t* cur) {
 	uint8_t raw[2] = {0};
 	read(buf, sizeof raw, cur, raw);
