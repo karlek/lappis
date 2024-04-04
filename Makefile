@@ -103,7 +103,7 @@ bin/kernel.dbg: bin/boot_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin
 #
 # -o file
 #     Place the primary output in file file.
-bin/kernel.o: src/kernel/*.c | bin
+bin/kernel.o: src/kernel/*.c src/kernel/*/*.c | bin
 	@# -Wno-pointer-sign should be investigated in the future, right now it's
 	@#  just annoying af.
 	@$(CC) \
