@@ -15,6 +15,8 @@ uint64_t strlen(uint8_t* s) {
 	return len;
 }
 
+#define EVER ;;
+
 void elf_userland() {
 	char buf[128];
 
@@ -22,4 +24,6 @@ void elf_userland() {
 	uint64_t len = strlen(buf);
 
 	sys_print(buf, len);
+
+	for (EVER) {}
 }
