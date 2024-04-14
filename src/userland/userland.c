@@ -20,7 +20,7 @@ uint64_t strlen(uint8_t* s) {
 void elf_userland() {
 	char buf[128];
 
-	sprintf(buf, "Hello, %s!", "world");
+	sprintf(buf, "Hello, %s!", "from userland");
 	uint64_t len = strlen(buf);
 
 	sys_print(buf, len);
