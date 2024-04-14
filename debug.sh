@@ -4,11 +4,11 @@ set -e
 
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
-alacritty --class lappis-serial-raw -e fish -c 'tail -f /tmp/serial.raw' &
-alacritty --class lappis-serial-log -e tail -f /tmp/serial.log &
+kitty --class lappis-serial-raw -e fish -c 'tail -f /tmp/serial.raw' &
+kitty --class lappis-serial-log -e tail -f /tmp/serial.log &
 sleep 1
 
-alacritty --class qemu-starter -e \
+kitty --class qemu-starter \
 	qemu-system-x86_64 \
 	-no-reboot \
 	-no-shutdown \
@@ -27,6 +27,6 @@ gdb \
 	--quiet \
 	-command=debug.gdb
 
-ps ax | grep alacritty | grep lappis-serial-log | awk '{print $1}' | xargs kill
-ps ax | grep alacritty | grep lappis-serial-raw | awk '{print $1}' | xargs kill
+ps ax | grep kitty | grep lappis-serial-log | awk '{print $1}' | xargs kill
+ps ax | grep kitty | grep lappis-serial-raw | awk '{print $1}' | xargs kill
 ps ax | grep qemu-system-x86_64 | grep kernel\.iso | awk '{print $1}' | xargs kill
