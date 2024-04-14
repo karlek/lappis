@@ -4,7 +4,7 @@ void sys_print(uint8_t *s, uint64_t len) {
 	asm volatile("mov $0, %%rax\n"
 				 "mov %0, %%rbx\n"
 				 "syscall\n"
-				 :: "r"(m) : "rax", "rbx");
+				 :: "r"(s), "r"(len) : "rax", "rbx");
 }
 
 uint64_t strlen(uint8_t* s) {
