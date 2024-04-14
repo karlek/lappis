@@ -147,9 +147,9 @@ gdt64:
 	; Limit
 	dw 0x67 ; Sizeof tss64
 	; Base
-	dw (tss64 - $$ + MULTIBOOT_ORG + 0x30) & 0xffff
+	dw (0x10b0ee) & 0xffff
 	; Base (mid)
-	db ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 16) & 0xff
+	db ((0x10b0ee) >> 16) & 0xff
 	; Access
 	; Present | TSS (0x9)
 	;
@@ -162,9 +162,9 @@ gdt64:
 	; Flags & limit
 	db 00000000b
 	; Base high
-	db ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 24) & 0xff
+	db ((0x10b0ee) >> 24) & 0xff
 	; Base highest
-	dd ((tss64 - $$ + MULTIBOOT_ORG + 0x30) >> 32)
+	dd ((0x10b0ee) >> 32)
 	; Reserved
 	dd 0
 .pointer:
