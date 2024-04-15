@@ -74,7 +74,8 @@ export fn map_kernel_data_segment() void {
     page_table_flags.writeable = true;
     page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
-    page_table_flags.no_execute = true;
+    // TODO: load userland to dedicated userland_code_segment and userland_data_segment pages (and not kernel_data_segment).
+    //page_table_flags.no_execute = true; // NOTE: userland code and data loaded here for now.
     page_table_entry.setFlags(page_table_flags);
     // Map pages of kernel data segment in P2 table.
     const p2_index_offset = paging.P2_KERNEL_DATA_FIRST_INDEX; // page index offset into P2 table of kernel data segment pages.
