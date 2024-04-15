@@ -96,17 +96,17 @@ pub const Cr0 = packed struct {
         flags.z_reserved17 = true;
         flags.z_reserved19_28 = std.math.maxInt(u10);
         flags.z_reserved32_63 = std.math.maxInt(u32);
-        break :blk @bitCast(u64, flags);
+        break :blk @as(u64, @bitCast(flags));
     };
 
     const ALL_NOT_RESERVED: u64 = ~ALL_RESERVED;
 
     pub fn fromU64(value: u64) Cr0 {
-        return @bitCast(Cr0, value & ALL_NOT_RESERVED);
+        return @as(Cr0, @bitCast(value & ALL_NOT_RESERVED));
     }
 
     pub fn toU64(self: Cr0) u64 {
-        return @bitCast(u64, self) & ALL_NOT_RESERVED;
+        return @as(u64, @bitCast(self)) & ALL_NOT_RESERVED;
     }
 
     test {
@@ -171,7 +171,7 @@ pub const Cr3 = struct {
                 // unchecked is fine as the mask ensures validity
                 PhysAddr.initUnchecked(value & 0x000f_ffff_ffff_f000),
             ),
-            .pcid = Pcid.init(@truncate(u12, value & 0xFFF)),
+            .pcid = Pcid.init(@as(u12, @truncate(value & 0xFFF))),
         };
     }
 
@@ -223,17 +223,17 @@ pub const Cr3Flags = packed struct {
         flags.z_reserved0 = true;
         flags.z_reserved1 = true;
         flags.z_reserved4_63 = std.math.maxInt(u60);
-        break :blk @bitCast(u64, flags);
+        break :blk @as(u64, @bitCast(flags));
     };
 
     const ALL_NOT_RESERVED: u64 = ~ALL_RESERVED;
 
     pub fn fromU64(value: u64) Cr3Flags {
-        return @bitCast(Cr3Flags, value & ALL_NOT_RESERVED);
+        return @as(Cr3Flags, @bitCast(value & ALL_NOT_RESERVED));
     }
 
     pub fn toU64(self: Cr3Flags) u64 {
-        return @bitCast(u64, self) & ALL_NOT_RESERVED;
+        return @as(u64, @bitCast(self)) & ALL_NOT_RESERVED;
     }
 
     test {
@@ -379,17 +379,17 @@ pub const Cr4 = packed struct {
         flags.z_reserved16 = true;
         flags.z_reserved25_31 = std.math.maxInt(u7);
         flags.z_reserved32_63 = std.math.maxInt(u32);
-        break :blk @bitCast(u64, flags);
+        break :blk @as(u64, @bitCast(flags));
     };
 
     const ALL_NOT_RESERVED: u64 = ~ALL_RESERVED;
 
     pub fn fromU64(value: u64) Cr4 {
-        return @bitCast(Cr4, value & ALL_NOT_RESERVED);
+        return @as(Cr4, @bitCast(value & ALL_NOT_RESERVED));
     }
 
     pub fn toU64(self: Cr4) u64 {
-        return @bitCast(u64, self) & ALL_NOT_RESERVED;
+        return @as(u64, @bitCast(self)) & ALL_NOT_RESERVED;
     }
 
     test {
@@ -457,17 +457,17 @@ pub const Efer = packed struct {
         flags.z_reserved9 = true;
         flags.z_reserved16_31 = std.math.maxInt(u16);
         flags.z_reserved32_63 = std.math.maxInt(u32);
-        break :blk @bitCast(u64, flags);
+        break :blk @as(u64, @bitCast(flags));
     };
 
     const ALL_NOT_RESERVED: u64 = ~ALL_RESERVED;
 
     pub fn fromU64(value: u64) Efer {
-        return @bitCast(Efer, value & ALL_NOT_RESERVED);
+        return @as(Efer, @bitCast(value & ALL_NOT_RESERVED));
     }
 
     pub fn toU64(self: Efer) u64 {
-        return @bitCast(u64, self) & ALL_NOT_RESERVED;
+        return @as(u64, @bitCast(self)) & ALL_NOT_RESERVED;
     }
 
     test {
@@ -500,8 +500,8 @@ fn Msr(comptime register: u32) type {
             asm volatile ("wrmsr"
                 :
                 : [reg] "{ecx}" (register),
-                  [low] "{eax}" (@truncate(u32, value)),
-                  [high] "{edx}" (@truncate(u32, value >> 32)),
+                  [low] "{eax}" (@as(u32, @truncate(value))),
+                  [high] "{edx}" (@as(u32, @truncate(value >> 32))),
                 : "memory"
             );
         }
@@ -539,7 +539,7 @@ pub const PhysFrame = extern struct {
     /// Returns the frame that contains the given physical address.
     pub fn containingAddress(address: PhysAddr) PhysFrame {
         return .{
-            .start_address = address.alignDown(@intCast(usize, size.bytes())),
+            .start_address = address.alignDown(@as(usize, @intCast(size.bytes()))),
         };
     }
 
@@ -614,7 +614,7 @@ pub const PhysAddr = packed struct {
     /// Aligns the physical address downwards to the given alignment.
     /// The alignment must be a power of 2 and greater than 0.
     pub fn alignDown(self: PhysAddr, alignment: usize) PhysAddr {
-        return .{ .value = std.mem.alignBackward(@intCast(usize, self.value), alignment) };
+        return .{ .value = std.mem.alignBackward(@as(usize, @intCast(self.value)), alignment) };
     }
 
     /// Checks whether the physical address has the given alignment.
@@ -712,5 +712,5 @@ pub fn getBits(target: anytype, comptime start_bit: comptime_int, comptime numbe
         }
     }
 
-    return @truncate(ReturnType, target >> start_bit);
+    return @as(ReturnType, @truncate(target >> start_bit));
 }
