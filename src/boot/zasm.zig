@@ -814,11 +814,11 @@ pub const PageTableFlags = packed struct {
     }
 
     pub fn fromU64(value: u64) PageTableFlags {
-        return @bitCast(PageTableFlags, value & ALL_NOT_RESERVED);
+        return @as(PageTableFlags, @bitCast(value & ALL_NOT_RESERVED));
     }
 
     pub fn toU64(self: PageTableFlags) u64 {
-        return @bitCast(u64, self) & ALL_NOT_RESERVED;
+        return @as(u64, @bitCast(self)) & ALL_NOT_RESERVED;
     }
 
     const ALL_RESERVED: u64 = blk: {
@@ -826,7 +826,7 @@ pub const PageTableFlags = packed struct {
         flags.z_reserved12_15 = std.math.maxInt(u4);
         flags.z_reserved16_47 = std.math.maxInt(u32);
         flags.z_reserved48_51 = std.math.maxInt(u4);
-        break :blk @bitCast(u64, flags);
+        break :blk @as(u64, @bitCast(flags));
     };
 
     const ALL_NOT_RESERVED: u64 = ~ALL_RESERVED;
