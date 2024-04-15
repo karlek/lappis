@@ -165,7 +165,7 @@ bin/libfloof.a: src/kernel/rust/src/lib.rs
 	cd src/kernel/rust; cargo build -Zbuild-std ; cargo build
 	mv src/kernel/rust/target/os/debug/libfloof.a bin
 
-build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img
+build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 
 debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 	./debug.sh
