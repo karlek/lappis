@@ -47,8 +47,10 @@ bin/%_elf64_zig.o: bin/%_32_zig.o
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
 
+# NOTE: using ld.lld instead of ld as work-around for bug in ld (for details,
+# see https://github.com/karlek/lappis/pull/19/commits/9cf1a8a7d40c21c6a23c1bb0412a7f49f3f1b211#r883015557).
 bin/kernel.elf: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	ld \
+	ld.lld \
 		--nmagic \
 		--output $@ \
 		--script linker.ld \
@@ -60,7 +62,7 @@ bin/kernel.elf: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kerne
 # --no-warn-rwx-segments
 #     Allow use of RWX segments.
 bin/kernel.dbg: bin/boot_elf64_zig.o bin/paging_elf64_zig.o bin/boot.o bin/kernel-userland.o bin/kernel.o bin/libhello.o bin/libfloof.a | bin
-	ld \
+	ld.lld \
 		--output $@ \
 		--script linker.ld \
 		$^
