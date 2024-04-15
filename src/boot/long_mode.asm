@@ -147,9 +147,9 @@ gdt64:
 	; Limit
 	dw 0x67 ; Sizeof tss64
 	; Base
-	dw (0x10b0ee) & 0xffff
+	dw (tss64_addr) & 0xffff
 	; Base (mid)
-	db ((0x10b0ee) >> 16) & 0xff
+	db ((tss64_addr) >> 16) & 0xff
 	; Access
 	; Present | TSS (0x9)
 	;
@@ -162,14 +162,16 @@ gdt64:
 	; Flags & limit
 	db 00000000b
 	; Base high
-	db ((0x10b0ee) >> 24) & 0xff
+	db ((tss64_addr) >> 24) & 0xff
 	; Base highest
-	dd ((0x10b0ee) >> 32)
+	dd ((tss64_addr) >> 32)
 	; Reserved
 	dd 0
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
+
+tss64_addr equ 0x10b042
 
 tss64:
 	           dd 0 ; Reserved
@@ -188,10 +190,17 @@ tss64:
 	           dw 0 ; Reserved
 	.iopb      dw 0 ; no IOPB
 
+extern enable_paging
 global init_long_mode
 section .text
 bits 32
 init_long_mode:
+	; NOTE: work-around for bug in objcopy when converting elf32 objects to
+	; elf64 format. The call from multiboot_start to init_long_mode is converted
+	; to call init_long_mode+4 after converting from elf32 to elf64. Thus we
+	; insert four nops.
+	times 4 nop
+
 	; ebx contains the 32-bit physical address of the Multiboot2 information
 	; structure provided by the boot loader.
 	mov esp, temp_stack_top
