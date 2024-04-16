@@ -32,6 +32,18 @@ A little appetizer of what you'll experience before we begin.
 <img src="notes/screenshots/first-dog.png">
 </div>
 
+### Docker
+
+```
+# Build in docker.
+$ docker build -t lappis-builder .
+
+# We set --user to create build artifacts as our user.
+$ docker run --rm -it --user "$(id -u):$(id -g)" -v $PWD:/lappis lappis-builder
+
+# Run on host.
+$ ./run.sh
+```
 ### Dependencies
 
 We need a few dependencies before we can compile and run lappis.
