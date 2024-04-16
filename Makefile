@@ -199,3 +199,5 @@ clean:
 	@rm -f fs/userland.elf
 	@rm -rf zig-cache
 	@rm -rf bin
+	@rm -rf z
+	@rm -rf cargo
