@@ -33,12 +33,12 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 # Install zig
 WORKDIR /zig
 
-ADD --checksum=sha256:2d00e789fec4f71790a6e7bf83ff91d564943c5ee843c5fd966efc474b423047 \
-	https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz \
-	/zig/zig-linux-x86_64-0.11.0.tar.xz
-RUN tar Jxvf /zig/zig-linux-x86_64-0.11.0.tar.xz
+ADD --checksum=sha256:c7ae866b8a76a568e2d5cfd31fe89cdb629bdd161fdd5018b29a4a0a17045cad \
+	https://ziglang.org/download/0.12.0/zig-linux-x86_64-0.12.0.tar.xz \
+	/zig/zig-linux-x86_64-0.12.0.tar.xz
+RUN tar Jxvf /zig/zig-linux-x86_64-0.12.0.tar.xz
 
-ENV PATH="${PATH}:/zig/zig-linux-x86_64-0.11.0"
+ENV PATH="${PATH}:/zig/zig-linux-x86_64-0.12.0"
 
 # Install rustup (as user)
 RUN useradd -m -G users -s /bin/bash user
