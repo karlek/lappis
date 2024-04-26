@@ -4,6 +4,7 @@ const paging = @import("paging.zig");
 
 export var p4_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
 export var p3_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
+// TODO: create four p2 tables to reach 4 GB.
 export var p2_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
 
 export fn set_up_page_tables() void {
@@ -115,6 +116,36 @@ export fn map_kernel_stack() void {
         // Set address of page table entry.
         const kernel_stack_page_offset = page_num * paging.page_size; // offset from start of kernel stack.
         const addr = zasm.PhysAddr.initUnchecked(kernel_stack_base_addr + kernel_stack_page_offset);
+        page_table_entry.setAddr(addr);
+        // Set page table entry.
+        const p2_index = page_num + p2_index_offset;
+        p2_table[p2_index] = page_table_entry.entry;
+    }
+}
+
+export fn map_userland() void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    // Set flags `present`, `writeable`, `user accessible` and `page size`.
+    // Note, `writeable` is only set for non-guard pages.
+    var page_table_flags = page_table_entry.getFlags();
+    page_table_flags.present = true;
+    page_table_flags.user_accessible = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    // Map pages of userland in P2 table.
+    const p2_index_offset = paging.P2_USERLAND_FIRST_INDEX; // page index offset into P2 table of userland pages.
+    const userland_base_addr = p2_index_offset * paging.page_size;
+    var page_num: usize = 0;
+    while (page_num < paging.NUM_USERLAND_PAGES) : (page_num += 1) {
+        // Make first and last pages `guard` pages by removing `writeable`.
+        if (page_num == 0 or page_num == paging.NUM_USERLAND_PAGES - 1) {
+            page_table_flags.writeable = false;
+        } else {
+            page_table_flags.writeable = true;
+        }
+        page_table_entry.setFlags(page_table_flags);
+        // Set address of page table entry.
+        const userland_page_offset = page_num * paging.page_size; // offset from start of userland.
+        const addr = zasm.PhysAddr.initUnchecked(userland_base_addr + userland_page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
         const p2_index = page_num + p2_index_offset;

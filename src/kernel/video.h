@@ -6,7 +6,8 @@
 #include "memcpy.h"
 #include "terminal-font.h"
 
-#define FRAME_BUFFER 0x4800000
+extern uint32_t FRAME_BUFFER_ADDR;
+
 #define WIDTH        1280
 #define HEIGHT       1024
 

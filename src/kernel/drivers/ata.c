@@ -88,7 +88,7 @@ void ide_400ns_delay(uint16_t io) {
 }
 
 void ide_print_error(uint16_t io) {
-	error("IDE:");
+	//error("IDE:");
 
 	uint8_t status = inb(io + ATA_REG_ERROR);
 	if (status & ATA_ER_AMNF) {
@@ -98,7 +98,7 @@ void ide_print_error(uint16_t io) {
 		error("- No Media or Media Error");
 	}
 	if (status & ATA_ER_ABRT) {
-		error("- Command Aborted");
+		//error("- Command Aborted");
 	}
 	if (status & ATA_ER_MCR) {
 		error("- No Media or Media Error");
@@ -135,7 +135,7 @@ void ide_poll(uint16_t io, bool advanced_check) {
 	uint8_t status = inb(io + ATA_REG_STATUS);
 	bool    is_err = (status & ATA_SR_ERR) != 0;
 	if (is_err) {
-		error("Unknown IDE error. TODO: implement IDE error handling");
+		//error("Unknown IDE error. TODO: implement IDE error handling");
 		ide_print_error(io);
 		return;
 	}
