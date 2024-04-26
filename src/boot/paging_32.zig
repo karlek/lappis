@@ -94,11 +94,10 @@ export fn map_kernel_data_segment() void {
 
 export fn map_kernel_stack() void {
     var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `user accessible`, `page size` and
-    // `no execute`. Note, `writeable` is only set for non-guard pages.
+    // Set flags `present`, `writeable`, `page size` and `no execute`. Note,
+    // `writeable` is only set for non-guard pages.
     var page_table_flags = page_table_entry.getFlags();
     page_table_flags.present = true;
-    page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
     page_table_flags.no_execute = true;
     // Map pages of kernel stack in P2 table.
@@ -125,12 +124,10 @@ export fn map_kernel_stack() void {
 
 export fn map_frame_buffer() void {
     var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `user accessible`, `page size` and
-    // `no execute`.
+    // Set flags `present`, `writeable`, `page size` and `no execute`.
     var page_table_flags = page_table_entry.getFlags();
     page_table_flags.present = true;
     page_table_flags.writeable = true;
-    page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
     page_table_flags.no_execute = true;
     page_table_entry.setFlags(page_table_flags);
