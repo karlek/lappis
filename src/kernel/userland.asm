@@ -2,6 +2,9 @@ bits 64
 
 global enter_userland
 extern debug_buffer
+extern USERLAND_ADDR
+
+PAGE_SIZE equ 0x200000
 
 syscall_landing_pad:
 	; rax = syscall number
@@ -71,7 +74,9 @@ enter_userland:
 	; cpuid    | enable interrupts | Always 1
 	mov r11, 0x200202
 
-	mov rsp, 0x200000
+	mov esp, dword [USERLAND_ADDR]
+	add rsp, PAGE_SIZE ; ignore guard page
+	add rsp, 0x1000    ; make room for temp stack
 	o64 sysret
 
 	; mov rax, SYS_BECOME_KERNEL
