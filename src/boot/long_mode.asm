@@ -171,7 +171,7 @@ gdt64:
 	dw $ - gdt64 - 1
 	dq gdt64
 
-tss64_addr equ 0x1f5b2a
+tss64_addr equ 0x1f5b2e
 
 tss64:
 	           dd 0 ; Reserved
@@ -194,6 +194,7 @@ extern set_up_page_tables
 extern map_kernel_code_segment
 extern map_kernel_data_segment
 extern map_kernel_stack
+extern map_userland
 extern map_frame_buffer
 extern enable_paging
 global init_long_mode
@@ -216,6 +217,7 @@ init_long_mode:
 	call map_kernel_code_segment
 	call map_kernel_data_segment
 	call map_kernel_stack
+	call map_userland
 	call map_frame_buffer
 
 	call enable_paging

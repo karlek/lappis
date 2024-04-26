@@ -1,7 +1,11 @@
 #include "video.h"
 
+uint8_t * FRAME_BUFFER() {
+	return (uint8_t *)FRAME_BUFFER_ADDR;
+}
+
 void set_pixel(uint32_t x, uint32_t y, const uint8_t color[4]) {
-	volatile uint8_t* fb = (volatile uint8_t*)FRAME_BUFFER;
+	volatile uint8_t* fb = (volatile uint8_t*)FRAME_BUFFER();
 
 	// Colors are written in little endian order.
 	// Red
@@ -15,7 +19,7 @@ void set_pixel(uint32_t x, uint32_t y, const uint8_t color[4]) {
 }
 
 void set_frame(uint8_t* frame) {
-	memcpy((uint8_t*)FRAME_BUFFER, frame, WIDTH * HEIGHT * 4);
+	memcpy((uint8_t*)FRAME_BUFFER(), frame, WIDTH * HEIGHT * 4);
 }
 
 void draw_char(uint8_t c, uint32_t x, uint32_t y, uint8_t* color) {
