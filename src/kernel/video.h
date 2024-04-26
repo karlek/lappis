@@ -6,7 +6,8 @@
 #include "memcpy.h"
 #include "terminal-font.h"
 
-#define FRAME_BUFFER 0x4800000
+// TODO: this is hard-coded. Why code easy when you can hard-code :sunglasses:
+#define FRAME_BUFFER 0x39a00000
 #define WIDTH        1280
 #define HEIGHT       1024
 

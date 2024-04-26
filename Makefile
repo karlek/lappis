@@ -21,7 +21,7 @@ bin/kernel-userland.o: src/kernel/userland.asm | bin
 # NOTE: use `-fcompiler-rt` to include __zig_probe_stack symbol when linking
 # (see https://github.com/ziglang/zig/issues/6817).
 bin/%_32_zig.o: src/boot/%_32.zig | bin
-	@zig build-obj \
+	zig build-obj \
 		--cache-dir bin/zig-cache \
 		-I src/kernel \
 		-mno-red-zone \

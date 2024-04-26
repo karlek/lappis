@@ -1,3 +1,6 @@
+extern TEMP_KERNEL_STACK
+extern KERNEL_STACK_TOP
+
 section .rodata
 
 ; Base          | Flags | Limit | Access        | Base
@@ -171,11 +174,12 @@ gdt64:
 	dw $ - gdt64 - 1
 	dq gdt64
 
-tss64_addr equ 0x1f5b2a
+; TODO: hard-coded;
+tss64_addr equ 0x1f5b46
 
 tss64:
 	           dd 0 ; Reserved
-	.rsp0      dq STACK_TOP
+	.rsp0      dq 0x000000060000000 ; TODO: hard-coded yo
 	.rsp1      dq 0
 	.rsp2      dq 0
 	           dq 0 ; Reserved
@@ -191,9 +195,12 @@ tss64:
 	.iopb      dw 0 ; no IOPB
 
 extern set_up_page_tables
+extern map_null_segment
+extern map_multimupp
 extern map_kernel_code_segment
 extern map_kernel_data_segment
 extern map_kernel_stack
+extern map_userland
 extern map_frame_buffer
 extern enable_paging
 global init_long_mode
@@ -209,13 +216,17 @@ init_long_mode:
 
 	; ebx contains the 32-bit physical address of the Multiboot2 information
 	; structure provided by the boot loader.
-	mov esp, temp_stack_top
+	mov esp, TEMP_KERNEL_STACK
+	add esp, 0x200
 	push ebx
 
 	call set_up_page_tables
+	; call map_null_segment
+	call map_multimupp
 	call map_kernel_code_segment
 	call map_kernel_data_segment
 	call map_kernel_stack
+	call map_userland
 	call map_frame_buffer
 
 	call enable_paging
@@ -255,7 +266,7 @@ long_mode_start:
 	; Fetch that multiboot structure, before we use our new fresh stack.
 	pop rdi
 	; Set our kernel stack.
-	mov rsp, STACK_TOP
+	mov rsp, qword [KERNEL_STACK_TOP]
 	call main
 
 	; A hint that we have escaped the kernel.

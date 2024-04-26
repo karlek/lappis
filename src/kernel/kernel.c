@@ -95,6 +95,8 @@ void get_cpu_features() {
 /* extern void enter_userland(uint8_t* data, uint32_t size); */
 
 void main(multiboot_info_t* boot_info) {
+	init_heap();
+
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
 
@@ -167,8 +169,15 @@ void main(multiboot_info_t* boot_info) {
 		}
 
 		debug("found userland.elf: %d", file->size);
+
 		// Work in progress.
-		run_userland(file->data, file->size);
+		// TODO: userland stack is kinda temporary and kinda small.
+		debug("userland alloc: %p", USERLAND()+0x100);
+		uint8_t* userland_p = userland_alloc(USERLAND()+0x100, file->size);
+		memcpy(userland_p, file->data, file->size);
+
+		debug("run_userland");
+		run_userland(userland_p, file->size);
 		break;
 	}
 

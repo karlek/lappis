@@ -1,0 +1,6 @@
+remove hardcoded addresses
+- multiboot unmapped
+- protection mode stack
+- tss64
+- framebuffer
+- elf userland landing area

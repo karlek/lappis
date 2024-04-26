@@ -71,7 +71,8 @@ enter_userland:
 	; cpuid    | enable interrupts | Always 1
 	mov r11, 0x200202
 
-	mov rsp, 0x200000
+	; TODO: hard-coded or hardly coding, am i right? :sunglasses:
+	mov rsp, 0x000000030000000+0x100
 	o64 sysret
 
 	; mov rax, SYS_BECOME_KERNEL

@@ -14,13 +14,12 @@ kitty --class qemu-starter \
 	-no-shutdown \
 	-S \
 	-gdb tcp::1234 \
-	-d int \
-	-m size=128M \
+	-d int,cpu_reset \
+	-m size=2G \
 	-monitor stdio \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
-	-drive media=disk,index=1,file=bin/fat32.img,format=raw,if=ide \
 	-cdrom bin/kernel.iso &
 
 gdb \
