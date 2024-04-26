@@ -171,7 +171,7 @@ gdt64:
 	dw $ - gdt64 - 1
 	dq gdt64
 
-tss64_addr equ 0x1e43ce
+tss64_addr equ 0x1f5b2a
 
 tss64:
 	           dd 0 ; Reserved

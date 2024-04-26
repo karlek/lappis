@@ -5,8 +5,8 @@
 
 #include "serial.h"
 
-// 96MiB heap
-#define HEAP_START 0x200000
+// 59MiB heap
+#define HEAP_START 0x300000
 #define HEAP_END   0x3e00000
 
 // Kernel stack:       0x4000000 - 0x4800000
