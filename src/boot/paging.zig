@@ -34,6 +34,8 @@ pub const P2_FRAME_BUFFER_FIRST_INDEX = P2_USERLAND_FIRST_INDEX + NUM_USERLAND_P
 
 // Remember, skip the last guard page.
 pub const STACK_TOP = page_size * (P2_KERNEL_STACK_FIRST_INDEX + (NUM_KERNEL_STACK_PAGES - 1));
+export const KERNEL_DATA_ADDR: c_long = page_size * P2_KERNEL_DATA_FIRST_INDEX;
+export const KERNEL_DATA_END_ADDR: c_long = page_size * (P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA_PAGES);
 export const FRAME_BUFFER_ADDR: c_long = page_size * P2_FRAME_BUFFER_FIRST_INDEX;
 
 pub const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000

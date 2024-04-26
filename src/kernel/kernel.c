@@ -95,6 +95,8 @@ void get_cpu_features() {
 /* extern void enter_userland(uint8_t* data, uint32_t size); */
 
 void main(multiboot_info_t* boot_info) {
+	init_heap();
+
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
 
