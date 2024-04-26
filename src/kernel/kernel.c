@@ -170,7 +170,11 @@ void main(multiboot_info_t* boot_info) {
 
 		debug("found userland.elf: %d", file->size);
 		// Work in progress.
-		run_userland(file->data, file->size);
+		debug("alloc userland: %p", USERLAND_START());
+		uint8_t *userland_p = userland_alloc((uint64_t)(USERLAND_START()), file->size);
+		memcpy(userland_p, file->data, file->size);
+		debug("run userland");
+		run_userland(userland_p, file->size);
 		break;
 	}
 
