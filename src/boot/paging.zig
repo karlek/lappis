@@ -41,3 +41,66 @@ export const USERLAND_END_ADDR: c_long = page_size * (P2_USERLAND_FIRST_INDEX + 
 export const FRAME_BUFFER_ADDR: c_long = page_size * P2_FRAME_BUFFER_FIRST_INDEX;
 
 pub const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
+
+// tss64:
+// 	           dd 0 ; Reserved
+// 	.rsp0      dq STACK_TOP
+// 	.rsp1      dq 0
+// 	.rsp2      dq 0
+// 	           dq 0 ; Reserved
+// 	.ist1      dq 0
+// 	.ist2      dq 0
+// 	.ist3      dq 0
+// 	.ist4      dq 0
+// 	.ist5      dq 0
+// 	.ist6      dq 0
+// 	.ist7      dq 0
+// 	           dq 0 ; Reserved
+// 	           dw 0 ; Reserved
+// 	.iopb      dw 0 ; no IOPB
+
+const Tss64 = packed struct {
+    reserved1: u32,
+    rsp0: u64,
+    rsp1: u64,
+    rsp2: u64,
+    reserved2: u64,
+    ist1: u64,
+    ist2: u64,
+    ist3: u64,
+    ist4: u64,
+    ist5: u64,
+    ist6: u64,
+    ist7: u64,
+    reserved3: u64,
+    reserved4: u64,
+    iopb: u64,
+
+    /// Creates an unused page table entry.
+    pub fn init(stack: u64) Tss64 {
+        return .{
+            .reserved1 = 0,
+            .rsp0 = stack,
+            .rsp1 = 0,
+            .rsp2 = 0,
+            .reserved2 = 0,
+            .ist1 = 0,
+            .ist2 = 0,
+            .ist3 = 0,
+            .ist4 = 0,
+            .ist5 = 0,
+            .ist6 = 0,
+            .ist7 = 0,
+            .reserved3 = 0,
+            .reserved4 = 0,
+            .iopb = 0,
+        };
+    }
+};
+
+export var tss64_addr: u64 = 0;
+
+export fn init_tss_addr() void {
+    const tss64: Tss64 = Tss64.init(STACK_TOP);
+    tss64_addr = @intFromPtr(&tss64);
+}
