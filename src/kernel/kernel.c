@@ -96,6 +96,7 @@ void get_cpu_features() {
 
 void main(multiboot_info_t* boot_info) {
 	init_heap();
+	init_userland_heap();
 
 	init_serial(SERIAL_COM1_PORT);
 	init_serial(SERIAL_COM2_PORT);
@@ -170,8 +171,9 @@ void main(multiboot_info_t* boot_info) {
 
 		debug("found userland.elf: %d", file->size);
 		// Work in progress.
-		debug("alloc userland: %p", USERLAND_START());
-		uint8_t *userland_p = userland_alloc((uint64_t)(USERLAND_START()), file->size);
+		debug("alloc userland");
+		uint8_t *userland_p = userland_malloc(file->size);
+		debug("userland_p: %p", userland_p);
 		memcpy(userland_p, file->data, file->size);
 		debug("run userland");
 		run_userland(userland_p, file->size);

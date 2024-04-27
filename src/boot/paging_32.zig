@@ -67,12 +67,10 @@ export fn map_kernel_code_segment() void {
 
 export fn map_kernel_data_segment() void {
     var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `user accessible`, `page size` and
-    // `no execute`.
+    // Set flags `present`, `writeable`, `page size` and `no execute`.
     var page_table_flags = page_table_entry.getFlags();
     page_table_flags.present = true;
     page_table_flags.writeable = true;
-    page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
     // TODO: load userland to dedicated userland_code_segment and userland_data_segment pages (and not kernel_data_segment).
     //page_table_flags.no_execute = true; // NOTE: userland code and data loaded here for now.

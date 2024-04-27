@@ -201,13 +201,13 @@ void run_userland(uint8_t* userland_obj, size_t userland_obj_size) {
 
 		debug("file size: 0x%llx", program_segment_header->p_filesz);
 		debug("pseg_cur: %d", pseg_cur);
-		uint8_t *code = malloc(program_segment_header->p_filesz);
-		read(userland_obj, program_segment_header->p_filesz, &pseg_cur, code);
+		uint8_t *userland_code = userland_malloc(program_segment_header->p_filesz);
+		read(userland_obj, program_segment_header->p_filesz, &pseg_cur, userland_code);
 		debug("pseg_cur: %d", pseg_cur);
-		// debug_buffer(code, program_segment_header->p_filesz);
+		// debug_buffer(userland_code, program_segment_header->p_filesz);
 
-		code += header->e_entry - program_segment_header->p_paddr;
-		enter_userland(code);
+		userland_code += header->e_entry - program_segment_header->p_paddr;
+		enter_userland(userland_code);
 		return;
 	}
 }
