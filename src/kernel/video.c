@@ -1,7 +1,7 @@
 #include "video.h"
 
 uint8_t * FRAME_BUFFER() {
-	return (uint8_t *)FRAME_BUFFER_ADDR;
+	return (uint8_t *)((uint64_t)FRAME_BUFFER_ADDR);
 }
 
 void set_pixel(uint32_t x, uint32_t y, const uint8_t color[4]) {
