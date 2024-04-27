@@ -1,5 +1,8 @@
 section .rodata
 
+extern tss64_addr
+extern init_tss_addr
+
 ; Base          | Flags | Limit | Access        | Base
 ; 31         24 | 3   0 | 19 16 | 7           0 | 23         16
 ; Base                          | Limit
@@ -146,10 +149,10 @@ gdt64:
 .tss: equ $ - gdt64
 	; Limit
 	dw 0x67 ; Sizeof tss64
-	; Base
-	dw (tss64_addr) & 0xffff
-	; Base (mid)
-	db ((tss64_addr) >> 16) & 0xff
+	; Base, set dynamically
+	dw 0
+	; Base (mid), set dynamically
+	db 0
 	; Access
 	; Present | TSS (0x9)
 	;
@@ -161,34 +164,15 @@ gdt64:
 	db 10001001b
 	; Flags & limit
 	db 00000000b
-	; Base high
-	db ((tss64_addr) >> 24) & 0xff
-	; Base highest
-	dd ((tss64_addr) >> 32)
+	; Base high, set dynamically
+	db 0
+	; Base highest, set dynamically
+	dd 0
 	; Reserved
 	dd 0
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
-
-tss64_addr equ 0x1f5b3e
-
-tss64:
-	           dd 0 ; Reserved
-	.rsp0      dq STACK_TOP
-	.rsp1      dq 0
-	.rsp2      dq 0
-	           dq 0 ; Reserved
-	.ist1      dq 0
-	.ist2      dq 0
-	.ist3      dq 0
-	.ist4      dq 0
-	.ist5      dq 0
-	.ist6      dq 0
-	.ist7      dq 0
-	           dq 0 ; Reserved
-	           dw 0 ; Reserved
-	.iopb      dw 0 ; no IOPB
 
 extern set_up_page_tables
 extern map_kernel_code_segment
@@ -224,6 +208,21 @@ init_long_mode:
 	lgdt [gdt64.pointer]
 
 	; Load the TSS
+	; TODO: unable to handle 64-bit address of tss63.
+	call init_tss_addr
+
+	mov eax, dword [tss64_addr]
+	mov word [gdt64 + gdt64.tss + 2], ax
+
+	shr eax, 16
+	mov byte [gdt64 + gdt64.tss + 4], al
+
+	shr eax, 8
+	mov byte [gdt64 + gdt64.tss + 7], al
+
+	shr eax, 8
+	mov byte [gdt64 + gdt64.tss + 8], al
+
 	mov ax, gdt64.tss
 	ltr ax
 
