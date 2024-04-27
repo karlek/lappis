@@ -11,7 +11,7 @@ void* userland_heap_end     = NULL;
 void* userland_heap_current = NULL;
 
 uint8_t * KERNEL_DATA() {
-	return (uint8_t *)KERNEL_DATA_ADDR;
+	return (uint8_t *)((uint64_t)KERNEL_DATA_ADDR);
 }
 
 void * HEAP_START() {
@@ -21,11 +21,11 @@ void * HEAP_START() {
 }
 
 void * HEAP_END() {
-	return (void *)KERNEL_DATA_END_ADDR;
+	return (void *)((uint64_t)KERNEL_DATA_END_ADDR);
 }
 
 uint8_t * USERLAND() {
-	return (uint8_t *)USERLAND_ADDR;
+	return (uint8_t *)((uint64_t)USERLAND_ADDR);
 }
 
 void * USERLAND_HEAP_START() {
@@ -35,7 +35,7 @@ void * USERLAND_HEAP_START() {
 }
 
 void * USERLAND_HEAP_END() {
-	return (void *)USERLAND_END_ADDR;
+	return (void *)((uint64_t)USERLAND_END_ADDR);
 }
 
 void init_heap() {
