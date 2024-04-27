@@ -41,12 +41,11 @@ export fn set_up_page_tables() void {
 
 export fn map_kernel_code_segment() void {
     var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `user accessible` and `page size`.
-    // Note, `no execute` is not set.
+    // Set flags `present`, `writeable`, and `page size`. Note, `no execute` is
+    // not set.
     var page_table_flags = page_table_entry.getFlags();
     page_table_flags.present = true;
     page_table_flags.writeable = true; // TODO: unset writeable and set no_execute for kernel code segment?
-    page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
     // Make only the range 0x000000-0x200000 (2MiB) executable.
     //page_table_flags.no_execute = true;
