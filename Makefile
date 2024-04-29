@@ -160,12 +160,6 @@ bin/zipfs.zip: fs/userland.elf | bin
 bin/zipfs.img: bin/zipfs.zip | bin
 	dd if=bin/zipfs.zip of=$@ bs=1M conv=sync
 
-bin/fat32.img: | bin
-	@dd if=/dev/zero of=$@ count=50 bs=1M conv=sync
-	@mkfs.vfat -F 32 $@
-	@mcopy -i $@ -s fs/* ::
-	@mdir -i $@ -s
-
 bin:
 	@mkdir -p $@
 
@@ -185,10 +179,10 @@ bin/libfloof.a: src/kernel/rust/src/lib.rs
 
 build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
 
-debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img bin/fat32.img
+debug: bin/kernel.iso bin/kernel.dbg bin/zipfs.img
 	./debug.sh
 
-run: bin/kernel.iso bin/zipfs.img bin/fat32.img
+run: bin/kernel.iso bin/zipfs.img
 	./run.sh
 
 bin/kernel.iso: bin/kernel.elf grub.cfg | bin

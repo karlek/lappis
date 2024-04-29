@@ -17,7 +17,6 @@ qemu-system-x86_64 \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
-	-drive media=disk,index=1,file=bin/fat32.img,format=raw,if=ide \
 	-monitor stdio \
 	-cdrom bin/kernel.iso
 
