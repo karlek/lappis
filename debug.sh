@@ -22,7 +22,7 @@ kitty --class qemu-starter \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
 	-cdrom bin/kernel.iso &
 
-gdb \
+kitty --class lappis-serial-raw -e gdb \
 	--quiet \
 	-command=debug.gdb
 
