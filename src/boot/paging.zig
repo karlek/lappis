@@ -1,44 +1,88 @@
 const zasm = @import("zasm.zig");
 
-// kernel code          0000000000000000 - 0000000000200000 --PDA--UW
-// kernel data          0000000000200000 - 0000000004000000 --PDA--UW
-// kernel stack (guard) 0000000004000000 - 0000000004200000 X-P------
-// kernel stack         0000000004200000 - 0000000004400000 X-PDA---W
-// kernel stack (guard) 0000000004600000 - 0000000004800000 X-P------
-// frame buffer         00000000fd000000 - 00000000fd600000 X-PDA---W
-
-// -----------------------------------------------------------------------------
-// kernel code:          0000000000000000 - 0000000000200000 (1 page, 2 MB)
-// kernel data:          0000000000200000 - 0000000004000000 (31 pages, 62 MB)
-// kernel stack (guard): 0000000004000000 - 0000000004200000 (1 page, 2 MB)
-// kernel stack:         0000000004200000 - 0000000004600000 (2 pages, 4 MB)
-// kernel stack (guard): 0000000004600000 - 0000000004800000 (1 page, 2 MB)
+// bootstrap            0000000000000000 - 0000000000200000 --PDA---W // (1 page)
+// bootstrap (guard)    0000000000200000 - 0000000000400000 X-P------ // (1 page)
 //
-// frame buffer:         00000000FD000000 - 00000000FD600000 (3 pages, 6 MB)
-// -----------------------------------------------------------------------------
+// kernel code (guard)  000000000fe00000 - 0000000010000000 --PDA---- // (1 page)
+// kernel code          0000000010000000 - 0000000010200000 --PDA---W // (1 page) TODO: RWX..
+// kernel code (guard)  0000000010200000 - 0000000010400000 --PDA---- // (1 page)
+//
+// kernel data (guard)  000000002fe00000 - 0000000030000000 X-PDA---- // (1 page)
+// kernel data          0000000030000000 - 0000000033e00000 X-PDA---W // (31 pages)
+// kernel data (guard)  0000000033e00000 - 0000000034000000 X-PDA---- // (1 page)
+//
+// kernel stack (guard) 000000004fe00000 - 0000000050000000 X-P------ // (1 page)
+// kernel stack         0000000050000000 - 0000000050800000 X-PDA---W // (4 pages)
+// kernel stack (guard) 0000000050800000 - 0000000050a00000 X-P------ // (1 page)
+//
+// userland (guard)     000000009fe00000 - 00000000a0000000 X-P------ // (1 page)
+// userland             00000000a0000000 - 00000000b0000000 --P----UW // (128 pages)
+// userland (guard)     00000000b0000000 - 00000000b0200000 X-P------ // (1 page)
+//
+// frame buffer (guard) 00000000fd000000 - 00000000fd600000 X-PDA---- // (1 page)
+// frame buffer         00000000fd000000 - 00000000fd600000 X-PDA---W // (3 pages)
+// frame buffer (guard) 00000000fd000000 - 00000000fd600000 X-PDA---- // (1 page)
+//
+// ---------------------------------------------------------------------------------
+//
+// gef> pt -p
+//           Address :         Length :         Phys | Permissions
+//               0x0 :       0x200000 :          0x0 | W:1 X:1 S:1 UC:0 WB:1
+//          0x200000 :       0x200000 :     0x200000 | W:0 X:0 S:1 UC:0 WB:1
+//         0xfe00000 :       0x200000 :    0xfe00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x10000000 :       0x200000 :   0x10000000 | W:1 X:1 S:1 UC:0 WB:1
+//        0x10200000 :       0x200000 :   0x10200000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x2fe00000 :       0x200000 :   0x2fe00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x30000000 :      0x3e00000 :   0x30000000 | W:1 X:0 S:1 UC:0 WB:1
+//        0x33e00000 :       0x200000 :   0x33e00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x4fe00000 :       0x200000 :   0x4fe00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x50000000 :       0x800000 :   0x50000000 | W:1 X:0 S:1 UC:0 WB:1
+//        0x50800000 :       0x200000 :   0x50800000 | W:0 X:0 S:1 UC:0 WB:1
+//        0x9fe00000 :       0x200000 :   0x9fe00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0xa0000000 :     0x10000000 :   0xa0000000 | W:1 X:1 S:0 UC:0 WB:1
+//        0xb0000000 :       0x200000 :   0xb0000000 | W:0 X:0 S:1 UC:0 WB:1
+//        0xfce00000 :       0x200000 :   0xfce00000 | W:0 X:0 S:1 UC:0 WB:1
+//        0xfd000000 :       0x600000 :   0xfd000000 | W:1 X:0 S:1 UC:0 WB:1
+//        0xfd600000 :       0x200000 :   0xfd600000 | W:0 X:0 S:1 UC:0 WB:1
 
-// NUM_KERNEL_CODE_PAGES + NUM_KERNEL_DATA_PAGES = 32 (NUM_PAGES)
+pub const NUM_BOOTSTRAP_PAGES = 1;
 pub const NUM_KERNEL_CODE_PAGES = 1;
 pub const NUM_KERNEL_DATA_PAGES = 31;
-// 1 guard page, NUM_KERNEL_STACK_PAGES-2 stack pages, 1 guard page
 pub const NUM_KERNEL_STACK_PAGES = 4;
 pub const NUM_USERLAND_PAGES = 128; // should be enough for everyone
-// 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
-pub const NUM_FRAME_BUFFER_PAGES = 3;
-
-pub const P2_KERNEL_CODE_FIRST_INDEX = 0; // [0, 1)
-pub const P2_KERNEL_DATA_FIRST_INDEX = P2_KERNEL_CODE_FIRST_INDEX + NUM_KERNEL_CODE_PAGES; // [1, 32)
-pub const P2_KERNEL_STACK_FIRST_INDEX = P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA_PAGES; // [32, 36)
-pub const P2_USERLAND_FIRST_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STACK_PAGES; // [32, 36)
-pub const P2_FRAME_BUFFER_FIRST_INDEX = P2_USERLAND_FIRST_INDEX + NUM_USERLAND_PAGES; // [36, 39)
+pub const NUM_FRAME_BUFFER_PAGES = 3; // 4 bytes per pixel, 1280x1024 pixels = 5 MiB => three (3) pages of 2MiB.
 
 // Remember, skip the last guard page.
-pub const STACK_TOP = page_size * (P2_KERNEL_STACK_FIRST_INDEX + (NUM_KERNEL_STACK_PAGES - 1));
+export const STACK_TOP = page_size * (P2_KERNEL_STACK_FIRST_INDEX + (NUM_KERNEL_STACK_PAGES - 1));
+
 export const KERNEL_DATA_ADDR: c_long = page_size * P2_KERNEL_DATA_FIRST_INDEX;
 export const KERNEL_DATA_END_ADDR: c_long = page_size * (P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA_PAGES);
-export const USERLAND_ADDR: c_long = page_size * P2_USERLAND_FIRST_INDEX;
-export const USERLAND_END_ADDR: c_long = page_size * (P2_USERLAND_FIRST_INDEX + NUM_USERLAND_PAGES);
-export const FRAME_BUFFER_ADDR: c_long = page_size * P2_FRAME_BUFFER_FIRST_INDEX;
+export const USERLAND_ADDR: u64 = page_size * P2_USERLAND_FIRST_INDEX;
+export const USERLAND_END_ADDR: u64 = page_size * (P2_USERLAND_FIRST_INDEX + NUM_USERLAND_PAGES);
+export const FRAME_BUFFER_ADDR: u64 = page_size * P2_FRAME_BUFFER_FIRST_INDEX;
+
+pub const P2_BOOTSTRAP_FIRST_INDEX = 0;
+pub const P2_BOOTSTRAP_END_GUARD_INDEX = P2_BOOTSTRAP_FIRST_INDEX + NUM_BOOTSTRAP_PAGES;
+
+pub const P2_KERNEL_CODE_START_GUARD_INDEX = P2_KERNEL_CODE_FIRST_INDEX - 1;
+pub const P2_KERNEL_CODE_FIRST_INDEX = 128; // 0x10000000 / 0x200000 (page_size) = 128
+pub const P2_KERNEL_CODE_END_GUARD_INDEX = P2_KERNEL_CODE_FIRST_INDEX + NUM_KERNEL_CODE_PAGES;
+
+pub const P2_KERNEL_DATA_START_GUARD_INDEX = P2_KERNEL_DATA_FIRST_INDEX - 1;
+pub const P2_KERNEL_DATA_FIRST_INDEX = 384; // 0x30000000 / 0x200000 (page_size) = 384
+pub const P2_KERNEL_DATA_END_GUARD_INDEX = P2_KERNEL_DATA_FIRST_INDEX + NUM_KERNEL_DATA_PAGES;
+
+pub const P2_KERNEL_STACK_START_GUARD_INDEX = P2_KERNEL_STACK_FIRST_INDEX - 1;
+pub const P2_KERNEL_STACK_FIRST_INDEX = 640; // 0x50000000 / 0x200000 (page_size) = 640
+pub const P2_KERNEL_STACK_END_GUARD_INDEX = P2_KERNEL_STACK_FIRST_INDEX + NUM_KERNEL_STACK_PAGES;
+
+pub const P2_USERLAND_START_GUARD_INDEX = P2_USERLAND_FIRST_INDEX - 1;
+pub const P2_USERLAND_FIRST_INDEX = 1280; // 0xa0000000 / 0x200000 (page_size) = 1280
+pub const P2_USERLAND_END_GUARD_INDEX = P2_USERLAND_FIRST_INDEX + NUM_USERLAND_PAGES;
+
+pub const P2_FRAME_BUFFER_START_GUARD_INDEX = P2_FRAME_BUFFER_FIRST_INDEX - 1;
+pub const P2_FRAME_BUFFER_FIRST_INDEX = 2024; // 0xfd000000 / 0x200000 (page_size) = 1280
+pub const P2_FRAME_BUFFER_END_GUARD_INDEX = P2_FRAME_BUFFER_FIRST_INDEX + NUM_FRAME_BUFFER_PAGES;
 
 pub const page_size = zasm.PageSize.Size2MiB.bytes(); // 2 * 1024 * 1024 = 0x200000
 

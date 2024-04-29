@@ -2,6 +2,7 @@ section .rodata
 
 extern tss64_addr
 extern init_tss_addr
+extern STACK_TOP
 
 ; Base          | Flags | Limit | Access        | Base
 ; 31         24 | 3   0 | 19 16 | 7           0 | 23         16
@@ -175,6 +176,7 @@ gdt64:
 	dq gdt64
 
 extern set_up_page_tables
+extern map_bootstrap
 extern map_kernel_code_segment
 extern map_kernel_data_segment
 extern map_kernel_stack
@@ -198,6 +200,7 @@ init_long_mode:
 	push ebx
 
 	call set_up_page_tables
+	call map_bootstrap
 	call map_kernel_code_segment
 	call map_kernel_data_segment
 	call map_kernel_stack

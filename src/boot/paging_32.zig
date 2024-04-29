@@ -2,10 +2,10 @@ const std = @import("std");
 const zasm = @import("zasm.zig");
 const paging = @import("paging.zig");
 
+const P2_MAX_ENTRIES = 512;
 export var p4_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
 export var p3_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
-// TODO: create four p2 tables to reach 4 GB.
-export var p2_table: [512]u64 align(4096) = std.mem.zeroes([512]u64); // [4096]u8
+export var p2_tables: [4][P2_MAX_ENTRIES]u64 align(4096) = std.mem.zeroes([4][P2_MAX_ENTRIES]u64); // [4][4096]u8
 
 export fn set_up_page_tables() void {
     // Map the first P4 entry to P3 table.
@@ -31,151 +31,172 @@ export fn set_up_page_tables() void {
     p3_page_table_flags.writeable = true;
     p3_page_table_flags.user_accessible = true;
     p3_page_table_entry.setFlags(p3_page_table_flags);
-    // Set address of page table entry.
-    const raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_table[0])));
-    const p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
-    p3_page_table_entry.setAddr(p2_addr);
-    // Set page table entry.
-    p3_table[0] = p3_page_table_entry.entry;
+
+    var i: usize = 0;
+    while (i < 4) : (i += 1) {
+        p2_tables[i] = std.mem.zeroes([P2_MAX_ENTRIES]u64);
+        // Set address of page table entry.
+        var raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_tables[i])));
+        var p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
+        p3_page_table_entry.setAddr(p2_addr);
+        // Set page table entry.
+        p3_table[i] = p3_page_table_entry.entry;
+    }
+}
+
+export fn map_bootstrap() void {
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
+    // NOTE: `no execute` is _not_ set.
+    page_table_flags.present = true;
+    page_table_flags.writeable = true;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+
+    const p2_index_offset = paging.P2_BOOTSTRAP_FIRST_INDEX; // page index offset into P2 table of userland pages.
+    const kernel_code_base_addr = p2_index_offset * paging.page_size;
+    map(kernel_code_base_addr, paging.P2_BOOTSTRAP_FIRST_INDEX, paging.NUM_KERNEL_CODE_PAGES, page_table_flags);
+
+    // Guard page.
+    const guard_index = paging.P2_BOOTSTRAP_END_GUARD_INDEX;
+    map_guard(guard_index);
 }
 
 export fn map_kernel_code_segment() void {
-    var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, and `page size`. Note, `no execute` is
-    // not set.
-    var page_table_flags = page_table_entry.getFlags();
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
+    // NOTE: `no execute` is _not_ set.
     page_table_flags.present = true;
     page_table_flags.writeable = true; // TODO: unset writeable and set no_execute for kernel code segment?
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
-    // Make only the range 0x000000-0x200000 (2MiB) executable.
-    //page_table_flags.no_execute = true;
-    page_table_entry.setFlags(page_table_flags);
-    // Map pages of kernel code segment in P2 table.
-    const p2_index_offset = paging.P2_KERNEL_CODE_FIRST_INDEX; // page index offset into P2 table of kernel code segment pages.
-    const kernel_code_seg_base_addr = p2_index_offset * paging.page_size;
-    var page_num: usize = 0;
-    while (page_num < paging.NUM_KERNEL_CODE_PAGES) : (page_num += 1) {
-        // Set address of page table entry.
-        const kernel_code_seg_page_offset = page_num * paging.page_size; // offset from start of kernel code segment.
-        const addr = zasm.PhysAddr.initUnchecked(kernel_code_seg_base_addr + kernel_code_seg_page_offset);
-        page_table_entry.setAddr(addr);
-        // Set page table entry.
-        const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
-    }
+
+    // Guard page.
+    var guard_index: usize = paging.P2_KERNEL_CODE_START_GUARD_INDEX;
+    map_guard(guard_index);
+
+    const p2_index_offset = paging.P2_KERNEL_CODE_FIRST_INDEX; // page index offset into P2 table of userland pages.
+    const kernel_code_base_addr = p2_index_offset * paging.page_size;
+    map(kernel_code_base_addr, paging.P2_KERNEL_CODE_FIRST_INDEX, paging.NUM_KERNEL_CODE_PAGES, page_table_flags);
+
+    // Guard page.
+    guard_index = paging.P2_KERNEL_CODE_END_GUARD_INDEX;
+    map_guard(guard_index);
 }
 
 export fn map_kernel_data_segment() void {
-    var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `page size` and `no execute`.
-    var page_table_flags = page_table_entry.getFlags();
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
     page_table_flags.present = true;
     page_table_flags.writeable = true;
+    page_table_flags.no_execute = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
-    // TODO: load userland to dedicated userland_code_segment and userland_data_segment pages (and not kernel_data_segment).
-    //page_table_flags.no_execute = true; // NOTE: userland code and data loaded here for now.
-    page_table_entry.setFlags(page_table_flags);
-    // Map pages of kernel data segment in P2 table.
-    const p2_index_offset = paging.P2_KERNEL_DATA_FIRST_INDEX; // page index offset into P2 table of kernel data segment pages.
-    const kernel_data_seg_base_addr = p2_index_offset * paging.page_size;
-    var page_num: usize = 0;
-    while (page_num < paging.NUM_KERNEL_DATA_PAGES) : (page_num += 1) {
-        // Set address of page table entry.
-        const kernel_data_seg_page_offset = page_num * paging.page_size; // offset from start of kernel data segment.
-        const addr = zasm.PhysAddr.initUnchecked(kernel_data_seg_base_addr + kernel_data_seg_page_offset);
-        page_table_entry.setAddr(addr);
-        // Set page table entry.
-        const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
-    }
+
+    // Guard page.
+    var guard_index: usize = paging.P2_KERNEL_DATA_START_GUARD_INDEX;
+    map_guard(guard_index);
+
+    const p2_index_offset = paging.P2_KERNEL_DATA_FIRST_INDEX; // page index offset into P2 table of userland pages.
+    const kernel_data_base_addr = p2_index_offset * paging.page_size;
+    map(kernel_data_base_addr, paging.P2_KERNEL_DATA_FIRST_INDEX, paging.NUM_KERNEL_DATA_PAGES, page_table_flags);
+
+    // Guard page.
+    guard_index = paging.P2_KERNEL_DATA_END_GUARD_INDEX;
+    map_guard(guard_index);
 }
 
 export fn map_kernel_stack() void {
-    var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `page size` and `no execute`. Note,
-    // `writeable` is only set for non-guard pages.
-    var page_table_flags = page_table_entry.getFlags();
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
     page_table_flags.present = true;
-    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    page_table_flags.writeable = true;
     page_table_flags.no_execute = true;
-    // Map pages of kernel stack in P2 table.
-    const p2_index_offset = paging.P2_KERNEL_STACK_FIRST_INDEX; // page index offset into P2 table of kernel stack pages.
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+
+    // Guard page.
+    var guard_index: usize = paging.P2_KERNEL_STACK_START_GUARD_INDEX;
+    map_guard(guard_index);
+
+    const p2_index_offset = paging.P2_KERNEL_STACK_FIRST_INDEX; // page index offset into P2 table of userland pages.
     const kernel_stack_base_addr = p2_index_offset * paging.page_size;
-    var page_num: usize = 0;
-    while (page_num < paging.NUM_KERNEL_STACK_PAGES) : (page_num += 1) {
-        // Make first and last pages `guard` pages by removing `writeable`.
-        if (page_num == 0 or page_num == paging.NUM_KERNEL_STACK_PAGES - 1) {
-            page_table_flags.writeable = false;
-        } else {
-            page_table_flags.writeable = true;
-        }
-        page_table_entry.setFlags(page_table_flags);
-        // Set address of page table entry.
-        const kernel_stack_page_offset = page_num * paging.page_size; // offset from start of kernel stack.
-        const addr = zasm.PhysAddr.initUnchecked(kernel_stack_base_addr + kernel_stack_page_offset);
-        page_table_entry.setAddr(addr);
-        // Set page table entry.
-        const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
-    }
+    map(kernel_stack_base_addr, paging.P2_KERNEL_STACK_FIRST_INDEX, paging.NUM_KERNEL_STACK_PAGES, page_table_flags);
+
+    // Guard page.
+    guard_index = paging.P2_KERNEL_STACK_END_GUARD_INDEX;
+    map_guard(guard_index);
 }
 
 export fn map_userland() void {
-    var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `user accessible` and `page size`.
-    // Note, `writeable` is only set for non-guard pages.
-    var page_table_flags = page_table_entry.getFlags();
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
     page_table_flags.present = true;
+    page_table_flags.writeable = true;
     page_table_flags.user_accessible = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
-    // Map pages of userland in P2 table.
+
+    // Guard page.
+    var guard_index: usize = paging.P2_USERLAND_START_GUARD_INDEX;
+    map_guard(guard_index);
+
     const p2_index_offset = paging.P2_USERLAND_FIRST_INDEX; // page index offset into P2 table of userland pages.
     const userland_base_addr = p2_index_offset * paging.page_size;
-    var page_num: usize = 0;
-    while (page_num < paging.NUM_USERLAND_PAGES) : (page_num += 1) {
-        // Make first and last pages `guard` pages by removing `writeable`.
-        if (page_num == 0 or page_num == paging.NUM_USERLAND_PAGES - 1) {
-            page_table_flags.writeable = false;
-        } else {
-            page_table_flags.writeable = true;
-        }
-        page_table_entry.setFlags(page_table_flags);
-        // Set address of page table entry.
-        const userland_page_offset = page_num * paging.page_size; // offset from start of userland.
-        const addr = zasm.PhysAddr.initUnchecked(userland_base_addr + userland_page_offset);
-        page_table_entry.setAddr(addr);
-        // Set page table entry.
-        const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
-    }
+    map(userland_base_addr, paging.P2_USERLAND_FIRST_INDEX, paging.NUM_USERLAND_PAGES, page_table_flags);
+
+    // Guard page.
+    guard_index = paging.P2_USERLAND_END_GUARD_INDEX;
+    map_guard(guard_index);
 }
 
 export fn map_frame_buffer() void {
-    var page_table_entry = zasm.PageTableEntry.init();
-    // Set flags `present`, `writeable`, `page size` and `no execute`.
-    var page_table_flags = page_table_entry.getFlags();
+    // TODO: hard-coded
+    const frame_buffer_base_addr = 0xFD000000;
+
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
     page_table_flags.present = true;
     page_table_flags.writeable = true;
     page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
     page_table_flags.no_execute = true;
-    page_table_entry.setFlags(page_table_flags);
-    // Map pages of frame buffer in P2 table.
-    const p2_index_offset = paging.P2_FRAME_BUFFER_FIRST_INDEX; // page index offset into P2 table of frame buffer pages.
-    // TODO: parse frame buffer pointer from Multiboot2 information
-    // structure provided by the boot loader.
 
-    // Start mapping the frame buffer at address 0xFD000000.
-    const frame_buffer_base_addr = 0xFD000000;
+    // Guard page.
+    var guard_index: usize = paging.P2_FRAME_BUFFER_START_GUARD_INDEX;
+    map_guard(guard_index);
+
+    map(frame_buffer_base_addr, paging.P2_FRAME_BUFFER_FIRST_INDEX, paging.NUM_FRAME_BUFFER_PAGES, page_table_flags);
+
+    // Guard page.
+    guard_index = paging.P2_FRAME_BUFFER_END_GUARD_INDEX;
+    map_guard(guard_index);
+}
+
+fn map(base_addr: u64, initial_offset: usize, num_pages: u64, page_table_flags: zasm.PageTableFlags) void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    page_table_entry.setFlags(page_table_flags);
+
+    const table_num = @divFloor(initial_offset, P2_MAX_ENTRIES);
+    const p2_index_offset = initial_offset; // page index offset into P2 table of frame buffer pages.
+
     var page_num: usize = 0;
-    while (page_num < paging.NUM_FRAME_BUFFER_PAGES) : (page_num += 1) {
+    while (page_num < num_pages) : (page_num += 1) {
         // Set address of page table entry.
-        const frame_buffer_page_offset = page_num * paging.page_size; // offset from start of frame buffer.
-        const addr = zasm.PhysAddr.initUnchecked(frame_buffer_base_addr + frame_buffer_page_offset);
+        const page_offset = page_num * paging.page_size; // offset from start of frame buffer.
+        const addr = zasm.PhysAddr.initUnchecked(base_addr + page_offset);
         page_table_entry.setAddr(addr);
         // Set page table entry.
-        const p2_index = page_num + p2_index_offset;
-        p2_table[p2_index] = page_table_entry.entry;
+        const p2_index = (page_num + p2_index_offset) % P2_MAX_ENTRIES;
+        p2_tables[table_num][p2_index] = page_table_entry.entry;
     }
+}
+
+fn map_guard(offset: usize) void {
+    var page_table_entry = zasm.PageTableEntry.init();
+    var page_table_flags = zasm.PageTableFlags.fromU64(0);
+    page_table_flags.present = true;
+    page_table_flags.writeable = false;
+    page_table_flags.no_execute = true;
+    page_table_flags.user_accessible = false;
+    page_table_flags.huge = true; // entry maps to a 2 MB frame (rather than a page table).
+    page_table_entry.setFlags(page_table_flags);
+
+    const base_addr = offset * paging.page_size;
+    const addr = zasm.PhysAddr.initUnchecked(base_addr);
+    page_table_entry.setAddr(addr);
+    // Set page table entry.
+    const p2_index = offset;
+    const table_num = @divFloor(offset, P2_MAX_ENTRIES);
+    p2_tables[table_num][p2_index % P2_MAX_ENTRIES] = page_table_entry.entry;
 }
 
 export fn enable_paging() void {
