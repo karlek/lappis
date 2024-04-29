@@ -13,7 +13,7 @@ qemu-system-x86_64 \
 	-no-reboot \
 	-no-shutdown \
 	-d int \
-	-m size=128M \
+	-m size=4G \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \

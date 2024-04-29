@@ -15,7 +15,7 @@ kitty --class qemu-starter \
 	-S \
 	-gdb tcp::1234 \
 	-d int \
-	-m size=128M \
+	-m size=4G \
 	-monitor stdio \
 	-serial file:/tmp/serial.log \
 	-serial file:/tmp/serial.raw \
