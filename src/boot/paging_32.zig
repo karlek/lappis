@@ -36,8 +36,8 @@ export fn set_up_page_tables() void {
     while (i < 4) : (i += 1) {
         p2_tables[i] = std.mem.zeroes([P2_MAX_ENTRIES]u64);
         // Set address of page table entry.
-        var raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_tables[i])));
-        var p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
+        const raw_p2_addr = @as(u64, @intCast(@intFromPtr(&p2_tables[i])));
+        const p2_addr = zasm.PhysAddr.initUnchecked(raw_p2_addr);
         p3_page_table_entry.setAddr(p2_addr);
         // Set page table entry.
         p3_table[i] = p3_page_table_entry.entry;
