@@ -53,7 +53,7 @@ export fn map_bootstrap() void {
 
     const p2_index_offset = paging.P2_BOOTSTRAP_FIRST_INDEX; // page index offset into P2 table of userland pages.
     const kernel_code_base_addr = p2_index_offset * paging.page_size;
-    map(kernel_code_base_addr, paging.P2_BOOTSTRAP_FIRST_INDEX, paging.NUM_KERNEL_CODE_PAGES, page_table_flags);
+    map(kernel_code_base_addr, paging.P2_BOOTSTRAP_FIRST_INDEX, paging.NUM_BOOTSTRAP_PAGES, page_table_flags);
 
     // Guard page.
     const guard_index = paging.P2_BOOTSTRAP_END_GUARD_INDEX;
