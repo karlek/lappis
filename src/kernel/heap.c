@@ -52,7 +52,7 @@ void init_userland_heap() {
 
 void* malloc(uint64_t size) {
 	if (heap_current + size >= heap_end) {
-		error("Out of heap memory");
+		error("Out of heap memory, cur: %p, size: %d, heap_end: %p", heap_current, size, heap_end);
 		return NULL;
 	}
 
