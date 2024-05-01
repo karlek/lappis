@@ -45,7 +45,7 @@ const zasm = @import("zasm.zig");
 //        0xfd000000 :       0x600000 :   0xfd000000 | W:1 X:0 S:1 UC:0 WB:1
 //        0xfd600000 :       0x200000 :   0xfd600000 | W:0 X:0 S:1 UC:0 WB:1
 
-pub const NUM_BOOTSTRAP_PAGES = 1;
+pub const NUM_BOOTSTRAP_PAGES = 2;
 pub const NUM_KERNEL_CODE_PAGES = 1;
 pub const NUM_KERNEL_DATA_PAGES = 31;
 pub const NUM_KERNEL_STACK_PAGES = 4;
