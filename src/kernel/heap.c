@@ -67,11 +67,24 @@ void* malloc(uint64_t size) {
 	return ptr;
 }
 
+static inline void cpu_flags_set_ac(void) {
+	// Set AC bit in RFLAGS register.
+	__asm__ volatile ("stac" ::: "cc");
+}
+
+static inline void cpu_flags_clear_ac(void) {
+	// Clear AC bit in RFLAGS register.
+	__asm__ volatile ("clac" ::: "cc");
+}
+
 void* userland_malloc(uint64_t size) {
 	if (userland_heap_current + size >= userland_heap_end) {
 		error("Out of userland heap memory");
 		return NULL;
 	}
+
+	// Disable SMAP protections.
+	cpu_flags_set_ac();
 
 	void* ptr = userland_heap_current;
 	// Zero out the memory.
@@ -81,5 +94,21 @@ void* userland_malloc(uint64_t size) {
 
 	userland_heap_current += size;
 
+	// Restore SMAP protections.
+	cpu_flags_clear_ac();
+
 	return ptr;
+}
+
+void* userland_memcpy(void *destination, const void *source, size_t size) {
+	// Disable SMAP protections.
+	cpu_flags_set_ac();
+
+	// Perform normal memcpy.
+	void *ret = memcpy(destination, source, size);
+
+	// Restore SMAP protections.
+	cpu_flags_clear_ac();
+
+	return ret;
 }

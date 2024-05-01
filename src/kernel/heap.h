@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "serial.h"
+#include "memcpy.h"
 
 extern uint32_t KERNEL_DATA_ADDR;
 extern uint32_t KERNEL_DATA_END_ADDR;
@@ -16,5 +17,6 @@ void init_userland_heap();
 
 void* malloc(uint64_t size);
 void* userland_malloc(uint64_t size);
+void* userland_memcpy(void *destination, const void *source, size_t size);
 
 #endif

@@ -92,7 +92,35 @@ void get_cpu_features() {
 	debug("CPU features: %x", edx);
 }
 
-/* extern void enter_userland(uint8_t* data, uint32_t size); */
+/**
+ * Enable SMEP
+ *
+ * Prevents the execution of instructions that reside in pages accessible by
+ * user-mode software when the processor is in supervisor-mode.
+ */
+void enable_smep() {
+	debug("enable_smep: enabling smep");
+	uint64_t cr4;
+	asm volatile("mov %%cr4, %0" : "=r"(cr4));
+	cr4 |= 0x100000; // Bit 20
+	asm volatile("mov %0, %%cr4" ::"r"(cr4));
+	debug("enable_smep: smep enabled");
+}
+
+/**
+ * Enable SMAP
+ *
+ * Enables restrictions for supervisor-mode software when reading data from
+ * user-mode pages.
+ */
+void enable_smap() {
+	debug("enable_smap: enabling smap");
+	uint64_t cr4;
+	asm volatile("mov %%cr4, %0" : "=r"(cr4));
+	cr4 |= 0x200000; // Bit 21
+	asm volatile("mov %0, %%cr4" ::"r"(cr4));
+	debug("enable_smap: smap enabled");
+}
 
 void main(multiboot_info_t* boot_info) {
 	init_heap();
@@ -118,6 +146,10 @@ void main(multiboot_info_t* boot_info) {
 
 	// Enable floating point operations.
 	enable_fpu();
+	// Enable SMEP.
+	enable_smep();
+	// Enable SMAP.
+	// enable_smap();
 
 	ide_dev_t dev = {
 		ATA_PRIMARY_BUS,
@@ -170,13 +202,7 @@ void main(multiboot_info_t* boot_info) {
 		}
 
 		debug("found userland.elf: %d", file->size);
-		// Work in progress.
-		debug("alloc userland");
-		uint8_t *userland_p = userland_malloc(file->size);
-		debug("userland_p: %p", userland_p);
-		memcpy(userland_p, file->data, file->size);
-		debug("run userland");
-		run_userland(userland_p, file->size);
+		run_userland(file->data, file->size);
 		break;
 	}
 
