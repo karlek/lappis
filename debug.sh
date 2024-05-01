@@ -10,6 +10,7 @@ sleep 1
 
 kitty --class qemu-starter \
 	qemu-system-x86_64 \
+	-cpu qemu64,+smep,+smap \
 	-no-reboot \
 	-no-shutdown \
 	-S \
