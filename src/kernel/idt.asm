@@ -11,6 +11,7 @@ extern ata_secondary_handler
 extern timer_handler
 
 %macro pushaq 0
+	pushfq ; save rflags
 	push rdi
 	push rsi
 	push rdx
@@ -18,9 +19,21 @@ extern timer_handler
 	push rax
 	push r8
 	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
 %endmacro
 
 %macro popaq 0
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
 	pop r9
 	pop r8
 	pop rax
@@ -28,6 +41,7 @@ extern timer_handler
 	pop rdx
 	pop rsi
 	pop rdi
+	popfq
 %endmacro
 
 isr_double_fault:
