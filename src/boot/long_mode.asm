@@ -259,7 +259,7 @@ long_mode_start:
 	; Fetch that multiboot structure, before we use our new fresh stack.
 	pop rdi
 	; Set our kernel stack.
-	mov rsp, STACK_TOP
+	mov rsp, [STACK_TOP]
 	call main
 
 	; A hint that we have escaped the kernel.
