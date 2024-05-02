@@ -2,10 +2,11 @@
 
 void sys_print(uint8_t *s, uint64_t len) {
 	// $0 is immediate value 0 in AT-T syntax.
-	asm volatile("mov $1, %%rax\n"
+	asm volatile("mov $0, %%rax\n"
 				 "mov %0, %%rdi\n"
+				 "mov %1, %%rsi\n"
 				 "syscall\n"
-				 :: "r"(s), "r"(len) : "rax", "rdi");
+				 :: "r"(s), "r"(len) : "rax", "rdi", "rsi");
 }
 
 uint64_t strlen(uint8_t* s) {
