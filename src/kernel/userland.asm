@@ -3,24 +3,57 @@ bits 64
 global enter_userland
 extern debug_buffer
 extern USERLAND_ADDR
+extern tss64_addr
 
 PAGE_SIZE equ 0x200000
 
-syscall_landing_pad:
-	; rax = syscall number
-	cli
+rsp0_offset equ 0x4
+rsp2_offset equ 0x14
 
+syscall_landing_pad:
+	swapgs
+
+	; save user rsp
+	; tss64.rsp2
+	mov gs:[rsp2_offset], rsp
+	mov rsp, gs:[rsp0_offset]
+	push rcx ; addr of instruction following syscall
+	push r11 ; rflags
+	push rbp
+	push rbx
+	push r12
+	push r13
+	push r14
+	push r15
+
+	; rax = syscall number
+	; rcx = the address of the instruction following SYSCALL
+	; rdi = first arg
+	; rsi = second arg
+	; rdx = third arg
+	; r10 = fourth arg (since rcx is clobbered)
+	; r8  = fifth arg
+	; r9  = sixth arg
 	cmp rax, 0
 	jz .sys_print
 	jnz .done
 
 .sys_print:
-	push rcx
 	call debug_buffer
-	pop rcx
 
 .done:
-	sti
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	pop rbp
+	pop r11
+	pop rcx
+
+	mov rsp, gs:[rsp2_offset]
+	swapgs
+
 	o64 sysret
 
 yay_userland:
@@ -35,14 +68,19 @@ enter_userland:
 	mov r12, rdi
 	; mov r13, rsi
 
-	; SYSCALL function pointer
+	; MSR_FMASK: clear interrupt flag on syscall.
+	xor rdx, rdx
+	mov rax, 0x200
+	mov rcx, 0xc0000084
+	; Write to model specific register.
+	wrmsr
+
+	; MSR_LSTAR: specify syscall handler.
 	; edx:eax = syscall_fptr
 	mov rdx, syscall_landing_pad
 	shr rdx, 32
-
 	mov eax, syscall_landing_pad
 	mov rcx, 0xc0000082
-	; Write to model specific register.
 	wrmsr
 
 	; Enable SYSCALL.
@@ -60,7 +98,17 @@ enter_userland:
 	mov rcx, 0xc0000081
 	rdmsr
 
+	; NOTE: This is one is super sneaky.
+	; https://nfil.dev/kernel/rust/coding/rust-kernel-to-userspace-and-back/#setting-the-ia32_star-model-specific-register
+	; TODO: hard-coded offsets of gdt selectors.
 	mov edx, 0x130008
+	wrmsr
+
+	; MSR_KERNEL_GS_BASE
+	mov rcx, 0xc0000102
+	mov rax, qword [tss64_addr]
+	mov rdx, rax
+	shr rdx, 32
 	wrmsr
 
 	; Disable interrupts.
