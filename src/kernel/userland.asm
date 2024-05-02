@@ -5,6 +5,9 @@ extern debug_buffer
 extern USERLAND_ADDR
 extern tss64_addr
 
+extern userland_memcpy
+extern malloc
+
 PAGE_SIZE equ 0x200000
 
 rsp0_offset equ 0x4
@@ -39,6 +42,22 @@ syscall_landing_pad:
 	jnz .done
 
 .sys_print:
+	push rsi
+	push rdi
+	mov rdi, rsi
+	call malloc	
+	; rax contains kernel heap mem
+	mov rdi, rax
+	; rsi now contains user ptr
+	pop rsi
+	; r8 now contains len
+	pop r8
+	push r8
+	call userland_memcpy
+
+	mov rdi, rax
+	; rsi now contains len
+	pop rsi
 	call debug_buffer
 
 .done:
