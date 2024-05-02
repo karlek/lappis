@@ -149,7 +149,7 @@ void main(multiboot_info_t* boot_info) {
 	// Enable SMEP.
 	enable_smep();
 	// Enable SMAP.
-	// enable_smap();
+	enable_smap();
 
 	ide_dev_t dev = {
 		ATA_PRIMARY_BUS,
