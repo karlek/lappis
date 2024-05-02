@@ -1,14 +1,13 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
-kitty --class lappis-serial-raw -e fish -c 'tail -f /tmp/serial.raw' &
+kitty --class lappis-serial-raw -e tail -f /tmp/serial.raw &
 kitty --class lappis-serial-log -e tail -f /tmp/serial.log &
-sleep 1
 
-kitty --class qemu-starter \
+kitty --class lappis-qemu \
 	qemu-system-x86_64 \
 	-cpu qemu64,+smep,+smap \
 	-no-reboot \
@@ -23,10 +22,12 @@ kitty --class qemu-starter \
 	-drive media=disk,index=0,file=bin/zipfs.img,format=raw,if=ide \
 	-cdrom bin/kernel.iso &
 
-kitty --class lappis-serial-raw -e gdb \
+sleep 1
+
+kitty --class lappis-gdb -e gdb \
 	--quiet \
 	-command=debug.gdb
 
 ps ax | grep kitty | grep lappis-serial-log | awk '{print $1}' | xargs kill
 ps ax | grep kitty | grep lappis-serial-raw | awk '{print $1}' | xargs kill
-ps ax | grep qemu-system-x86_64 | grep kernel\.iso | awk '{print $1}' | xargs kill
+ps ax | grep kitty | grep lappis-qemu       | awk '{print $1}' | xargs kill
