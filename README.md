@@ -21,6 +21,7 @@ A toy 64-bit operating system.<br>
 * Run RIP relative executables in userland with support for a whopping **1**
   system call(s)!
 * The kernel is written in nasm, C, Rust and Zig for maximum spaghetti!
+* Feel protected by SMEP and SMAP. Now you only have to worry about performance!
 * NoTakeBack heap-allocator, don't worry about `free()`'s, you can't anyway!
 * And of course: you can render a **mandelbrot**!
 
