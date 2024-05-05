@@ -54,7 +54,14 @@ We need a few dependencies before we can compile and run lappis.
 
 ```
 # Arch
-pacman -S nasm qemu-full mtools clang rustup zig libisoburn
+# Build
+pacman -S nasm mtools clang rustup zig libisoburn
+
+# Dev
+pacman -S bear
+
+# Run
+pacman -S qemu-full
 ```
 
 </details>
