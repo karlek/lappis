@@ -14,3 +14,4 @@ zig-out
 *.elf
 .gdb_history
 fs/*
+compile_commands.json
