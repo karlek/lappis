@@ -204,6 +204,9 @@ lint:
 		-checks="modernize-*,readability-*,performance-*,-readability-magic-numbers,llvm-include-order" \
 		-fix '{}'
 
+compile_commands.json:
+	bear -- make
+
 dump-format-config:
 	@clang-format --fcolor-diagnostics --Werror --verbose --style=file --dump-config
 
