@@ -1,12 +1,13 @@
 bits 64
 
 global enter_userland
-extern debug_buffer
-extern USERLAND_ADDR
-extern tss64_addr
 
-extern userland_memcpy
-extern malloc
+; TODO: used to calculate userland stack. Ugly temporary hack.
+extern USERLAND_ADDR
+; Used to populate MSR_KERNEL_GS_BASE.
+extern tss64_addr
+; Array mapping syscall nr to func ptr.
+extern syscall_table
 
 PAGE_SIZE equ 0x200000
 
@@ -29,6 +30,8 @@ syscall_landing_pad:
 	push r14
 	push r15
 
+	; Setup fourth arg.
+	; mov rcx, r10
 	; rax = syscall number
 	; rcx = the address of the instruction following SYSCALL
 	; rdi = first arg
@@ -37,28 +40,9 @@ syscall_landing_pad:
 	; r10 = fourth arg (since rcx is clobbered)
 	; r8  = fifth arg
 	; r9  = sixth arg
-	cmp rax, 0
-	jz .sys_print
-	jnz .done
 
-.sys_print:
-	push rsi
-	push rdi
-	mov rdi, rsi
-	call malloc	
-	; rax contains kernel heap mem
-	mov rdi, rax
-	; rsi now contains user ptr
-	pop rsi
-	; r8 now contains len
-	pop r8
-	push r8
-	call userland_memcpy
-
-	mov rdi, rax
-	; rsi now contains len
-	pop rsi
-	call debug_buffer
+	call syscall_table[rax*8]
+	jmp .done
 
 .done:
 	pop r15
