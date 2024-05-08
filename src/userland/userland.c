@@ -102,8 +102,8 @@ void elf_userland() {
 	for (EVER) {
 		uint8_t printl[128];
 		uint8_t readl[128];
-		memset(printl, 0, sizeof printl);
-		memset(readl, 0, sizeof readl);
+		memset(printl, 0, sizeof(printl));
+		memset(readl, 0, sizeof(readl));
 		get_line(readl);
 
 		// Remove trailing whitespace.
