@@ -85,8 +85,8 @@ bool strcmp(uint8_t* a, uint8_t* b) {
 	return true;
 }
 
-void memset(uint8_t* p, uint8_t c, uint32_t len) {
-	for (uint32_t i = 0; i < len; i++) {
+void memset(uint8_t* p, uint8_t c, int32_t len) {
+	for (int32_t i = 0; i < len; i++) {
 		p[i] = c;
 	}
 }
