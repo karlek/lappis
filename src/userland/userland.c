@@ -53,32 +53,24 @@ void __attribute__((noinline)) debug_interrupt() {
 	;
 
 void strip(uint8_t* s) {
-	if (strlen(s) == 0) {
-		return;
-	}
-
-	bool    stop = true;
-	int32_t i    = strlen(s) - 1;
-
-	for (; i > 0; i--) {
+	int32_t kill = strlen(s);
+	for (int32_t i = strlen(s) - 1; i > 0; i--) {
 		if (s[i] == ' ') {
-			stop = false;
+			kill = i;
+			continue;
 		}
 		if (s[i] == '\n') {
-			stop = false;
+			kill = i;
+			continue;
 		}
 		if (s[i] == '\t') {
-			stop = false;
+			kill = i;
+			continue;
 		}
-		if (stop) {
-			break;
-		}
-	}
 
-	if (strlen(s) - 1 == i) {
+		s[kill] = '\0';
 		return;
 	}
-	s[i] = '\0';
 }
 
 bool strcmp(uint8_t* a, uint8_t* b) {
