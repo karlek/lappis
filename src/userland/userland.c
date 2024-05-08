@@ -40,7 +40,7 @@ void get_line(uint8_t line[128]) {
 	}
 }
 
-void debug_interrupt() {
+void __attribute__((noinline)) debug_interrupt() {
 	// NOTE: This will actually throw a general protection fault, since it's a
 	// privileged instruction. So we just hook this empty void stub instead and
 	// pretend that it works!
