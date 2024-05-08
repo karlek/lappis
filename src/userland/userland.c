@@ -53,16 +53,21 @@ void __attribute__((noinline)) debug_interrupt() {
 	;
 
 void strip(uint8_t* s) {
-	bool     stop = true;
-	uint32_t i    = strlen(s) - 1;
+	if (strlen(s) == 0) {
+		return;
+	}
+
+	bool    stop = true;
+	int32_t i    = strlen(s) - 1;
+
 	for (; i > 0; i--) {
-		if (i == ' ') {
+		if (s[i] == ' ') {
 			stop = false;
 		}
-		if (i == '\n') {
+		if (s[i] == '\n') {
 			stop = false;
 		}
-		if (i == '\t') {
+		if (s[i] == '\t') {
 			stop = false;
 		}
 		if (stop) {

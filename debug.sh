@@ -2,6 +2,11 @@
 
 set -ex
 
+if [ $(sysctl -n kernel.yama.ptrace_scope) -ne 0 ]; then
+	echo 'Run `sudo sysctl -w kernel.yama.ptrace_scope=0`'
+	exit 1
+fi
+
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
 kitty --class lappis-serial-raw -e tail -f /tmp/serial.raw &
