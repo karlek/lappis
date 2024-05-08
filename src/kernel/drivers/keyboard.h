@@ -8,4 +8,6 @@
 #include "string.h"
 #include "terminal-font.h"
 
+bool circ_buf_pop(uint8_t* data);
+
 #endif

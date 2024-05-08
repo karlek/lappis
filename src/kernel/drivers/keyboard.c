@@ -197,6 +197,74 @@ enum KEY_STATE {
 /* 	KEY_STATE pressed; */
 /* }; */
 
+#define MAX_KEYS 128
+
+typedef struct {
+	uint8_t* const buffer;
+	uint32_t       head;
+	uint32_t       tail;
+	uint32_t       maxlen;
+} circ_buf_t;
+
+uint8_t    key_buffer[MAX_KEYS];
+circ_buf_t cbuf = {
+	.buffer = key_buffer,
+	.head   = 0,
+	.tail   = 0,
+	.maxlen = MAX_KEYS,
+};
+
+// circ_buf_push adds data in the first free location.
+//
+// Returns true on success.
+bool circ_buf_push(uint8_t data) {
+	circ_buf_t* c = &cbuf;
+
+	uint32_t next = c->head + 1;
+
+	// We wrap around!
+	if (next >= c->maxlen) {
+		next = 0;
+	}
+
+	// Circ buffer full.
+	if (next == c->tail) {
+		return false;
+	}
+
+	// Set data.
+	c->buffer[c->head] = data;
+	// Update head position.
+	c->head            = next;
+
+	return true;
+}
+
+// circ_buf_pop retrieves the last element from the circular buffer.
+//
+// Returns true on success.
+bool circ_buf_pop(uint8_t* data) {
+	circ_buf_t* c = &cbuf;
+
+	// No data.
+	if (c->head == c->tail) {
+		return false;
+	}
+	uint32_t next = c->tail + 1;
+
+	// We wrap around!
+	if (next >= c->maxlen) {
+		next = 0;
+	}
+
+	// Set data.
+	*data   = c->buffer[c->tail];
+	// Update tail position.
+	c->tail = next;
+
+	return true;
+}
+
 uint32_t    caret_x = 0;
 uint32_t    caret_y = 3 * LARGE_FONT_CELL_HEIGHT;
 extern void keyboard_handler() {
@@ -215,6 +283,9 @@ extern void keyboard_handler() {
 		PIC_sendEOI(0x22);
 		return;
 	}
+
+	debug("kernel key: %c", c);
+	circ_buf_push(c);
 
 	if (is_print(c)) {
 		kprintf(caret_x, caret_y, NULL, "%c", c);
