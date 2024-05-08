@@ -94,7 +94,7 @@ void memset(uint8_t* p, uint8_t c, int32_t len) {
 void elf_userland() {
 	uint8_t buf[128];
 
-	sprintf(&buf[0], "Hello, %s!", "from userland");
+	sprintf((char*)buf, "Hello, %s!", "from userland");
 	uint64_t len = strlen(buf);
 
 	sys_print(buf, len);
@@ -109,8 +109,8 @@ void elf_userland() {
 		// Remove trailing whitespace.
 		strip(readl);
 
-		if (strcmp(readl, "pwd")) {
-			sprintf(&printl[0], "> %s\n", "/");
+		if (strcmp(readl, (uint8_t*)"pwd")) {
+			sprintf((char*)printl, "> %s\n", "/");
 			sys_print(printl, strlen(printl));
 		}
 	}
