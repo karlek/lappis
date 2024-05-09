@@ -96,9 +96,8 @@ gdt64:
 	; present, dpl=0, descriptor, execute, readable
 	db 10011010b
 	; Flags & limit
-	; Long mode, granularity
-	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
-	db 10100000b
+	; Long mode (1 << 5)
+	db 00100000b
 	; Base (high)
 	db 0x00
 .data: equ $ - gdt64
@@ -112,9 +111,8 @@ gdt64:
 	; Present, dpl=0, descriptor, writable
 	db 10010010b
 	; Flags & limit
-	; Long mode, granularity
-	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
-	db 10100000b
+	; Long mode (1 << 5)
+	db 00100000b
 	; Base (high)
 	db 0x00
 .user_data: equ $ - gdt64
@@ -128,8 +126,8 @@ gdt64:
 	; Present, dpl=3, writeable
 	db 0xf2
 	; Flags & limit
-	; Long mode, granularity
-	db 10100000b
+	; Long mode
+	db 00100000b
 	; Base (high)
 	db 0x00
 .user_code: equ $ - gdt64
@@ -143,8 +141,8 @@ gdt64:
 	; Present, dpl=3, execute, readable
 	db 0xfa
 	; Flags & limit
-	; Long mode, granularity
-	db 10100000b
+	; Long mode
+	db 00100000b
 	; Base (high)
 	db 0x00
 .tss: equ $ - gdt64
@@ -155,7 +153,7 @@ gdt64:
 	; Base (mid), set dynamically
 	db 0
 	; Access
-	; Present | TSS (0x9)
+	; Present | TSS (0x9), from intel manual
 	;
 	; "In most systems, the DPLs of TSS descriptors are set to values less than 3,
 	; so that only privileged software can perform task switching. However, in
