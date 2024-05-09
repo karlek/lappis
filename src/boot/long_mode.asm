@@ -111,8 +111,7 @@ gdt64:
 	; Present, dpl=0, descriptor, writable
 	db 10010010b
 	; Flags & limit
-	; Long mode (1 << 5)
-	db 00100000b
+	db 00000000b
 	; Base (high)
 	db 0x00
 .user_data: equ $ - gdt64
@@ -126,8 +125,7 @@ gdt64:
 	; Present, dpl=3, writeable
 	db 0xf2
 	; Flags & limit
-	; Long mode
-	db 00100000b
+	db 00000000b
 	; Base (high)
 	db 0x00
 .user_code: equ $ - gdt64
