@@ -87,7 +87,7 @@ gdt64:
 	dq 0 ; Zero entry
 .code: equ $ - gdt64
 	; Limit
-	dw 0xffff
+	dw 0x0000
 	; Base
 	dw 0x0000
 	; Base (mid)
@@ -98,12 +98,12 @@ gdt64:
 	; Flags & limit
 	; Long mode, granularity
 	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
-	db 10101111b
+	db 10100000b
 	; Base (high)
 	db 0x00
 .data: equ $ - gdt64
 	; Limit
-	dw 0xffff
+	dw 0x0000
 	; Base
 	dw 0x0000
 	; Base (mid)
@@ -114,12 +114,12 @@ gdt64:
 	; Flags & limit
 	; Long mode, granularity
 	; 0b1010_1111 == (1 << 5) | (1 << 7) | 0x0f
-	db 10101111b
+	db 10100000b
 	; Base (high)
 	db 0x00
 .user_data: equ $ - gdt64
 	; Limit
-	dw 0xffff
+	dw 0x0000
 	; Base
 	dw 0x0000
 	; Base (mid)
@@ -129,12 +129,12 @@ gdt64:
 	db 0xf2
 	; Flags & limit
 	; Long mode, granularity
-	db 10101111b
+	db 10100000b
 	; Base (high)
 	db 0x00
 .user_code: equ $ - gdt64
 	; Limit
-	dw 0xffff
+	dw 0x0000
 	; Base
 	dw 0x0000
 	; Base (mid)
@@ -144,7 +144,7 @@ gdt64:
 	db 0xfa
 	; Flags & limit
 	; Long mode, granularity
-	db 10101111b
+	db 10100000b
 	; Base (high)
 	db 0x00
 .tss: equ $ - gdt64
