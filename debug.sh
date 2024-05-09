@@ -7,6 +7,11 @@ if [ $(sysctl -n kernel.yama.ptrace_scope) -ne 0 ]; then
 	exit 1
 fi
 
+if [ -n "$(pgrep qemu-system)" ]; then
+	echo 'Multiple qemu instances running, prioritize lappis'
+	exit 1
+fi
+
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
 kitty --class lappis-serial-raw -e tail -f /tmp/serial.raw &
