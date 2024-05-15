@@ -173,9 +173,10 @@ bin/libhello.o: src/kernel/zig/hello.zig | bin
 		$<
 
 bin/libfloof.a: src/kernel/rust/src/lib.rs
-	@# make creates a sub-shell per line.
-	cd src/kernel/rust; cargo build -Zbuild-std ; cargo build
-	mv src/kernel/rust/target/os/debug/libfloof.a bin
+	@# NOTE: this does not handle updates to the sneaky .cargo/* files. Is it
+	@# only possible to build rust projects in cwd?
+	@cargo build --target src/kernel/rust/os.json --manifest-path src/kernel/rust/Cargo.toml -Zbuild-std --target-dir bin/rust/target
+	@cargo build --target-dir bin/rust/target -Z unstable-options --out-dir ./bin --manifest-path src/kernel/rust/Cargo.toml
 
 build: bin/kernel.iso bin/kernel.dbg bin/zipfs.img
 
