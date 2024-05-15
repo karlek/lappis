@@ -28,6 +28,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   xorriso \
   xz-utils \
   zip \
+  lld \
   && rm -rf /var/lib/apt/lists/*
 
 # Install zig
