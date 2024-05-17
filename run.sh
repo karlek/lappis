@@ -2,10 +2,15 @@
 
 set -ex
 
+if [ -n "$(pgrep qemu-system)" ]; then
+	echo 'Multiple qemu instances running, prioritize lappis'
+	exit 1
+fi
+
 cat /dev/null > /tmp/serial.log
 cat /dev/null > /tmp/serial.raw
-alacritty --class lappis-serial-raw -e tail -f /tmp/serial.raw &
-alacritty --class lappis-serial-log -e tail -f /tmp/serial.log &
+kitty --class lappis-serial-raw -e tail -f /tmp/serial.raw &
+kitty --class lappis-serial-log -e tail -f /tmp/serial.log &
 sleep 1
 
 # swaymsg '[app_id="lapis-serial-log"] move window to workspace 4'
@@ -22,6 +27,6 @@ kitty --class lappis-qemu \
 		-monitor stdio \
 		-cdrom bin/kernel.iso
 
-ps ax | grep alacritty | grep lappis-serial-raw | awk '{print $1}' | xargs kill
-ps ax | grep alacritty | grep lappis-serial-log | awk '{print $1}' | xargs kill
+ps ax | grep kitty | grep lappis-serial-raw | awk '{print $1}' | xargs kill
+ps ax | grep kitty | grep lappis-serial-log | awk '{print $1}' | xargs kill
 ps ax | grep kitty | grep lappis-qemu       | awk '{print $1}' | xargs kill
