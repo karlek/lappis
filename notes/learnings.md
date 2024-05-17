@@ -55,6 +55,10 @@ support for hardware interrupts.
 "Apparently in x86, you have to acknowledge clock interrupts after each one. I.e
 one must send an acknowledgment to the lapic after every clock interrupt."
 
+## Canonical addresses
+
+The purpose is to reserve the higher bits of an address for future usage.
+
 # GCC
 
 ## Red Zones
