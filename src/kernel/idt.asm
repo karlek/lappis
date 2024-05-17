@@ -122,7 +122,7 @@ reserved_%1:
 	call warn_interrupt
 
 	popaq
-	nop
+	hlt
 %endmacro
 
 %macro not_implemented 1
@@ -133,7 +133,7 @@ not_implemented_%1:
 	call warn_interrupt
 
 	popaq
-	nop
+	hlt
 %endmacro
 
 ; Generate the labels.
