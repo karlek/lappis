@@ -71,9 +71,18 @@ enter_userland:
 	mov r12, rdi
 	; mov r13, rsi
 
-	; MSR_FMASK: clear interrupt flag on syscall.
+	; MSR_SFMASK: clear flags (rflags) on syscall.
 	xor rdx, rdx
-	mov rax, 0x200
+	; Clear trap flag.
+	or rax, 1<<8
+	; Clear interrupt flag.
+	or rax, 1<<9
+	; Clear direction flag. Flag that controls the left-to-right or
+	; right-to-left direction of string processing
+	or rax, 1<<10
+	; Clear AC flag.
+	; Fun ref: https://blog.back.engineering/22/03/2021/
+	or rax, 1<<18
 	mov rcx, 0xc0000084
 	; Write to model specific register.
 	wrmsr
