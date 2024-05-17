@@ -132,6 +132,7 @@ bin/kernel.o: src/kernel/*.c src/kernel/*/*.c | bin
 		-nostdlib \
 		-static \
 		-r \
+		-fcf-protection=branch \
 		-I./src/kernel \
 		-fno-stack-protector \
 		-ffreestanding \
@@ -146,6 +147,7 @@ fs/userland.elf: src/userland/*.c | bin
 		-nostdlib \
 		-static \
 		-fno-stack-protector \
+		-fcf-protection=branch \
 		-ffreestanding \
 		-e elf_userland \
 		-g \
