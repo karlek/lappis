@@ -1,11 +1,12 @@
 #include "idt.h"
+#include "pic.h"
 
 uint64_t countdown = 0;
-extern void timer_handler() {
-	if (countdown > 0) {
-		countdown--;
-	}
-	PIC_sendEOI(0x20);
+void     timer_handler() {
+    if (countdown > 0) {
+        countdown--;
+    }
+    PIC_sendEOI(PIC_EOI);
 }
 
 void sleep(uint64_t ms) {
